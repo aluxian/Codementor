@@ -27,7 +27,6 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -162,9 +161,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void refresh(Runnable callback) {
         refreshCallback = callback;
-        String conversationPath = "chatrooms/" + mChatroom.getChatroomFirebaseId() + "/" + mChatroom.getChatroomId();
         Firebase ref = new Firebase("https://codementor.firebaseio.com/");
-        ref.child(conversationPath).addValueEventListener(this);
+        ref.child(mChatroom.getFirebasePath()).addValueEventListener(this);
     }
 
     @Override
@@ -193,14 +191,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Type listType = new TypeToken<List<Message>>() {}.getType();
 
                 Map<String, Object> result = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {});
-                JsonElement parsed = gson.toJsonTree(result.values());
-                List<Message> messages = gson.fromJson(parsed, listType);
-
-                for (int i = 0; i < messages.size(); i++) {
-                    messages.get(i).setRawJson(parsed.getAsJsonArray().get(i));
-                }
-
-                return messages;
+                return gson.fromJson(gson.toJsonTree(result.values()), listType);
             }
 
             @Override
@@ -230,6 +221,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         Log.e(TAG, firebaseError.getMessage(), firebaseError.toException());
+    }
+
+    public Message getNewestItem() {
+        return mMessagesList.size() > 0 ? mMessagesList.get(mMessagesList.size() - 1) : null;
     }
 
     public static class EmptyViewHolder extends RecyclerView.ViewHolder {

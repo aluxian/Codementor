@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/teal_blue</item>
         <item name="colorPrimaryDark">@color/nile_blue</item>
         <item name="colorAccent">@color/sunset_orange</item>
+        <item name="android:actionModeBackground">@color/teal_blue</item>
     </style>
 
     <style name="AppTheme.Login">

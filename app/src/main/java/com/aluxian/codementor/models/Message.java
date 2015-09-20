@@ -2,12 +2,11 @@ package com.aluxian.codementor.models;
 
 import android.util.Log;
 
-import com.google.gson.JsonElement;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+@SuppressWarnings("unused")
 public class Message {
 
     private static final String TAG = Message.class.getSimpleName();
@@ -19,7 +18,6 @@ public class Message {
     private Request request;
     private String created_at;
     private String type;
-    private JsonElement rawJson;
 
     public Message() {}
 
@@ -84,14 +82,6 @@ public class Message {
         return id;
     }
 
-    public JsonElement getRawJson() {
-        return rawJson;
-    }
-
-    public void setRawJson(JsonElement rawJson) {
-        this.rawJson = rawJson;
-    }
-
     public enum Type {
         MESSAGE,
         CONNECT,
@@ -109,6 +99,22 @@ public class Message {
                 return 0;
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Message)) return false;
+
+        Message message = (Message) o;
+
+        return id.equals(message.id);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 
 }
