@@ -4,11 +4,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
@@ -39,16 +43,34 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         View rootView = inflater.inflate(R.layout.fragment_chatroom, container, false);
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         recyclerView.setLayoutManager(layoutManager);
 
         App app = (App) getActivity().getApplication();
         conversationAdapter = new ConversationAdapter(chatroom, app.getUserManager(), getActivity());
+        conversationAdapter.setHasStableIds(true);
         recyclerView.setAdapter(conversationAdapter);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.sunset_orange));
         mSwipeRefreshLayout.setOnRefreshListener(this);
+
+        ImageButton sendButton = (ImageButton) rootView.findViewById(R.id.send);
+        EditText messageField = (EditText) rootView.findViewById(R.id.message);
+
+        sendButton.setOnClickListener(v -> {
+            String message = messageField.getText().toString();
+
+            if (TextUtils.isEmpty(message)) {
+                return;
+            }
+
+            //send
+
+            messageField.setText("");
+        });
 
         return rootView;
     }

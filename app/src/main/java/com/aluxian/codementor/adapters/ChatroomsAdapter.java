@@ -42,10 +42,10 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
     private UserManager userManager;
     private ClickListener clickListener;
 
-    private ColorStateList initialTitleColors;
-    private ColorStateList initialSubtitleColors;
-    private int selectedTitleColor;
-    private int selectedSubtitleColor;
+//    private ColorStateList initialTitleColors;
+//    private ColorStateList initialSubtitleColors;
+//    private int selectedTitleColor;
+//    private int selectedSubtitleColor;
 
     public ChatroomsAdapter(OkHttpClient okHttpClient, UserManager userManager, ClickListener clickListener) {
         this.okHttpClient = okHttpClient;
@@ -93,13 +93,13 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
                 chatroomViewHolder.subtitleTextView.setText(chatroom.getContent());
             }
 
-            if (isSelected(position)) {
-                chatroomViewHolder.titleTextView.setTextColor(selectedTitleColor);
-                chatroomViewHolder.subtitleTextView.setTextColor(selectedSubtitleColor);
-            } else {
-                chatroomViewHolder.titleTextView.setTextColor(initialTitleColors);
-                chatroomViewHolder.subtitleTextView.setTextColor(initialSubtitleColors);
-            }
+//            if (isSelected(position)) {
+//                chatroomViewHolder.titleTextView.setTextColor(selectedTitleColor);
+//                chatroomViewHolder.subtitleTextView.setTextColor(selectedSubtitleColor);
+//            } else {
+//                chatroomViewHolder.titleTextView.setTextColor(initialTitleColors);
+//                chatroomViewHolder.subtitleTextView.setTextColor(initialSubtitleColors);
+//            }
 
             Uri avatarUri = Uri.parse(otherUser.getAvatarUrl());
             chatroomViewHolder.avatarView.setImageURI(avatarUri);
@@ -143,11 +143,11 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
             titleTextView = (TextView) itemView.findViewById(R.id.title);
             subtitleTextView = (TextView) itemView.findViewById(R.id.subtitle);
 
-            initialTitleColors = titleTextView.getTextColors();
-            initialSubtitleColors = subtitleTextView.getTextColors();
-
-            selectedTitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange);
-            selectedSubtitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange_light);
+//            initialTitleColors = titleTextView.getTextColors();
+//            initialSubtitleColors = subtitleTextView.getTextColors();
+//
+//            selectedTitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange);
+//            selectedSubtitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange_light);
         }
 
     }

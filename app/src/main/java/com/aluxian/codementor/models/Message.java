@@ -2,6 +2,8 @@ package com.aluxian.codementor.models;
 
 import android.util.Log;
 
+import com.google.gson.JsonElement;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -10,12 +12,14 @@ public class Message {
 
     private static final String TAG = Message.class.getSimpleName();
 
+    private String id;
     private String content;
     private User sender;
     private User receiver;
     private Request request;
     private String created_at;
     private String type;
+    private JsonElement rawJson;
 
     public Message() {}
 
@@ -74,6 +78,18 @@ public class Message {
             default:
                 return getContent();
         }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public JsonElement getRawJson() {
+        return rawJson;
+    }
+
+    public void setRawJson(JsonElement rawJson) {
+        this.rawJson = rawJson;
     }
 
     public enum Type {

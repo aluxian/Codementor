@@ -20,4 +20,5 @@
 
     <string name="msg_authenticating">Authenticating…</string>
     <string name="msg_firebase_auth">Connecting to Firebase…</string>
+    <string name="msg_send_hint">Send a message…</string>
 </resources>

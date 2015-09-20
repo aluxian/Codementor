@@ -27,6 +27,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("Convert2streamapi")
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ValueEventListener {
@@ -46,9 +48,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ITEM_TYPE_FILE = 4;
 
     private Runnable refreshCallback;
-    private final UserManager mUserManager;
-    private final List<Message> mMessagesList;
-    private final Chatroom mChatroom;
+    private UserManager mUserManager;
+    private List<Message> mMessagesList;
+    private Chatroom mChatroom;
     private boolean showEmpty = false;
     private Activity activity;
 
@@ -149,6 +151,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     @Override
+    public long getItemId(int position) {
+        return UUID.fromString(mMessagesList.get(position).getId()).getMostSignificantBits();
+    }
+
+    @Override
     public int getItemCount() {
         return mMessagesList.size();
     }
@@ -165,14 +172,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                Gson gson = new Gson();
-
-                Type listType = new TypeToken<List<Message>>() {}.getType();
-                Map<String, Object> result = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {});
-                List<Message> newMessages = gson.fromJson(gson.toJson(result.values()), listType);
-
-                mMessagesList.clear();
-                mMessagesList.addAll(newMessages);
+                mMessagesList = parseData();
 
                 Collections.sort(mMessagesList, (lhs, rhs) -> {
                     if (lhs.getCreatedAt() < rhs.getCreatedAt()) {
@@ -186,6 +186,21 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
                 showEmpty = mMessagesList.size() == 0;
                 return null;
+            }
+
+            private List<Message> parseData() {
+                Gson gson = new Gson();
+                Type listType = new TypeToken<List<Message>>() {}.getType();
+
+                Map<String, Object> result = dataSnapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {});
+                JsonElement parsed = gson.toJsonTree(result.values());
+                List<Message> messages = gson.fromJson(parsed, listType);
+
+                for (int i = 0; i < messages.size(); i++) {
+                    messages.get(i).setRawJson(parsed.getAsJsonArray().get(i));
+                }
+
+                return messages;
             }
 
             @Override
