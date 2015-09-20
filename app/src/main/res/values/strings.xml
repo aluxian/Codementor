@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Codementor</string>
+
+    <string name="title_activity_login">Log in</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <string name="action_log_in">Log in</string>
+    <string name="action_log_out">Log out</string>
+
+    <string name="hint_username_email">Username or Email</string>
+    <string name="hint_password">Password</string>
+
+    <string name="error_field_required">This field is required</string>
+    <string name="error_unexpected">An unexpected error occurred</string>
+
+    <string name="empty_chatrooms">No chatrooms.\nSwipe down to refresh.</string>
+    <string name="empty_conversation">No messages.</string>
+
+    <string name="msg_authenticating">Authenticating…</string>
+    <string name="msg_firebase_auth">Connecting to Firebase…</string>
+</resources>
