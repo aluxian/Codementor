@@ -40,7 +40,7 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public long getItemId(int position) {
-        return UUID.fromString(chatrooms.get(position).getChatroomId()).getMostSignificantBits();
+        return UUID.fromString(chatrooms.get(position).getId()).getMostSignificantBits();
     }
 
     @Override

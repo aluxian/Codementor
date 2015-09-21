@@ -24,12 +24,12 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         app = (App) getApplication();
 
         if (!app.getUserManager().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
+            return;
         }
 
         Fragment navDrawerFragment = getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
