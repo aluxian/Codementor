@@ -29,34 +29,33 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
 
     private static final String TAG = DrawerFragment.class.getSimpleName();
 
-    /** Remember the position of the selected item. */
-    private static final String STATE_SELECTED_POSITION = "selected_drawer_position";
-
-    /** A pointer to the current callbacks instance (the Activity). */
+    private App app;
     private Listener mListener;
 
-    /** Helper component that ties the action bar to the navigation drawer. */
-    private ActionBarDrawerToggle drawerToggle;
-
     private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private View fragmentContainerView;
+
+    private boolean fromSavedInstanceState;
     private ChatroomsAdapter chatroomsAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private View fragmentContainerView;
-    private App app;
-
-    private int currentSelectedPosition = -1;
-    private boolean fromSavedInstanceState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         app = (App) getActivity().getApplication();
+        app.setNewMessageCallback(this::onRefresh);
 
         if (savedInstanceState != null) {
-            currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             fromSavedInstanceState = true;
-//            selectItem(currentSelectedPosition);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        app.setNewMessageCallback(null);
     }
 
     @Override
@@ -126,12 +125,6 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, currentSelectedPosition);
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
@@ -160,14 +153,12 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
     }
 
     @Override
-    public void onChatroomClick(int position, Chatroom chatroom) {
-        currentSelectedPosition = position;
-
+    public void onChatroomSelected(Chatroom chatroom) {
         if (drawerLayout != null) {
             drawerLayout.closeDrawer(fragmentContainerView);
         }
 
-        if (mListener != null && chatroomsAdapter.getItemCount() > position) {
+        if (mListener != null) {
             mListener.onChatroomSelected(chatroom);
         }
     }

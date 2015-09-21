@@ -68,7 +68,7 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             User otherUser = chatroom.getOtherUser(userManager.getUsername());
 
             ChatroomViewHolder chatroomViewHolder = (ChatroomViewHolder) holder;
-            chatroomViewHolder.itemView.setOnClickListener(v -> callbacks.onChatroomClick(position, chatroom));
+            chatroomViewHolder.itemView.setOnClickListener(v -> callbacks.onChatroomSelected(chatroom));
             chatroomViewHolder.titleTextView.setText(otherUser.getName());
 
             if (chatroom.getSender().getUsername().equals(userManager.getUsername())) {
@@ -151,10 +151,9 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         /**
          * Called when a Chatroom is clicked in the adapter.
          *
-         * @param position The position of the Chatroom in the list.
          * @param chatroom The Chatroom object.
          */
-        void onChatroomClick(int position, Chatroom chatroom);
+        void onChatroomSelected(Chatroom chatroom);
 
         /**
          * Called when an error occurs.

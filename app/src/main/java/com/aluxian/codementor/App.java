@@ -16,6 +16,7 @@ public class App extends Application {
     private UserManager userManager;
     private OkHttpClient okHttpClient;
     private PersistentCookieStore cookieStore;
+    private Runnable newMessageCallback;
 
     @Override
     public void onCreate() {
@@ -42,6 +43,14 @@ public class App extends Application {
 
     public PersistentCookieStore getCookieStore() {
         return cookieStore;
+    }
+
+    public Runnable getNewMessageCallback() {
+        return newMessageCallback;
+    }
+
+    public void setNewMessageCallback(Runnable newMessageCallback) {
+        this.newMessageCallback = newMessageCallback;
     }
 
 }

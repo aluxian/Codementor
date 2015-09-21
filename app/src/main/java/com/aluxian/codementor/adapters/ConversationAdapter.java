@@ -1,5 +1,6 @@
 package com.aluxian.codementor.adapters;
 
+import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.format.Formatter;
@@ -145,6 +146,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onDataChange(DataSnapshot dataSnapshot) {
+        callbacks.onNewMessage();
         new ParseFirebaseResponseTask(this).execute(dataSnapshot);
     }
 
@@ -213,6 +215,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
          * Called when an adapter refresh is finished.
          */
         void onRefreshFinished();
+
+        /**
+         * Called when a new message is received.
+         */
+        void onNewMessage();
 
         /**
          * Called when a PERMISSION_DENIED error is received from Firebase.

@@ -3,6 +3,7 @@ package com.aluxian.codementor.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -105,6 +106,15 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     public void onRefreshFinished() {
         swipeRefreshLayout.setRefreshing(false);
         swipeRefreshLayout.setEnabled(false);
+    }
+
+    @Override
+    public void onNewMessage() {
+        Runnable callback = app.getNewMessageCallback();
+
+        if (callback != null) {
+            new Handler().postDelayed(callback, 1000);
+        }
     }
 
     @Override
