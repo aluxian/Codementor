@@ -11,9 +11,11 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
@@ -22,8 +24,10 @@ import com.aluxian.codementor.lib.DividerItemDecoration;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.utils.SimpleObservable;
 
-public class DrawerFragment extends Fragment
-        implements SimpleObservable<DrawerFragment.Listener>, SwipeRefreshLayout.OnRefreshListener {
+public class DrawerFragment extends Fragment implements SimpleObservable<DrawerFragment.Listener>,
+        SwipeRefreshLayout.OnRefreshListener, ChatroomsAdapter.Callbacks {
+
+    private static final String TAG = DrawerFragment.class.getSimpleName();
 
     /** Remember the position of the selected item. */
     private static final String STATE_SELECTED_POSITION = "selected_drawer_position";
@@ -32,24 +36,26 @@ public class DrawerFragment extends Fragment
     private Listener mListener;
 
     /** Helper component that ties the action bar to the navigation drawer. */
-    private ActionBarDrawerToggle mDrawerToggle;
+    private ActionBarDrawerToggle drawerToggle;
 
-    private DrawerLayout mDrawerLayout;
-    private ChatroomsAdapter mChatroomsAdapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
-    private View mFragmentContainerView;
+    private DrawerLayout drawerLayout;
+    private ChatroomsAdapter chatroomsAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private View fragmentContainerView;
+    private App app;
 
-    private int mCurrentSelectedPosition = -1;
-    private boolean mFromSavedInstanceState;
+    private int currentSelectedPosition = -1;
+    private boolean fromSavedInstanceState;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        app = (App) getActivity().getApplication();
 
         if (savedInstanceState != null) {
-            mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
-            mFromSavedInstanceState = true;
-//            selectItem(mCurrentSelectedPosition);
+            currentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+            fromSavedInstanceState = true;
+//            selectItem(currentSelectedPosition);
         }
     }
 
@@ -65,13 +71,13 @@ public class DrawerFragment extends Fragment
         LinearLayoutManager layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        App app = (App) getActivity().getApplication();
-        mChatroomsAdapter = new ChatroomsAdapter(app.getOkHttpClient(), app.getUserManager(), this::selectItem);
-        recyclerView.setAdapter(mChatroomsAdapter);
+        chatroomsAdapter = new ChatroomsAdapter(app.getOkHttpClient(), app.getUserManager(), this);
+        chatroomsAdapter.setHasStableIds(true);
+        recyclerView.setAdapter(chatroomsAdapter);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        mSwipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.sunset_orange));
-        mSwipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
+        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.sunset_orange));
+        swipeRefreshLayout.setOnRefreshListener(this);
 
         return rootView;
     }
@@ -80,7 +86,7 @@ public class DrawerFragment extends Fragment
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         view.postDelayed(() -> {
-            mSwipeRefreshLayout.setRefreshing(true);
+            swipeRefreshLayout.setRefreshing(true);
             onRefresh();
         }, 250);
     }
@@ -92,41 +98,29 @@ public class DrawerFragment extends Fragment
      * @param drawerLayout The DrawerLayout containing this fragment's UI.
      */
     public void setUp(int fragmentId, DrawerLayout drawerLayout) {
-        mFragmentContainerView = getActivity().findViewById(fragmentId);
+        fragmentContainerView = getActivity().findViewById(fragmentId);
 
-        mDrawerLayout = drawerLayout;
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+        this.drawerLayout = drawerLayout;
+        this.drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
-        mDrawerToggle = new ActionBarDrawerToggle(getActivity(), mDrawerLayout,
+        drawerToggle = new ActionBarDrawerToggle(getActivity(), this.drawerLayout,
                 R.string.drawer_open, R.string.drawer_close);
 
-        if (!mFromSavedInstanceState) {
-            mDrawerLayout.openDrawer(mFragmentContainerView);
+        if (!fromSavedInstanceState) {
+            this.drawerLayout.openDrawer(fragmentContainerView);
         }
 
         // Defer code dependent on restoration of previous instance state
-        mDrawerLayout.post(mDrawerToggle::syncState);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-    }
-
-    private void selectItem(int position, Chatroom chatroom) {
-        mCurrentSelectedPosition = position;
-
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
-
-        if (mListener != null && mChatroomsAdapter.getItemCount() > position) {
-            mListener.onChatroomSelected(chatroom);
-        }
+        this.drawerLayout.post(drawerToggle::syncState);
+        this.drawerLayout.setDrawerListener(drawerToggle);
     }
 
     public void toggleDrawer() {
-        if (mDrawerLayout != null) {
-            if (mDrawerLayout.isDrawerOpen(mFragmentContainerView)) {
-                mDrawerLayout.closeDrawer(mFragmentContainerView);
+        if (drawerLayout != null) {
+            if (drawerLayout.isDrawerOpen(fragmentContainerView)) {
+                drawerLayout.closeDrawer(fragmentContainerView);
             } else {
-                mDrawerLayout.openDrawer(mFragmentContainerView);
+                drawerLayout.openDrawer(fragmentContainerView);
             }
         }
     }
@@ -134,7 +128,7 @@ public class DrawerFragment extends Fragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        outState.putInt(STATE_SELECTED_POSITION, currentSelectedPosition);
     }
 
     @Override
@@ -142,7 +136,7 @@ public class DrawerFragment extends Fragment
         super.onConfigurationChanged(newConfig);
 
         // Forward the new configuration the drawer toggle component
-        mDrawerToggle.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -157,7 +151,31 @@ public class DrawerFragment extends Fragment
 
     @Override
     public void onRefresh() {
-        mChatroomsAdapter.refresh(() -> mSwipeRefreshLayout.setRefreshing(false));
+        chatroomsAdapter.startRefresh();
+    }
+
+    @Override
+    public void onRefreshFinished() {
+        swipeRefreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onChatroomClick(int position, Chatroom chatroom) {
+        currentSelectedPosition = position;
+
+        if (drawerLayout != null) {
+            drawerLayout.closeDrawer(fragmentContainerView);
+        }
+
+        if (mListener != null && chatroomsAdapter.getItemCount() > position) {
+            mListener.onChatroomSelected(chatroom);
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+        Log.e(TAG, e.getMessage(), e);
+        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     public interface Listener {

@@ -1,7 +1,7 @@
 package com.aluxian.codementor.fragments;
 
 import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -20,23 +20,14 @@ import android.widget.Toast;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
+import com.aluxian.codementor.activities.LoginActivity;
 import com.aluxian.codementor.adapters.ConversationAdapter;
 import com.aluxian.codementor.models.Chatroom;
-import com.aluxian.codementor.models.Message;
-import com.aluxian.codementor.models.User;
-import com.aluxian.codementor.models.firebase.FirebaseMessage;
-import com.aluxian.codementor.models.firebase.FirebaseServerMessage;
-import com.aluxian.codementor.utils.CamelCaseNamingStrategy;
-import com.firebase.client.Firebase;
+import com.aluxian.codementor.tasks.SendMessageTask;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
 
-import java.io.IOException;
-
-public class ConversationFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class ConversationFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
+        ConversationAdapter.Callbacks, SendMessageTask.Callbacks {
 
     private static final String TAG = ConversationFragment.class.getSimpleName();
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
@@ -60,12 +51,12 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     public void onAttach(Context context) {
         super.onAttach(context);
         app = (App) getActivity().getApplication();
+        chatroom = new Gson().fromJson(getArguments().getString(ARG_CHATROOM_JSON), Chatroom.class);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_chatroom, container, false);
-        chatroom = new Gson().fromJson(getArguments().getString(ARG_CHATROOM_JSON), Chatroom.class);
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -73,8 +64,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         recyclerView.setLayoutManager(layoutManager);
 
-        App app = (App) getActivity().getApplication();
-        conversationAdapter = new ConversationAdapter(chatroom, app.getUserManager(), getActivity());
+        conversationAdapter = new ConversationAdapter(app.getUserManager(), this, chatroom);
         conversationAdapter.setHasStableIds(true);
         recyclerView.setAdapter(conversationAdapter);
 
@@ -90,7 +80,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
             messageField.setText("");
 
             if (!TextUtils.isEmpty(message)) {
-                new SendMessageTask().execute(message);
+                new SendMessageTask(app.getOkHttpClient(), app.getUserManager(), this, chatroom).execute(message);
             }
         });
 
@@ -108,71 +98,26 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public void onRefresh() {
-        conversationAdapter.refresh(() -> {
-            swipeRefreshLayout.setRefreshing(false);
-            swipeRefreshLayout.setEnabled(false);
-        });
+        conversationAdapter.startRefresh();
     }
 
-    private class SendMessageTask extends AsyncTask<String, Void, Void> {
+    @Override
+    public void onRefreshFinished() {
+        swipeRefreshLayout.setRefreshing(false);
+        swipeRefreshLayout.setEnabled(false);
+    }
 
-        @Override
-        protected Void doInBackground(String... params) {
-            Message newestItem = conversationAdapter.getNewestItem();
+    @Override
+    public void onPermissionDenied(Exception e) {
+        onError(new Exception("Permission denied from Firebase, please log in again", e));
+        getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
+        getActivity().finish();
+    }
 
-            if (newestItem == null) {
-                throw new RuntimeException("Must have an item to use as example for building a new request");
-            }
-
-            User receiver = chatroom.getOtherUser(app.getUserManager().getUsername());
-            User sender = chatroom.getOtherUser(receiver.getUsername());
-
-            FirebaseMessage firebaseMessage = new FirebaseMessage(chatroom.getChatroomId(),
-                    Message.Type.MESSAGE, params[0], sender, receiver);
-
-            Firebase ref = new Firebase("https://codementor.firebaseio.com/");
-            ref.child(chatroom.getFirebasePath()).push().setValue(firebaseMessage, (firebaseError, msgRef) -> {
-                if (firebaseError != null) {
-                    Log.e(TAG, firebaseError.getMessage(), firebaseError.toException());
-                    showErrorToast();
-                    return;
-                }
-
-                Log.d(TAG, "Successfully saved on Firebase");
-                Log.e(TAG, "FB " + msgRef.getKey() + "=key " + msgRef.getPath() + "=path str=" + msgRef.toString());
-
-                try {
-                    saveOnServer(firebaseMessage, msgRef.getKey());
-                    Log.d(TAG, "Successfully saved on Codementor's server");
-                } catch (IOException e) {
-                    showErrorToast();
-                    Log.e(TAG, e.getMessage(), e);
-                }
-            });
-
-            return null;
-        }
-
-        private boolean saveOnServer(FirebaseMessage firebaseMessage, String firebaseKey) throws IOException {
-            FirebaseServerMessage firebaseServerMessage = new FirebaseServerMessage(firebaseKey, firebaseMessage);
-            String requestBody = new GsonBuilder()
-                    .setFieldNamingStrategy(new CamelCaseNamingStrategy())
-                    .create()
-                    .toJson(firebaseServerMessage);
-
-            Request request = new Request.Builder()
-                    .post(RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), requestBody))
-                    .url("https://www.codementor.io/api/chatrooms/" + app.getUserManager().getUsername())
-                    .build();
-
-            Log.e(TAG, "POST ON SERVER JSON=" + requestBody);
-            return false;//app.getOkHttpClient().newCall(request).execute().isSuccessful();
-        }
-
-        private void showErrorToast() {
-            Toast.makeText(getContext(), "An unexpected error occurred", Toast.LENGTH_SHORT).show();
-        }
-
+    @Override
+    public void onError(Exception e) {
+        Log.e(TAG, e.getMessage(), e);
+        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -1,60 +1,50 @@
 package com.aluxian.codementor.adapters;
 
-import android.content.Context;
-import android.content.res.ColorStateList;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.aluxian.codementor.R;
-import com.aluxian.codementor.lib.TrackSelectionAdapter;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.User;
+import com.aluxian.codementor.tasks.GetChatroomsTask;
 import com.aluxian.codementor.utils.UserManager;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapter.ViewHolder> {
+public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements GetChatroomsTask.Callbacks {
 
-    private static final String TAG = ChatroomsAdapter.class.getSimpleName();
+    private static final int ITEM_TYPE_EMPTY = 1;
+    private static final int ITEM_TYPE_CHATROOM = 2;
 
-    private static final int ITEM_TYPE_CHATROOM = 1;
-    private static final int ITEM_TYPE_EMPTY = 2;
-
-    private final List<Chatroom> mChatroomsList = new ArrayList<>();
+    private List<Chatroom> chatrooms = new ArrayList<>();
     private boolean showEmpty = false;
 
     private OkHttpClient okHttpClient;
     private UserManager userManager;
-    private ClickListener clickListener;
+    private Callbacks callbacks;
 
-//    private ColorStateList initialTitleColors;
-//    private ColorStateList initialSubtitleColors;
-//    private int selectedTitleColor;
-//    private int selectedSubtitleColor;
-
-    public ChatroomsAdapter(OkHttpClient okHttpClient, UserManager userManager, ClickListener clickListener) {
+    public ChatroomsAdapter(OkHttpClient okHttpClient, UserManager userManager, Callbacks callbacks) {
         this.okHttpClient = okHttpClient;
         this.userManager = userManager;
-        this.clickListener = clickListener;
+        this.callbacks = callbacks;
     }
 
     @Override
-    public TrackSelectionAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public long getItemId(int position) {
+        return UUID.fromString(chatrooms.get(position).getChatroomId()).getMostSignificantBits();
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView;
 
         switch (viewType) {
@@ -62,7 +52,6 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
                 rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chatroom, parent, false);
                 return new ChatroomViewHolder(rootView);
 
-            case ITEM_TYPE_EMPTY:
             default:
                 rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_empty, parent, false);
                 return new EmptyViewHolder(rootView);
@@ -70,20 +59,16 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
     }
 
     @Override
-    public void onBindViewHolder(TrackSelectionAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof EmptyViewHolder) {
             EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
             emptyViewHolder.textView.setText(R.string.empty_chatrooms);
         } else {
-            ChatroomViewHolder chatroomViewHolder = (ChatroomViewHolder) holder;
-            chatroomViewHolder.itemView.setOnClickListener(v -> {
-                clickListener.onChatroomClick(position, mChatroomsList.get(position));
-                chatroomViewHolder.handleSelectableClick();
-            });
-
-            Chatroom chatroom = mChatroomsList.get(position);
+            Chatroom chatroom = chatrooms.get(position);
             User otherUser = chatroom.getOtherUser(userManager.getUsername());
 
+            ChatroomViewHolder chatroomViewHolder = (ChatroomViewHolder) holder;
+            chatroomViewHolder.itemView.setOnClickListener(v -> callbacks.onChatroomClick(position, chatroom));
             chatroomViewHolder.titleTextView.setText(otherUser.getName());
 
             if (chatroom.getSender().getUsername().equals(userManager.getUsername())) {
@@ -92,14 +77,6 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
             } else {
                 chatroomViewHolder.subtitleTextView.setText(chatroom.getContent());
             }
-
-//            if (isSelected(position)) {
-//                chatroomViewHolder.titleTextView.setTextColor(selectedTitleColor);
-//                chatroomViewHolder.subtitleTextView.setTextColor(selectedSubtitleColor);
-//            } else {
-//                chatroomViewHolder.titleTextView.setTextColor(initialTitleColors);
-//                chatroomViewHolder.subtitleTextView.setTextColor(initialSubtitleColors);
-//            }
 
             Uri avatarUri = Uri.parse(otherUser.getAvatarUrl());
             chatroomViewHolder.avatarView.setImageURI(avatarUri);
@@ -113,14 +90,32 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
 
     @Override
     public int getItemCount() {
-        return showEmpty ? 1 : mChatroomsList.size();
+        return showEmpty ? 1 : chatrooms.size();
     }
 
-    public void refresh(Runnable callback) {
-        new GetChatroomsTask(callback).execute();
+    @Override
+    public void onFinishedLoading(List<Chatroom> chatrooms) {
+        this.chatrooms.clear();
+        this.chatrooms.addAll(chatrooms);
+        showEmpty = this.chatrooms.size() == 0;
+        notifyDataSetChanged();
     }
 
-    public class EmptyViewHolder extends TrackSelectionAdapter.ViewHolder {
+    @Override
+    public void onFinished() {
+        callbacks.onRefreshFinished();
+    }
+
+    @Override
+    public void onError(Exception e) {
+        callbacks.onError(e);
+    }
+
+    public void startRefresh() {
+        new GetChatroomsTask(okHttpClient, this).execute();
+    }
+
+    public class EmptyViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
 
@@ -131,31 +126,27 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
 
     }
 
-    public class ChatroomViewHolder extends TrackSelectionAdapter.ViewHolder {
+    public class ChatroomViewHolder extends RecyclerView.ViewHolder {
 
-        public final SimpleDraweeView avatarView;
         public final TextView titleTextView;
         public final TextView subtitleTextView;
+        public final SimpleDraweeView avatarView;
 
         public ChatroomViewHolder(View itemView) {
             super(itemView);
-            avatarView = (SimpleDraweeView) itemView.findViewById(R.id.avatar);
             titleTextView = (TextView) itemView.findViewById(R.id.title);
             subtitleTextView = (TextView) itemView.findViewById(R.id.subtitle);
-
-//            initialTitleColors = titleTextView.getTextColors();
-//            initialSubtitleColors = subtitleTextView.getTextColors();
-//
-//            selectedTitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange);
-//            selectedSubtitleColor = ContextCompat.getColor(itemView.getContext(), R.color.sunset_orange_light);
+            avatarView = (SimpleDraweeView) itemView.findViewById(R.id.avatar);
         }
 
     }
 
-    /**
-     * Listen for click events on this adapter's views.
-     */
-    public interface ClickListener {
+    public interface Callbacks {
+
+        /**
+         * Called when an adapter refresh is finished.
+         */
+        void onRefreshFinished();
 
         /**
          * Called when a Chatroom is clicked in the adapter.
@@ -165,45 +156,12 @@ public class ChatroomsAdapter extends TrackSelectionAdapter<TrackSelectionAdapte
          */
         void onChatroomClick(int position, Chatroom chatroom);
 
-    }
-
-    private class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
-
-        private Runnable callback;
-
-        private GetChatroomsTask(Runnable callback) {
-            this.callback = callback;
-        }
-
-        @Override
-        protected List<Chatroom> doInBackground(Void... params) {
-            try {
-                Request request = new Request.Builder().url("https://www.codementor.io/api/chatrooms").build();
-                Response response = okHttpClient.newCall(request).execute();
-                String responseBody = response.body().string();
-
-                Type listType = new TypeToken<List<Chatroom>>() {}.getType();
-                return new Gson().fromJson(responseBody, listType);
-            } catch (IOException e) {
-                Log.e(TAG, e.getMessage(), e);
-            }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Chatroom> chatrooms) {
-            super.onPostExecute(chatrooms);
-
-            if (chatrooms != null) {
-                mChatroomsList.clear();
-                mChatroomsList.addAll(chatrooms);
-                showEmpty = mChatroomsList.size() == 0;
-                notifyDataSetChanged();
-            }
-
-            callback.run();
-        }
+        /**
+         * Called when an error occurs.
+         *
+         * @param e The error's Exception.
+         */
+        void onError(Exception e);
 
     }
 
