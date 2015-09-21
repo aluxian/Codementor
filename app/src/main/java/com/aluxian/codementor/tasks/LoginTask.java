@@ -20,15 +20,15 @@ import java.util.regex.Pattern;
 public class LoginTask extends AsyncTask<String, Void, String> implements Firebase.AuthResultHandler {
 
     private OkHttpClient okHttpClient;
-    private Callbacks callback;
+    private Callbacks callbacks;
     private Exception error;
 
     private String username;
     private String firebaseToken;
 
-    public LoginTask(OkHttpClient okHttpClient, Callbacks callback) {
+    public LoginTask(OkHttpClient okHttpClient, Callbacks callbacks) {
         this.okHttpClient = okHttpClient;
-        this.callback = callback;
+        this.callbacks = callbacks;
     }
 
     @Override
@@ -49,25 +49,25 @@ public class LoginTask extends AsyncTask<String, Void, String> implements Fireba
         this.firebaseToken = firebaseToken;
 
         if (firebaseToken != null) {
-            callback.onFirebaseAuth();
+            callbacks.onFirebaseAuth();
             Firebase ref = new Firebase("https://codementor.firebaseio.com/");
             ref.authWithCustomToken(firebaseToken, this);
         } else {
-            callback.onAuthError(this.error);
-            callback.onAuthFinished();
+            callbacks.onAuthError(this.error);
+            callbacks.onAuthFinished();
         }
     }
 
     @Override
     public void onAuthenticated(AuthData authData) {
-        callback.onAuthFinished();
-        callback.onAuthSuccessful(username, firebaseToken);
+        callbacks.onAuthFinished();
+        callbacks.onAuthSuccessful(username, firebaseToken);
     }
 
     @Override
     public void onAuthenticationError(FirebaseError firebaseError) {
-        callback.onAuthFinished();
-        callback.onAuthError(firebaseError.toException());
+        callbacks.onAuthFinished();
+        callbacks.onAuthError(firebaseError.toException());
     }
 
     private String doSignIn(String username, String password) throws IOException {

@@ -109,7 +109,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public void onPermissionDenied(Exception e) {
-        onError(new Exception("Permission denied from Firebase, please log in again", e));
+        onBackgroundError(new Exception("Permission denied from Firebase, please log in again", e));
         getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
         getActivity().finish();
     }
@@ -118,6 +118,11 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     public void onError(Exception e) {
         Log.e(TAG, e.getMessage(), e);
         Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackgroundError(Exception e) {
+        getActivity().runOnUiThread(() -> onError(e));
     }
 
 }

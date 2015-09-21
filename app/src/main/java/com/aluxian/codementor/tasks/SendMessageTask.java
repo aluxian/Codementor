@@ -45,7 +45,7 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
                 Message.Type.MESSAGE, params[0], sender, receiver);
 
         Firebase ref = new Firebase("https://codementor.firebaseio.com/");
-        ref.child(chatroom.getFirebasePath()).push().setValue(firebaseMessage, null, this);
+        ref.child(chatroom.getFirebasePath()).push().setValue(firebaseMessage, this);
 
         return null;
     }
@@ -53,14 +53,14 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
     @Override
     public void onComplete(FirebaseError firebaseError, Firebase ref) {
         if (firebaseError != null) {
-            callbacks.onError(firebaseError.toException());
+            callbacks.onBackgroundError(firebaseError.toException());
             return;
         }
 
         try {
             saveOnServer(firebaseMessage, ref.getKey());
         } catch (IOException e) {
-            callbacks.onError(e);
+            callbacks.onBackgroundError(e);
         }
     }
 
@@ -91,7 +91,7 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
          *
          * @param e The error's Exception.
          */
-        void onError(Exception e);
+        void onBackgroundError(Exception e);
 
     }
 

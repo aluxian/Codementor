@@ -18,6 +18,7 @@ public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
 
     private OkHttpClient okHttpClient;
     private Callbacks callbacks;
+    private Exception error;
 
     public GetChatroomsTask(OkHttpClient okHttpClient, Callbacks callbacks) {
         this.okHttpClient = okHttpClient;
@@ -34,7 +35,7 @@ public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
             Type listType = new TypeToken<List<Chatroom>>() {}.getType();
             return new Gson().fromJson(responseBody, listType);
         } catch (IOException | JsonSyntaxException e) {
-            callbacks.onError(e);
+            error = e;
         }
 
         return null;
@@ -43,6 +44,10 @@ public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
     @Override
     protected void onPostExecute(List<Chatroom> chatrooms) {
         super.onPostExecute(chatrooms);
+
+        if (error != null) {
+            callbacks.onError(error);
+        }
 
         if (chatrooms != null) {
             callbacks.onFinishedLoading(chatrooms);
