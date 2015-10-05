@@ -33,6 +33,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ITEM_TYPE_CONNECT = 3;
     private static final int ITEM_TYPE_FILE = 4;
 
+    private Firebase chatroomFirebaseRef;
     private UserManager userManager;
     private Callbacks callbacks;
     private Chatroom chatroom;
@@ -40,7 +41,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<Message> messages = new ArrayList<>();
     private boolean showEmpty = false;
 
-    public ConversationAdapter(UserManager userManager, Callbacks callbacks, Chatroom chatroom) {
+    public ConversationAdapter(Firebase firebase, UserManager userManager, Callbacks callbacks, Chatroom chatroom) {
+        this.chatroomFirebaseRef = firebase.child(chatroom.getFirebasePath());
         this.userManager = userManager;
         this.callbacks = callbacks;
         this.chatroom = chatroom;
@@ -168,9 +170,12 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
-    public void startRefresh() {
-        Firebase ref = new Firebase("https://codementor.firebaseio.com/");
-        ref.child(chatroom.getFirebasePath()).addValueEventListener(this);
+    public void enableRefresh() {
+        chatroomFirebaseRef.addValueEventListener(this);
+    }
+
+    public void disableRefresh() {
+        chatroomFirebaseRef.removeEventListener(this);
     }
 
     public static class EmptyViewHolder extends RecyclerView.ViewHolder {

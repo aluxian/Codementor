@@ -17,6 +17,7 @@ public class App extends Application {
     private OkHttpClient okHttpClient;
     private PersistentCookieStore cookieStore;
     private Runnable newMessageCallback;
+    private Firebase firebase;
 
     @Override
     public void onCreate() {
@@ -31,6 +32,8 @@ public class App extends Application {
         okHttpClient = new OkHttpClient();
         okHttpClient.setCookieHandler(new CookieManager(cookieStore, CookiePolicy.ACCEPT_ALL));
         okHttpClient.setFollowRedirects(false);
+
+        firebase = new Firebase("https://codementor.firebaseio.com/");
     }
 
     public UserManager getUserManager() {
@@ -51,6 +54,10 @@ public class App extends Application {
 
     public void setNewMessageCallback(Runnable newMessageCallback) {
         this.newMessageCallback = newMessageCallback;
+    }
+
+    public Firebase getFirebase() {
+        return firebase;
     }
 
 }

@@ -65,7 +65,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         recyclerView.setLayoutManager(layoutManager);
 
-        conversationAdapter = new ConversationAdapter(app.getUserManager(), this, chatroom);
+        conversationAdapter = new ConversationAdapter(app.getFirebase(), app.getUserManager(), this, chatroom);
         conversationAdapter.setHasStableIds(true);
         recyclerView.setAdapter(conversationAdapter);
 
@@ -99,7 +99,13 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
 
     @Override
     public void onRefresh() {
-        conversationAdapter.startRefresh();
+        conversationAdapter.enableRefresh();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        conversationAdapter.disableRefresh();
     }
 
     @Override
