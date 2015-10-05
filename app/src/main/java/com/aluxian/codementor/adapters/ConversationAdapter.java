@@ -1,6 +1,5 @@
 package com.aluxian.codementor.adapters;
 
-import android.os.Handler;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.format.Formatter;
