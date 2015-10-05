@@ -2,7 +2,6 @@ package com.aluxian.codementor.fragments;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -22,10 +21,9 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.adapters.ChatroomsAdapter;
 import com.aluxian.codementor.lib.DividerItemDecoration;
 import com.aluxian.codementor.models.Chatroom;
-import com.aluxian.codementor.utils.SimpleObservable;
 
-public class DrawerFragment extends Fragment implements SimpleObservable<DrawerFragment.Listener>,
-        SwipeRefreshLayout.OnRefreshListener, ChatroomsAdapter.Callbacks {
+public class DrawerFragment extends Fragment
+        implements SwipeRefreshLayout.OnRefreshListener, ChatroomsAdapter.Callbacks {
 
     private static final String TAG = DrawerFragment.class.getSimpleName();
 
@@ -134,12 +132,10 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
-    @Override
     public void setListener(Listener listener) {
         mListener = listener;
     }
 
-    @Override
     public void removeListener() {
         mListener = null;
     }

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class UserManager extends Observable<UserManager.Listener> {
+public class UserManager {
 
     private static final String KEY_LOGGED_IN = "is_logged_in";
     private static final String KEY_FIREBASE_TOKEN = "firebase_token";
@@ -28,10 +28,6 @@ public class UserManager extends Observable<UserManager.Listener> {
         return loggedIn;
     }
 
-    public String getFirebaseToken() {
-        return firebaseToken;
-    }
-
     public String getUsername() {
         return username;
     }
@@ -40,18 +36,14 @@ public class UserManager extends Observable<UserManager.Listener> {
         this.loggedIn = true;
         this.firebaseToken = firebaseToken;
         this.username = username;
-
         persistState();
-        notifyListeners(Listener::onLoggedIn);
     }
 
     public void setLoggedOut() {
         this.loggedIn = false;
         this.firebaseToken = null;
         this.username = null;
-
         persistState();
-        notifyListeners(Listener::onLoggedOut);
     }
 
     private void persistState() {
@@ -60,23 +52,6 @@ public class UserManager extends Observable<UserManager.Listener> {
                 .putString(KEY_FIREBASE_TOKEN, firebaseToken)
                 .putString(KEY_USERNAME, username)
                 .apply();
-    }
-
-    /**
-     * Callback interface for events related to UserManager.
-     */
-    public interface Listener {
-
-        /**
-         * Called when the user logs in.
-         */
-        void onLoggedIn();
-
-        /**
-         * Called when the user logs out.
-         */
-        void onLoggedOut();
-
     }
 
 }
