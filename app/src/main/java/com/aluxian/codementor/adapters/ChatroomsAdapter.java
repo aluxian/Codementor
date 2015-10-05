@@ -94,10 +94,9 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onFinishedLoading(List<Chatroom> chatrooms) {
-        this.chatrooms.clear();
-        this.chatrooms.addAll(chatrooms);
-        showEmpty = this.chatrooms.size() == 0;
+    public void onFinishedLoading(List<Chatroom> newChatrooms) {
+        chatrooms = newChatrooms;
+        showEmpty = chatrooms.size() == 0;
         notifyDataSetChanged();
     }
 
@@ -113,6 +112,14 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     public void startRefresh() {
         new GetChatroomsTask(okHttpClient, this).execute();
+    }
+
+    public boolean isEmpty() {
+        return chatrooms.size() == 0;
+    }
+
+    public Chatroom getFirstChatroom() {
+        return chatrooms.get(0);
     }
 
     public class EmptyViewHolder extends RecyclerView.ViewHolder {
@@ -144,7 +151,7 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public interface Callbacks {
 
         /**
-         * Called when an adapter refresh is finished.
+         * Called when adapter refresh is finished.
          */
         void onRefreshFinished();
 

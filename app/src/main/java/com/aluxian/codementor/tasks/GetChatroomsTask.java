@@ -61,9 +61,9 @@ public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
         /**
          * Called *only* when the task finished successfully.
          *
-         * @param chatrooms The list of chatrooms.
+         * @param newChatrooms The list of chatrooms.
          */
-        void onFinishedLoading(List<Chatroom> chatrooms);
+        void onFinishedLoading(List<Chatroom> newChatrooms);
 
         /**
          * Called when the task completes execution.

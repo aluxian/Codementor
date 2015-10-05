@@ -2,6 +2,7 @@ package com.aluxian.codementor.fragments;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -15,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
@@ -36,9 +36,11 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
     private ActionBarDrawerToggle drawerToggle;
     private View fragmentContainerView;
 
-    private boolean fromSavedInstanceState;
     private ChatroomsAdapter chatroomsAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+
+    private boolean fromSavedInstanceState;
+    private boolean hasSelectedChatroom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -149,24 +151,30 @@ public class DrawerFragment extends Fragment implements SimpleObservable<DrawerF
 
     @Override
     public void onRefreshFinished() {
+//        if (!hasSelectedChatroom && !chatroomsAdapter.isEmpty()) {
+//            new Handler().postDelayed(() -> onChatroomSelected(chatroomsAdapter.getFirstChatroom()), 250);
+//        }
+
         swipeRefreshLayout.setRefreshing(false);
     }
 
     @Override
     public void onChatroomSelected(Chatroom chatroom) {
-        if (drawerLayout != null) {
+        if (drawerLayout != null && hasSelectedChatroom) {
             drawerLayout.closeDrawer(fragmentContainerView);
         }
 
         if (mListener != null) {
             mListener.onChatroomSelected(chatroom);
         }
+
+        hasSelectedChatroom = true;
     }
 
     @Override
     public void onError(Exception e) {
         Log.e(TAG, e.getMessage(), e);
-        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     public interface Listener {
