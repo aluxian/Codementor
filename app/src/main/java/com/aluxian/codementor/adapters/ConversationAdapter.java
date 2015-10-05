@@ -1,7 +1,12 @@
 package com.aluxian.codementor.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.format.Formatter;
 import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
@@ -36,7 +41,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private Firebase chatroomFirebaseRef;
     private UserManager userManager;
     private Callbacks callbacks;
-    private Chatroom chatroom;
+
+    private int blueBayouxColor;
+    private int solitudeColor;
+    private int darkTextColor;
 
     private List<Message> messages = new ArrayList<>();
     private boolean showEmpty = false;
@@ -45,7 +53,16 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.chatroomFirebaseRef = firebase.child(chatroom.getFirebasePath());
         this.userManager = userManager;
         this.callbacks = callbacks;
-        this.chatroom = chatroom;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        Context context = recyclerView.getContext();
+
+        blueBayouxColor = ContextCompat.getColor(context, R.color.blue_bayoux);
+        solitudeColor = ContextCompat.getColor(context, R.color.solitude);
+        darkTextColor = -1;
     }
 
     @Override
@@ -54,7 +71,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         switch (viewType) {
             case ITEM_TYPE_MESSAGE:
-                rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_message, parent, false);
+                rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_msg_text, parent, false);
                 return new MessageViewHolder(rootView);
 
             case ITEM_TYPE_CONNECT:
@@ -78,42 +95,68 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             emptyViewHolder.textView.setText(R.string.empty_conversation);
         } else {
             MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
-
             Message message = messages.get(position);
-            String body = message.getTypeContent(userManager.getUsername());
 
+            if (darkTextColor == -1) {
+                darkTextColor = messageViewHolder.messageTextView.getCurrentTextColor();
+            }
+
+            String body = message.getTypeContent(userManager.getUsername());
             boolean alignRight = message.sentBy(userManager.getUsername());
-            int offset = holder.itemView.getResources().getDimensionPixelSize(R.dimen.message_offset);
+
+            bindAdjustGravity(messageViewHolder, alignRight);
+            bindAdjustColors(messageViewHolder, alignRight);
 
             if (messageViewHolder instanceof FileMessageViewHolder) {
-                String size = Formatter.formatShortFileSize(holder.itemView.getContext(),
-                        message.getRequest().getSize());
-
-                FileMessageViewHolder fileMessageHolder = (FileMessageViewHolder) messageViewHolder;
-                fileMessageHolder.messageTextView.setText(Html.fromHtml(body));
-                fileMessageHolder.subtextView.setText(size);
-                fileMessageHolder.subtextView.setMovementMethod(LinkMovementMethod.getInstance());
-                fileMessageHolder.subtextView.requestLayout();
-
-                if (alignRight) {
-                    fileMessageHolder.messageTextView.setGravity(Gravity.END);
-                    fileMessageHolder.subtextView.setGravity(Gravity.END);
-                } else {
-                    fileMessageHolder.messageTextView.setGravity(Gravity.START);
-                    fileMessageHolder.subtextView.setGravity(Gravity.START);
-                }
+                bindFileMessage((FileMessageViewHolder) messageViewHolder, message, body, alignRight);
             } else {
                 messageViewHolder.messageTextView.setText(body);
             }
 
             messageViewHolder.messageTextView.requestLayout();
-            messageViewHolder.linearLayout.setGravity(alignRight ? Gravity.END : Gravity.START);
+        }
+    }
 
-            if (alignRight) {
-                messageViewHolder.linearLayout.setPadding(offset, 0, 0, 0);
-            } else {
-                messageViewHolder.linearLayout.setPadding(0, 0, offset, 0);
-            }
+    private void bindFileMessage(FileMessageViewHolder holder, Message message, String body, boolean alignRight) {
+        Spanned htmlBody = Html.fromHtml(body);
+        holder.messageTextView.setText(htmlBody);
+
+        String size = Formatter.formatShortFileSize(holder.itemView.getContext(), message.getRequest().getSize());
+        holder.subtextView.setText(size);
+        holder.subtextView.setMovementMethod(LinkMovementMethod.getInstance());
+        holder.subtextView.requestLayout();
+
+        if (alignRight) {
+            holder.subtextView.setGravity(Gravity.END);
+            holder.subtextView.setTextColor(blueBayouxColor);
+        } else {
+            holder.subtextView.setGravity(Gravity.START);
+            holder.subtextView.setTextColor(darkTextColor);
+        }
+    }
+
+    private void bindAdjustGravity(MessageViewHolder holder, boolean alignRight) {
+        int offset = holder.itemView.getResources().getDimensionPixelSize(R.dimen.message_offset);
+        holder.linearLayout.setGravity(alignRight ? Gravity.END : Gravity.START);
+
+        if (alignRight) {
+            holder.messageTextView.setGravity(Gravity.END);
+            holder.linearLayout.setPadding(offset, 0, 0, 0);
+        } else {
+            holder.messageTextView.setGravity(Gravity.START);
+            holder.linearLayout.setPadding(0, 0, offset, 0);
+        }
+    }
+
+    private void bindAdjustColors(MessageViewHolder holder, boolean alignRight) {
+        View cardChild = holder.cardView.getChildAt(0);
+
+        if (alignRight) {
+            cardChild.setBackgroundColor(solitudeColor);
+            holder.messageTextView.setTextColor(blueBayouxColor);
+        } else {
+            cardChild.setBackgroundColor(Color.WHITE);
+            holder.messageTextView.setTextColor(darkTextColor);
         }
     }
 
@@ -191,11 +234,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public static class MessageViewHolder extends RecyclerView.ViewHolder {
 
+        public final CardView cardView;
         public final LinearLayout linearLayout;
         public final TextView messageTextView;
 
         public MessageViewHolder(View view) {
             super(view);
+            cardView = (CardView) view.findViewById(R.id.card);
             linearLayout = (LinearLayout) view;
             messageTextView = (TextView) view.findViewById(R.id.message);
         }

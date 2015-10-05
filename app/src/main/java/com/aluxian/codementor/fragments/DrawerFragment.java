@@ -156,7 +156,7 @@ public class DrawerFragment extends Fragment
 
     @Override
     public void onChatroomSelected(Chatroom chatroom) {
-        if (drawerLayout != null && hasSelectedChatroom) {
+        if (drawerLayout != null) { // && hasSelectedChatroom
             drawerLayout.closeDrawer(fragmentContainerView);
         }
 
