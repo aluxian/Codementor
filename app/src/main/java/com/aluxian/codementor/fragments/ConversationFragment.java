@@ -70,7 +70,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         recyclerView.setAdapter(conversationAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.sunset_orange));
+        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.brand_accent));
         swipeRefreshLayout.setOnRefreshListener(this);
 
         ImageButton sendButton = (ImageButton) rootView.findViewById(R.id.send);

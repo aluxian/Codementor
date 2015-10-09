@@ -1,8 +1,10 @@
 <resources>
-    <color name="nile_blue">#1E374D</color>
-    <color name="teal_blue">#00455A</color>
-    <color name="sunset_orange">#F3664F</color>
-    <color name="black_haze">#F7F7F7</color>
-    <color name="blue_bayoux">#3C566A</color>
-    <color name="solitude">#E6F4FF</color>
+    <color name="brand">#00455A</color>
+    <color name="brand_darker">#1E374D</color>
+    <color name="brand_accent">#F3664F</color>
+
+    <color name="sender_text">#3C566A</color>
+    <color name="sender_background">#E6F4FF</color>
+
+    <color name="empty_state_gray">#AAA</color>
 </resources>

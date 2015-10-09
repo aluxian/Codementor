@@ -27,7 +27,7 @@
                 android:paddingLeft="8dp"
                 android:paddingRight="8dp"
                 android:paddingTop="8dp"
-                android:textColorLink="@color/sunset_orange"
+                android:textColorLink="@color/brand_accent"
                 android:textStyle="bold" />
 
             <TextView

@@ -8,7 +8,24 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/empty_state_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginBottom="64dp"
+            android:layout_marginLeft="64dp"
+            android:layout_marginRight="64dp"
+            android:drawablePadding="36dp"
+            android:drawableTop="@drawable/message"
+            android:gravity="center_horizontal"
+            android:text="@string/msg_no_conversations"
+            android:textColor="@color/empty_state_gray"
+            android:textSize="16sp" />
+
+    </FrameLayout>
 
     <fragment
         android:id="@+id/navigation_drawer"

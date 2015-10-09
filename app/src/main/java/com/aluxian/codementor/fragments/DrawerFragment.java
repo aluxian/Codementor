@@ -75,7 +75,7 @@ public class DrawerFragment extends Fragment
         recyclerView.setAdapter(chatroomsAdapter);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_container);
-        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.sunset_orange));
+        swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.brand_accent));
         swipeRefreshLayout.setOnRefreshListener(this);
 
         return rootView;

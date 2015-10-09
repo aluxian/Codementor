@@ -1,21 +1,20 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">@color/teal_blue</item>
-        <item name="colorPrimaryDark">@color/nile_blue</item>
-        <item name="colorAccent">@color/sunset_orange</item>
-        <item name="android:actionModeBackground">@color/teal_blue</item>
-        <item name="android:windowBackground">@color/black_haze</item>
+        <item name="colorPrimary">@color/brand</item>
+        <item name="colorPrimaryDark">@color/brand_darker</item>
+        <item name="colorAccent">@color/brand_accent</item>
+        <item name="android:actionModeBackground">@color/brand</item>
     </style>
 
     <style name="AppTheme.Login">
-        <item name="colorButtonNormal">@color/teal_blue</item>
+        <item name="colorButtonNormal">@color/brand</item>
     </style>
 
     <style name="AppTheme.Login.Dialog" parent="Theme.AppCompat.Dialog.Alert">
         <item name="colorAccent">@android:color/white</item>
         <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:background">@color/teal_blue</item>
+        <item name="android:background">@color/brand</item>
     </style>
 
 </resources>

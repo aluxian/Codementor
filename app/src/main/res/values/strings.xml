@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Codementor</string>
 
+    <string name="app_name_full">Codementor Chat</string>
     <string name="title_activity_login">Log in</string>
 
     <string name="drawer_open">Open navigation drawer</string>
@@ -21,4 +22,6 @@
     <string name="msg_authenticating">Authenticating…</string>
     <string name="msg_firebase_auth">Connecting to Firebase…</string>
     <string name="msg_send_hint">Send a message…</string>
+    <string name="msg_no_conversations">Your messages will appear here. Pick a conversation from the drawer and
+        chat away!</string>
 </resources>

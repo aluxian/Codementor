@@ -8,6 +8,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
@@ -18,13 +20,16 @@ import com.aluxian.codementor.models.Chatroom;
 public class MainActivity extends AppCompatActivity implements DrawerFragment.Listener {
 
     private DrawerFragment drawerFragment;
+    private TextView emptyStateMsgView;
     private App app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         app = (App) getApplication();
+        emptyStateMsgView = (TextView) findViewById(R.id.empty_state_msg);
 
         if (!app.getUserManager().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
@@ -58,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, ConversationFragment.newInstance(chatroom))
                 .commit();
+
+        emptyStateMsgView.setVisibility(View.GONE);
     }
 
     @Override
@@ -68,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setTitle(R.string.app_name_full);
         }
 
         return true;

@@ -42,9 +42,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private UserManager userManager;
     private Callbacks callbacks;
 
-    private int blueBayouxColor;
-    private int solitudeColor;
-    private int darkTextColor;
+    private int senderChatTextColor;
+    private int senderChatBackgroundColor;
+    private int defaultDarkTextColor;
 
     private List<Message> messages = new ArrayList<>();
     private boolean showEmpty = false;
@@ -60,9 +60,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         super.onAttachedToRecyclerView(recyclerView);
         Context context = recyclerView.getContext();
 
-        blueBayouxColor = ContextCompat.getColor(context, R.color.blue_bayoux);
-        solitudeColor = ContextCompat.getColor(context, R.color.solitude);
-        darkTextColor = -1;
+        senderChatTextColor = ContextCompat.getColor(context, R.color.sender_text);
+        senderChatBackgroundColor = ContextCompat.getColor(context, R.color.sender_background);
+        defaultDarkTextColor = -1;
     }
 
     @Override
@@ -97,8 +97,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
             Message message = messages.get(position);
 
-            if (darkTextColor == -1) {
-                darkTextColor = messageViewHolder.messageTextView.getCurrentTextColor();
+            if (defaultDarkTextColor == -1) {
+                defaultDarkTextColor = messageViewHolder.messageTextView.getCurrentTextColor();
             }
 
             String body = message.getTypeContent(userManager.getUsername());
@@ -128,10 +128,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         if (alignRight) {
             holder.subtextView.setGravity(Gravity.END);
-            holder.subtextView.setTextColor(blueBayouxColor);
+            holder.subtextView.setTextColor(senderChatTextColor);
         } else {
             holder.subtextView.setGravity(Gravity.START);
-            holder.subtextView.setTextColor(darkTextColor);
+            holder.subtextView.setTextColor(defaultDarkTextColor);
         }
     }
 
@@ -152,11 +152,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View cardChild = holder.cardView.getChildAt(0);
 
         if (alignRight) {
-            cardChild.setBackgroundColor(solitudeColor);
-            holder.messageTextView.setTextColor(blueBayouxColor);
+            cardChild.setBackgroundColor(senderChatBackgroundColor);
+            holder.messageTextView.setTextColor(senderChatTextColor);
         } else {
             cardChild.setBackgroundColor(Color.WHITE);
-            holder.messageTextView.setTextColor(darkTextColor);
+            holder.messageTextView.setTextColor(defaultDarkTextColor);
         }
     }
 
