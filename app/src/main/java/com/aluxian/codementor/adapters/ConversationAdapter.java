@@ -123,8 +123,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         String size = Formatter.formatShortFileSize(holder.itemView.getContext(), message.getRequest().getSize());
         holder.subtextView.setText(size);
-        holder.subtextView.setMovementMethod(LinkMovementMethod.getInstance());
-        holder.subtextView.requestLayout();
 
         if (alignRight) {
             holder.subtextView.setGravity(Gravity.END);
@@ -254,6 +252,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public FileMessageViewHolder(View view) {
             super(view);
             subtextView = (TextView) view.findViewById(R.id.subtext);
+            subtextView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
     }

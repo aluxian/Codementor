@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
+            <com.aluxian.codementor.views.WrapWidthTextView
                 android:id="@+id/message"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -30,7 +30,7 @@
                 android:textColorLink="@color/brand_accent"
                 android:textStyle="bold" />
 
-            <TextView
+            <com.aluxian.codementor.views.WrapWidthTextView
                 android:id="@+id/subtext"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
