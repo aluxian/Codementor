@@ -1,7 +1,6 @@
 package com.aluxian.codementor.tasks;
 
 import android.os.AsyncTask;
-import android.os.Handler;
 
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.Message;
@@ -57,13 +56,11 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
             return;
         }
 
-        new Handler().postDelayed(() -> new Thread(() -> {
-            try {
-                saveOnServer(firebaseMessage, ref.getKey());
-            } catch (IOException e) {
-                callbacks.onBackgroundError(e);
-            }
-        }).start(), 1000);
+        try {
+            saveOnServer(firebaseMessage, ref.getKey());
+        } catch (IOException e) {
+            callbacks.onBackgroundError(e);
+        }
     }
 
     private void saveOnServer(FirebaseMessage firebaseMessage, String firebaseKey) throws IOException {
