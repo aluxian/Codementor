@@ -56,11 +56,13 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
             return;
         }
 
-        try {
-            saveOnServer(firebaseMessage, ref.getKey());
-        } catch (IOException e) {
-            callbacks.onBackgroundError(e);
-        }
+        new Thread(() -> {
+            try {
+                saveOnServer(firebaseMessage, ref.getKey());
+            } catch (IOException e) {
+                callbacks.onBackgroundError(e);
+            }
+        }).start();
     }
 
     private void saveOnServer(FirebaseMessage firebaseMessage, String firebaseKey) throws IOException {
