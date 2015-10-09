@@ -3,15 +3,14 @@ package com.aluxian.codementor.tasks;
 import android.os.AsyncTask;
 
 import com.aluxian.codementor.models.Chatroom;
+import com.aluxian.codementor.models.ChatroomList;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.List;
 
 public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
@@ -28,12 +27,12 @@ public class GetChatroomsTask extends AsyncTask<Void, Void, List<Chatroom>> {
     @Override
     protected List<Chatroom> doInBackground(Void... params) {
         try {
-            Request request = new Request.Builder().url("https://www.codementor.io/api/chatrooms").build();
+            Request request = new Request.Builder().url("https://www.codementor.io/api/chatrooms/list").build();
             Response response = okHttpClient.newCall(request).execute();
             String responseBody = response.body().string();
 
-            Type listType = new TypeToken<List<Chatroom>>() {}.getType();
-            return new Gson().fromJson(responseBody, listType);
+            ChatroomList chatroomList = new Gson().fromJson(responseBody, ChatroomList.class);
+            return chatroomList.getRecentChats();
         } catch (IOException | JsonSyntaxException e) {
             error = e;
         }
