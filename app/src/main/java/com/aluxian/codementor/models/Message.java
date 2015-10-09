@@ -34,8 +34,14 @@ public class Message {
     }
 
     public Type getType() {
+        String rawType = type.toUpperCase();
+
+        if ("SESSIONLINK".equals(rawType)) {
+            rawType = "CONNECT";
+        }
+
         try {
-            return Type.valueOf(type.toUpperCase());
+            return Type.valueOf(rawType);
         } catch (IllegalArgumentException e) {
             Log.e(TAG, e.getMessage(), e);
             return Type.MESSAGE;
