@@ -252,7 +252,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         public FileMessageViewHolder(View view) {
             super(view);
             subtextView = (TextView) view.findViewById(R.id.subtext);
-            subtextView.setMovementMethod(LinkMovementMethod.getInstance());
+            messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
     }

@@ -18,7 +18,7 @@
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:autoLink="all"
+            android:autoLink="web"
             android:linksClickable="true"
             android:padding="8dp"
             android:textColorLink="@color/brand_accent" />
