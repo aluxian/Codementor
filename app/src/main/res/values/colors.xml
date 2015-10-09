@@ -1,7 +1,8 @@
 <resources>
     <color name="brand">#00455A</color>
     <color name="brand_darker">#1E374D</color>
-    <color name="brand_accent">#F3664F</color>
+    <color name="brand_accent">#EF3B1F</color>
+
 
     <color name="sender_text">#3C566A</color>
     <color name="sender_background">#E6F4FF</color>
