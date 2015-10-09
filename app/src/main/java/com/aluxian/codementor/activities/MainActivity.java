@@ -41,7 +41,10 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        drawerFragment.removeListener();
+
+        if (drawerFragment != null) {
+            drawerFragment.removeListener();
+        }
     }
 
     @Override

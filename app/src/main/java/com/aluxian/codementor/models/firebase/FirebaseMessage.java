@@ -38,4 +38,5 @@ public class FirebaseMessage {
         this.sender = sender;
         this.receiver = receiver;
     }
+
 }

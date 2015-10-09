@@ -2,7 +2,6 @@ package com.aluxian.codementor.tasks;
 
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.util.Log;
 
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.Message;
@@ -69,6 +68,8 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
 
     private void saveOnServer(FirebaseMessage firebaseMessage, String firebaseKey) throws IOException {
         FirebaseServerMessage firebaseServerMessage = new FirebaseServerMessage(firebaseKey, firebaseMessage);
+        String receiverUsername = chatroom.getOtherUser(userManager.getUsername()).getUsername();
+
         String requestBody = new GsonBuilder()
                 .setFieldNamingStrategy(new CamelCaseNamingStrategy())
                 .disableHtmlEscaping()
@@ -77,12 +78,10 @@ public class SendMessageTask extends AsyncTask<String, Void, Void> implements Fi
 
         Request request = new Request.Builder()
                 .post(RequestBody.create(MediaType.parse("application/json;charset=UTF-8"), requestBody))
-                .url("https://www.codementor.io/api/chatrooms/" + userManager.getUsername())
+                .url("https://www.codementor.io/api/chatrooms/" + receiverUsername)
                 .build();
 
         Response response = okHttpClient.newCall(request).execute();
-
-        Log.e("POST MESSAGE CM SERVER", "req=" + requestBody + " \n\nres=" + response.body().string());
 
         if (!response.isSuccessful()) {
             throw new IOException("POST message to Codementor server failed with code " + response.code());
