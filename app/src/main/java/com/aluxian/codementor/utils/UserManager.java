@@ -6,9 +6,9 @@ import android.preference.PreferenceManager;
 
 public class UserManager {
 
-    private static final String KEY_LOGGED_IN = "is_logged_in";
-    private static final String KEY_FIREBASE_TOKEN = "firebase_token";
-    private static final String KEY_USERNAME = "username";
+    private static final String KEY_LOGGED_IN = "um_logged_in";
+    private static final String KEY_FIREBASE_TOKEN = "um_firebase_token";
+    private static final String KEY_USERNAME = "um_username";
 
     private SharedPreferences sharedPrefs;
 

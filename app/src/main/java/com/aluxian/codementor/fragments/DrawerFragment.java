@@ -69,7 +69,7 @@ public class DrawerFragment extends Fragment
         LinearLayoutManager layoutManager = new LinearLayoutManager(inflater.getContext());
         recyclerView.setLayoutManager(layoutManager);
 
-        chatroomsAdapter = new ChatroomsAdapter(app.getOkHttpClient(), app.getUserManager(), this);
+        chatroomsAdapter = new ChatroomsAdapter(app, app.getOkHttpClient(), this);
         chatroomsAdapter.setHasStableIds(true);
         recyclerView.setAdapter(chatroomsAdapter);
 

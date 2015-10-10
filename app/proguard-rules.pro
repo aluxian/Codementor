@@ -35,3 +35,10 @@
 # Gson
 -keep public class com.google.gson
 -keep class com.aluxian.codementor.models.** { *; }
+
+# ButterKnife
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+-keepclasseswithmembernames class * { @butterknife.* <fields>; }
+-keepclasseswithmembernames class * { @butterknife.* <methods>; }
