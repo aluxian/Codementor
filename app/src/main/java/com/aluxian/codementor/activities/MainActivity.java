@@ -5,33 +5,29 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.fragments.ConversationFragment;
 import com.aluxian.codementor.fragments.DrawerFragment;
 import com.aluxian.codementor.models.Chatroom;
 
-public class MainActivity extends AppCompatActivity implements DrawerFragment.Listener {
+public class MainActivity extends BaseActivity implements DrawerFragment.Listener {
 
     private DrawerFragment drawerFragment;
     private TextView emptyStateMsgView;
-    private App app;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        app = (App) getApplication();
         emptyStateMsgView = (TextView) findViewById(R.id.empty_state_msg);
 
-        if (!app.getUserManager().isLoggedIn()) {
+        if (!getAppComponent().userManager().isLoggedIn()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
@@ -57,13 +53,11 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
         ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle(chatroom.getOtherUser(app.getUserManager().getUsername()).getName());
+            actionBar.setTitle(chatroom.getOtherUser(getAppComponent().userManager().getUsername()).getName());
             actionBar.setSubtitle(null);
         }
 
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container, ConversationFragment.newInstance(chatroom))
-                .commit();
+        replaceFragment(R.id.container, ConversationFragment.newInstance(chatroom));
 
         emptyStateMsgView.setVisibility(View.GONE);
     }
@@ -90,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
                 return true;
 
             case R.id.action_log_out:
-                app.getUserManager().setLoggedOut();
-                app.getCookieStore().removeAll();
+                getAppComponent().userManager().setLoggedOut();
+                getAppComponent().cookieStore().removeAll();
 
                 startActivity(new Intent(this, LoginActivity.class));
                 finish();

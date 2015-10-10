@@ -2,22 +2,20 @@ package com.aluxian.codementor;
 
 import android.app.Application;
 
-import com.aluxian.codementor.lib.PersistentCookieStore;
+import com.aluxian.codementor.di.components.AppComponent;
+import com.aluxian.codementor.di.components.DaggerAppComponent;
+import com.aluxian.codementor.di.modules.AppModule;
+import com.aluxian.codementor.di.modules.HttpModule;
 import com.aluxian.codementor.utils.UserManager;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Firebase;
 import com.squareup.okhttp.OkHttpClient;
 
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-
 public class App extends Application {
 
-    private UserManager userManager;
-    private OkHttpClient okHttpClient;
-    private PersistentCookieStore cookieStore;
+    private AppComponent appComponent;
+
     private Runnable newMessageCallback;
-    private Firebase firebaseRef;
 
     @Override
     public void onCreate() {
@@ -26,26 +24,26 @@ public class App extends Application {
         Fresco.initialize(this);
         Firebase.setAndroidContext(this);
 
-        userManager = new UserManager(this);
-        cookieStore = new PersistentCookieStore(this);
+        this.initializeInjector();
+    }
 
-        okHttpClient = new OkHttpClient();
-        okHttpClient.setCookieHandler(new CookieManager(cookieStore, CookiePolicy.ACCEPT_ALL));
-        okHttpClient.setFollowRedirects(false);
+    private void initializeInjector() {
+        appComponent = DaggerAppComponent.builder()
+                .appModule(new AppModule(this))
+                .httpModule(new HttpModule(this))
+                .build();
+    }
 
-        firebaseRef = new Firebase("https://codementor.firebaseio.com/");
+    public AppComponent getAppComponent() {
+        return appComponent;
     }
 
     public UserManager getUserManager() {
-        return userManager;
+        return getAppComponent().userManager();
     }
 
     public OkHttpClient getOkHttpClient() {
-        return okHttpClient;
-    }
-
-    public PersistentCookieStore getCookieStore() {
-        return cookieStore;
+        return appComponent.okHttpClient();
     }
 
     public Runnable getNewMessageCallback() {
@@ -57,7 +55,7 @@ public class App extends Application {
     }
 
     public Firebase getFirebaseRef() {
-        return firebaseRef;
+        return getAppComponent().firebaseRef();
     }
 
 }

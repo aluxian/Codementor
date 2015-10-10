@@ -4,19 +4,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatButton;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.tasks.LoginTask;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
-public class LoginActivity extends AppCompatActivity
-        implements DialogInterface.OnCancelListener, LoginTask.Callbacks {
+public class LoginActivity extends BaseActivity implements DialogInterface.OnCancelListener, LoginTask.Callbacks {
 
     private static final String TAG = LoginActivity.class.getSimpleName();
 
@@ -26,15 +23,11 @@ public class LoginActivity extends AppCompatActivity
     private AlertDialog progressDialog;
     private LoginTask loginTask;
 
-    private App app;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        app = (App) getApplication();
-        app.getCookieStore().removeAll();
+        getAppComponent().cookieStore().removeAll();
 
         loginField = (MaterialEditText) findViewById(R.id.input_login);
         passwordField = (MaterialEditText) findViewById(R.id.input_password);
@@ -66,7 +59,7 @@ public class LoginActivity extends AppCompatActivity
                 .setOnCancelListener(this)
                 .show();
 
-        loginTask = new LoginTask(app.getFirebaseRef(), app.getOkHttpClient(), this);
+        loginTask = new LoginTask(getAppComponent().firebaseRef(), getAppComponent().okHttpClient(), this);
         loginTask.execute(username, password);
     }
 
@@ -78,7 +71,7 @@ public class LoginActivity extends AppCompatActivity
 
     @Override
     public void onAuthSuccessful(String username, String firebaseToken) {
-        app.getUserManager().setLoggedIn(username, firebaseToken);
+        getAppComponent().userManager().setLoggedIn(username, firebaseToken);
         startActivity(new Intent(this, MainActivity.class));
         finish();
     }
