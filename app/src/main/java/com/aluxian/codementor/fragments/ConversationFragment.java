@@ -114,7 +114,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         });
 
         int brandAccentColor = ContextCompat.getColor(getContext(), R.color.brand_accent);
-        int sendButtonDisabledColor = ContextCompat.getColor(getContext(), R.color.send_button_disabled);
+        int sendButtonDisabledColor = ContextCompat.getColor(getContext(), R.color.neutral_gray);
 
         sendButton.setColorFilter(sendButtonDisabledColor, PorterDuff.Mode.SRC_ATOP);
         sendButton.setClickable(false);

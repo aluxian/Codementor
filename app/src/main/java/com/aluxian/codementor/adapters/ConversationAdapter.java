@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.Message;
+import com.aluxian.codementor.models.TimeMarker;
 import com.aluxian.codementor.tasks.ParseFirebaseResponseTask;
 import com.aluxian.codementor.tasks.SetMessagesReadTask;
 import com.aluxian.codementor.utils.UserManager;
@@ -26,15 +27,18 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.github.curioustechizen.ago.RelativeTimeTextView;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements ValueEventListener, ParseFirebaseResponseTask.Callbacks, SetMessagesReadTask.Callbacks {
 
+    private static final int ITEM_TYPE_TIME_MARKER = 0;
     private static final int ITEM_TYPE_EMPTY = 1;
     private static final int ITEM_TYPE_MESSAGE = 2;
     private static final int ITEM_TYPE_CONNECT = 3;
@@ -49,7 +53,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private int senderChatBackgroundColor;
     private int defaultDarkTextColor;
 
-    private List<Message> messages = new ArrayList<>();
+    private List<Object> items = new ArrayList<>();
     private boolean showEmpty = false;
 
     public ConversationAdapter(Firebase firebase, OkHttpClient okHttpClient, UserManager userManager,
@@ -75,6 +79,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View rootView;
 
         switch (viewType) {
+            case ITEM_TYPE_TIME_MARKER:
+                rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_time_marker, parent, false);
+                return new TimeMarkerViewHolder(rootView);
+
             case ITEM_TYPE_MESSAGE:
                 rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_msg_text, parent, false);
                 return new MessageViewHolder(rootView);
@@ -98,9 +106,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (holder instanceof EmptyViewHolder) {
             EmptyViewHolder emptyViewHolder = (EmptyViewHolder) holder;
             emptyViewHolder.textView.setText(R.string.empty_conversation);
+        } else if (holder instanceof TimeMarkerViewHolder) {
+            TimeMarkerViewHolder timeMarkerViewHolder = (TimeMarkerViewHolder) holder;
+            TimeMarker timeMarker = (TimeMarker) items.get(position);
+            timeMarkerViewHolder.textView.setReferenceTime(timeMarker.getTimestamp());
         } else {
             MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
-            Message message = messages.get(position);
+            Message message = ((Message) items.get(position));
 
             if (defaultDarkTextColor == -1) {
                 defaultDarkTextColor = messageViewHolder.messageTextView.getCurrentTextColor();
@@ -169,7 +181,11 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return ITEM_TYPE_EMPTY;
         }
 
-        switch (messages.get(position).getType()) {
+        if (items.get(position) instanceof TimeMarker) {
+            return ITEM_TYPE_TIME_MARKER;
+        }
+
+        switch (((Message) items.get(position)).getType()) {
             case CONNECT:
                 return ITEM_TYPE_CONNECT;
 
@@ -183,12 +199,16 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public long getItemId(int position) {
-        return UUID.fromString(messages.get(position).getId()).getMostSignificantBits();
+        if (items.get(position) instanceof TimeMarker) {
+            return ((TimeMarker) items.get(position)).getTimestamp();
+        } else {
+            return UUID.fromString(((Message) items.get(position)).getId()).getMostSignificantBits();
+        }
     }
 
     @Override
     public int getItemCount() {
-        return messages.size();
+        return items.size();
     }
 
     @Override
@@ -210,8 +230,8 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public void onFirebaseResponse(List<Message> newMessages) {
-        this.messages = newMessages;
-        showEmpty = messages.size() == 0;
+        updateMessages(newMessages);
+        showEmpty = newMessages.size() == 0;
         callbacks.onRefreshFinished();
         notifyDataSetChanged();
 
@@ -229,12 +249,54 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         callbacks.onError(e);
     }
 
+    private void updateMessages(List<Message> messages) {
+        items.clear();
+
+        if (messages.size() == 0) {
+            return;
+        }
+
+        items.add(messages.get(0));
+
+        for (int i = 1; i < messages.size(); i++) {
+            Message message1 = messages.get(i - 1);
+            Message message2 = messages.get(i);
+
+            long timestamp1 = new Date(message1.getCreatedAt()).getTime();
+            long timestamp2 = new Date(message2.getCreatedAt()).getTime();
+
+            if (timestamp1 - timestamp2 > 60 * 60 * 1000) {
+                items.add(new TimeMarker(timestamp1));
+            }
+
+            items.add(message2);
+        }
+
+        Message lastMessage = (Message) items.get(items.size() - 1);
+        long lastTimestamp = new Date(lastMessage.getCreatedAt()).getTime();
+
+        if (new Date().getTime() - lastTimestamp > 60 * 60 * 1000) {
+            items.add(new TimeMarker(lastTimestamp));
+        }
+    }
+
     public void enableRefresh() {
         chatroomFirebaseRef.addValueEventListener(this);
     }
 
     public void disableRefresh() {
         chatroomFirebaseRef.removeEventListener(this);
+    }
+
+    public static class TimeMarkerViewHolder extends RecyclerView.ViewHolder {
+
+        public final RelativeTimeTextView textView;
+
+        public TimeMarkerViewHolder(View itemView) {
+            super(itemView);
+            textView = (RelativeTimeTextView) itemView;
+        }
+
     }
 
     public static class EmptyViewHolder extends RecyclerView.ViewHolder {

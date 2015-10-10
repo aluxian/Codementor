@@ -7,6 +7,5 @@
     <color name="sender_text">#3C566A</color>
     <color name="sender_background">#E6F4FF</color>
 
-    <color name="empty_state_gray">#AAA</color>
-    <color name="send_button_disabled">#AAA</color>
+    <color name="neutral_gray">#AAA</color>
 </resources>
