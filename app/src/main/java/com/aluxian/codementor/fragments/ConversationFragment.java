@@ -247,6 +247,26 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     private void updateStatus(String status) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
+        switch (status) {
+            case "available":
+                status = "Instant Session";
+                break;
+            case "online":
+                status = "Online";
+                break;
+            case "away":
+                status = "Away";
+                break;
+            case "session":
+                status = "In Session";
+                break;
+            case "offline":
+                status = "Offline";
+                break;
+            default:
+                status = null;
+        }
+
         if (actionBar != null) {
             actionBar.setSubtitle(status);
         }
