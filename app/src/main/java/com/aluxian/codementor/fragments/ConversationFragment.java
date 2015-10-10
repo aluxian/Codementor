@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -80,6 +81,19 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
 
         ImageButton sendButton = (ImageButton) rootView.findViewById(R.id.send);
         EditText messageField = (EditText) rootView.findViewById(R.id.message);
+
+        messageField.requestFocus();
+        messageField.setOnFocusChangeListener((v1, hasFocus) -> {
+            if (!hasFocus) {
+                InputMethodManager imm = (InputMethodManager)
+                        getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+
+                View view = getView();
+                if (view != null) {
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
+            }
+        });
 
         sendButton.setOnClickListener(v -> {
             String message = messageField.getText().toString();
