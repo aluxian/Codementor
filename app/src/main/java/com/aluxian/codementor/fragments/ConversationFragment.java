@@ -32,6 +32,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.activities.LoginActivity;
 import com.aluxian.codementor.adapters.ConversationAdapter;
 import com.aluxian.codementor.models.Chatroom;
+import com.aluxian.codementor.tasks.FirebaseReAuthTask;
 import com.aluxian.codementor.tasks.SendMessageTask;
 import com.aluxian.codementor.tasks.SetMessagesReadTask;
 import com.firebase.client.DataSnapshot;
@@ -41,7 +42,8 @@ import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 
 public class ConversationFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        ConversationAdapter.Callbacks, SendMessageTask.Callbacks, ValueEventListener, SetMessagesReadTask.Callbacks {
+        ConversationAdapter.Callbacks, SendMessageTask.Callbacks, ValueEventListener, SetMessagesReadTask.Callbacks,
+        FirebaseReAuthTask.Callbacks {
 
     private static final String TAG = ConversationFragment.class.getSimpleName();
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
@@ -51,6 +53,8 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     private SwipeRefreshLayout swipeRefreshLayout;
     private Firebase presenceRef;
     private Chatroom chatroom;
+
+    private boolean retriedFirebaseAuth;
 
     public static ConversationFragment newInstance(Chatroom chatroom) {
         Bundle args = new Bundle();
@@ -79,7 +83,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         recyclerView.setLayoutManager(layoutManager);
 
-        conversationAdapter = new ConversationAdapter(app.getFirebase(), app.getOkHttpClient(),
+        conversationAdapter = new ConversationAdapter(app.getFirebaseRef(), app.getOkHttpClient(),
                 app.getUserManager(), this, chatroom);
         conversationAdapter.setHasStableIds(true);
         recyclerView.setAdapter(conversationAdapter);
@@ -175,7 +179,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
             onRefresh();
 
             String otherUser = chatroom.getOtherUser(app.getUserManager().getUsername()).getUsername();
-            presenceRef = app.getFirebase().child("presence/" + otherUser + "/magic");
+            presenceRef = app.getFirebaseRef().child("presence/" + otherUser + "/magic");
             presenceRef.addValueEventListener(this);
         }, 250);
     }
@@ -240,7 +244,13 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         updateStatus(null);
 
         if (firebaseError.getCode() == FirebaseError.PERMISSION_DENIED) {
-            onPermissionDenied(firebaseError.toException());
+            if (retriedFirebaseAuth) {
+                onPermissionDenied(firebaseError.toException());
+                retriedFirebaseAuth = false;
+            } else {
+                new FirebaseReAuthTask(app.getFirebaseRef(), app.getOkHttpClient(), app.getUserManager(),
+                        firebaseError, this).execute();
+            }
         } else {
             onError(firebaseError.toException());
         }
@@ -249,29 +259,41 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     private void updateStatus(String status) {
         ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
 
-        switch (status) {
-            case "available":
-                status = "Instant Session";
-                break;
-            case "online":
-                status = "Online";
-                break;
-            case "away":
-                status = "Away";
-                break;
-            case "session":
-                status = "In Session";
-                break;
-            case "offline":
-                status = "Offline";
-                break;
-            default:
-                status = null;
+        if (status != null) {
+            switch (status) {
+                case "available":
+                    status = "Instant Session";
+                    break;
+                case "online":
+                    status = "Online";
+                    break;
+                case "away":
+                    status = "Away";
+                    break;
+                case "session":
+                    status = "In Session";
+                    break;
+                case "offline":
+                    status = "Offline";
+                    break;
+            }
         }
 
         if (actionBar != null) {
             actionBar.setSubtitle(status);
         }
+    }
+
+    @Override
+    public void restartRefresh() {
+        retriedFirebaseAuth = true;
+        presenceRef.removeEventListener(ConversationFragment.this);
+        presenceRef.addValueEventListener(ConversationFragment.this);
+    }
+
+    @Override
+    public void onFirebaseReAuthError(Exception e) {
+        onPermissionDenied(e);
     }
 
 }

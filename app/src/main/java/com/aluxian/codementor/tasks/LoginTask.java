@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 public class LoginTask extends AsyncTask<String, Void, String> implements Firebase.AuthResultHandler {
 
+    private Firebase firebaseRef;
     private OkHttpClient okHttpClient;
     private Callbacks callbacks;
     private Exception error;
@@ -26,7 +27,8 @@ public class LoginTask extends AsyncTask<String, Void, String> implements Fireba
     private String username;
     private String firebaseToken;
 
-    public LoginTask(OkHttpClient okHttpClient, Callbacks callbacks) {
+    public LoginTask(Firebase firebaseRef, OkHttpClient okHttpClient, Callbacks callbacks) {
+        this.firebaseRef = firebaseRef;
         this.okHttpClient = okHttpClient;
         this.callbacks = callbacks;
     }
@@ -50,8 +52,7 @@ public class LoginTask extends AsyncTask<String, Void, String> implements Fireba
 
         if (firebaseToken != null) {
             callbacks.onFirebaseAuth();
-            Firebase ref = new Firebase("https://codementor.firebaseio.com/");
-            ref.authWithCustomToken(firebaseToken, this);
+            firebaseRef.authWithCustomToken(firebaseToken, this);
         } else {
             callbacks.onAuthError(this.error);
             callbacks.onAuthFinished();
@@ -100,7 +101,7 @@ public class LoginTask extends AsyncTask<String, Void, String> implements Fireba
         }
 
         if (hasCorrectStatusCode && hasCorrectLocation) {
-            return getFirebaseToken();
+            return getFirebaseToken(okHttpClient);
         }
 
         return null;
@@ -127,7 +128,7 @@ public class LoginTask extends AsyncTask<String, Void, String> implements Fireba
         return code;
     }
 
-    private String getFirebaseToken() throws IOException {
+    public static String getFirebaseToken(OkHttpClient okHttpClient) throws IOException {
         String token = null;
 
         // The /terms page is smaller than others (~3k lines)

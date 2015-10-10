@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity
                 .setOnCancelListener(this)
                 .show();
 
-        loginTask = new LoginTask(app.getOkHttpClient(), this);
+        loginTask = new LoginTask(app.getFirebaseRef(), app.getOkHttpClient(), this);
         loginTask.execute(username, password);
     }
 

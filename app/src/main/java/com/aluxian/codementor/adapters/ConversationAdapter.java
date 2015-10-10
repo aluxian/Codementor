@@ -20,6 +20,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.Message;
 import com.aluxian.codementor.models.TimeMarker;
+import com.aluxian.codementor.tasks.FirebaseReAuthTask;
 import com.aluxian.codementor.tasks.ParseFirebaseResponseTask;
 import com.aluxian.codementor.tasks.SetMessagesReadTask;
 import com.aluxian.codementor.utils.UserManager;
@@ -36,7 +37,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements ValueEventListener, ParseFirebaseResponseTask.Callbacks, SetMessagesReadTask.Callbacks {
+        implements ValueEventListener, ParseFirebaseResponseTask.Callbacks,
+        SetMessagesReadTask.Callbacks, FirebaseReAuthTask.Callbacks {
 
     private static final int ITEM_TYPE_TIME_MARKER = 0;
     private static final int ITEM_TYPE_EMPTY = 1;
@@ -44,7 +46,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ITEM_TYPE_CONNECT = 3;
     private static final int ITEM_TYPE_FILE = 4;
 
+    private Firebase firebaseRef;
     private Firebase chatroomFirebaseRef;
+
     private OkHttpClient okHttpClient;
     private UserManager userManager;
     private Callbacks callbacks;
@@ -54,12 +58,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private int defaultDarkTextColor;
 
     private List<Object> items = new ArrayList<>();
+    private boolean retriedFirebaseAuth = false;
     private boolean showEmpty = false;
 
-    public ConversationAdapter(Firebase firebase, OkHttpClient okHttpClient, UserManager userManager,
+    public ConversationAdapter(Firebase firebaseRef, OkHttpClient okHttpClient, UserManager userManager,
                                Callbacks callbacks, Chatroom chatroom) {
+        this.firebaseRef = firebaseRef;
+        this.chatroomFirebaseRef = firebaseRef.child(chatroom.getFirebasePath());
         this.okHttpClient = okHttpClient;
-        this.chatroomFirebaseRef = firebase.child(chatroom.getFirebasePath());
         this.userManager = userManager;
         this.callbacks = callbacks;
     }
@@ -215,15 +221,21 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onDataChange(DataSnapshot dataSnapshot) {
         callbacks.onNewMessage();
         new ParseFirebaseResponseTask(this).execute(dataSnapshot);
+        retriedFirebaseAuth = false;
     }
 
     @Override
     public void onCancelled(FirebaseError firebaseError) {
-        callbacks.onRefreshFinished();
-
         if (firebaseError.getCode() == FirebaseError.PERMISSION_DENIED) {
-            callbacks.onPermissionDenied(firebaseError.toException());
+            if (retriedFirebaseAuth) {
+                callbacks.onRefreshFinished();
+                callbacks.onPermissionDenied(firebaseError.toException());
+                retriedFirebaseAuth = false;
+            } else {
+                new FirebaseReAuthTask(firebaseRef, okHttpClient, userManager, firebaseError, this).execute();
+            }
         } else {
+            callbacks.onRefreshFinished();
             callbacks.onError(firebaseError.toException());
         }
     }
@@ -286,6 +298,19 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     public void disableRefresh() {
         chatroomFirebaseRef.removeEventListener(this);
+    }
+
+    @Override
+    public void restartRefresh() {
+        retriedFirebaseAuth = true;
+        disableRefresh();
+        enableRefresh();
+    }
+
+    @Override
+    public void onFirebaseReAuthError(Exception e) {
+        callbacks.onRefreshFinished();
+        callbacks.onPermissionDenied(e);
     }
 
     public static class TimeMarkerViewHolder extends RecyclerView.ViewHolder {
