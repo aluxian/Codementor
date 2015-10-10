@@ -20,18 +20,20 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.models.Message;
 import com.aluxian.codementor.tasks.ParseFirebaseResponseTask;
+import com.aluxian.codementor.tasks.SetMessagesReadTask;
 import com.aluxian.codementor.utils.UserManager;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.squareup.okhttp.OkHttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
-        implements ValueEventListener, ParseFirebaseResponseTask.Callbacks {
+        implements ValueEventListener, ParseFirebaseResponseTask.Callbacks, SetMessagesReadTask.Callbacks {
 
     private static final int ITEM_TYPE_EMPTY = 1;
     private static final int ITEM_TYPE_MESSAGE = 2;
@@ -39,6 +41,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private static final int ITEM_TYPE_FILE = 4;
 
     private Firebase chatroomFirebaseRef;
+    private OkHttpClient okHttpClient;
     private UserManager userManager;
     private Callbacks callbacks;
 
@@ -49,7 +52,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<Message> messages = new ArrayList<>();
     private boolean showEmpty = false;
 
-    public ConversationAdapter(Firebase firebase, UserManager userManager, Callbacks callbacks, Chatroom chatroom) {
+    public ConversationAdapter(Firebase firebase, OkHttpClient okHttpClient, UserManager userManager,
+                               Callbacks callbacks, Chatroom chatroom) {
+        this.okHttpClient = okHttpClient;
         this.chatroomFirebaseRef = firebase.child(chatroom.getFirebasePath());
         this.userManager = userManager;
         this.callbacks = callbacks;
@@ -209,6 +214,19 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         showEmpty = messages.size() == 0;
         callbacks.onRefreshFinished();
         notifyDataSetChanged();
+
+        if (newMessages.size() > 0) {
+            Message lastMessage = newMessages.get(newMessages.size() - 1);
+
+            if (!lastMessage.sentBy(userManager.getUsername()) && !lastMessage.hasBeenRead()) {
+                new SetMessagesReadTask(lastMessage.getSender().getUsername(), okHttpClient, this).execute();
+            }
+        }
+    }
+
+    @Override
+    public void onError(Exception e) {
+        callbacks.onError(e);
     }
 
     public void enableRefresh() {

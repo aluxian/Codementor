@@ -33,6 +33,7 @@ import com.aluxian.codementor.activities.LoginActivity;
 import com.aluxian.codementor.adapters.ConversationAdapter;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.tasks.SendMessageTask;
+import com.aluxian.codementor.tasks.SetMessagesReadTask;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -40,7 +41,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 
 public class ConversationFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        ConversationAdapter.Callbacks, SendMessageTask.Callbacks, ValueEventListener {
+        ConversationAdapter.Callbacks, SendMessageTask.Callbacks, ValueEventListener, SetMessagesReadTask.Callbacks {
 
     private static final String TAG = ConversationFragment.class.getSimpleName();
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
@@ -78,7 +79,8 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, true);
         recyclerView.setLayoutManager(layoutManager);
 
-        conversationAdapter = new ConversationAdapter(app.getFirebase(), app.getUserManager(), this, chatroom);
+        conversationAdapter = new ConversationAdapter(app.getFirebase(), app.getOkHttpClient(),
+                app.getUserManager(), this, chatroom);
         conversationAdapter.setHasStableIds(true);
         recyclerView.setAdapter(conversationAdapter);
 

@@ -17,6 +17,7 @@ public class Message {
     private User receiver;
     private Request request;
     private String created_at;
+    private String read_at;
     private String type;
 
     public Message() {}
@@ -50,6 +51,18 @@ public class Message {
 
     public User getMentor() {
         return sender.getRole().equals("mentor") ? sender : receiver;
+    }
+
+    public User getOtherUser(String loggedInUsername) {
+        if (sender.getUsername().equals(loggedInUsername)) {
+            return receiver;
+        } else {
+            return sender;
+        }
+    }
+
+    public boolean hasBeenRead() {
+        return read_at != null;
     }
 
     public boolean sentBy(String username) {
@@ -86,6 +99,10 @@ public class Message {
 
     public String getId() {
         return id;
+    }
+
+    public User getSender() {
+        return sender;
     }
 
     public enum Type {
