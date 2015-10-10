@@ -34,6 +34,4 @@
 
 # Gson
 -keep public class com.google.gson
--keep class com.aluxian.codementor.models.Chatroom { *; }
--keep class com.aluxian.codementor.models.Message { *; }
--keep class com.aluxian.codementor.models.User { *; }
+-keep class com.aluxian.codementor.models.** { *; }
