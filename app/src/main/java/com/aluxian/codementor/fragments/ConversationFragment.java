@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,10 +33,14 @@ import com.aluxian.codementor.activities.LoginActivity;
 import com.aluxian.codementor.adapters.ConversationAdapter;
 import com.aluxian.codementor.models.Chatroom;
 import com.aluxian.codementor.tasks.SendMessageTask;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.gson.Gson;
 
 public class ConversationFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener,
-        ConversationAdapter.Callbacks, SendMessageTask.Callbacks {
+        ConversationAdapter.Callbacks, SendMessageTask.Callbacks, ValueEventListener {
 
     private static final String TAG = ConversationFragment.class.getSimpleName();
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
@@ -42,6 +48,7 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     private App app;
     private ConversationAdapter conversationAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Firebase presenceRef;
     private Chatroom chatroom;
 
     public static ConversationFragment newInstance(Chatroom chatroom) {
@@ -164,7 +171,17 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
         view.postDelayed(() -> {
             swipeRefreshLayout.setRefreshing(true);
             onRefresh();
+
+            String otherUser = chatroom.getOtherUser(app.getUserManager().getUsername()).getUsername();
+            presenceRef = app.getFirebase().child("presence/" + otherUser + "/magic");
+            presenceRef.addValueEventListener(this);
         }, 250);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        presenceRef.removeEventListener(this);
     }
 
     @Override
@@ -209,6 +226,30 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
     @Override
     public void onBackgroundError(Exception e) {
         getActivity().runOnUiThread(() -> onError(e));
+    }
+
+    @Override
+    public void onDataChange(DataSnapshot dataSnapshot) {
+        updateStatus(dataSnapshot.getValue(String.class));
+    }
+
+    @Override
+    public void onCancelled(FirebaseError firebaseError) {
+        updateStatus(null);
+
+        if (firebaseError.getCode() == FirebaseError.PERMISSION_DENIED) {
+            onPermissionDenied(firebaseError.toException());
+        } else {
+            onError(firebaseError.toException());
+        }
+    }
+
+    private void updateStatus(String status) {
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setSubtitle(status);
+        }
     }
 
 }

@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Li
 
         if (actionBar != null) {
             actionBar.setTitle(chatroom.getOtherUser(app.getUserManager().getUsername()).getName());
+            actionBar.setSubtitle(null);
         }
 
         getSupportFragmentManager().beginTransaction()
