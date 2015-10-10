@@ -36,6 +36,10 @@
             android:layout_marginRight="16dp"
             android:background="?android:attr/selectableItemBackground"
             android:contentDescription="@null"
+            android:paddingEnd="0dp"
+            android:paddingLeft="4dp"
+            android:paddingRight="0dp"
+            android:paddingStart="4dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_send" />
 

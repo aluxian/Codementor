@@ -1,7 +1,10 @@
 package com.aluxian.codementor.fragments;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -10,7 +13,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +87,57 @@ public class ConversationFragment extends Fragment implements SwipeRefreshLayout
 
             if (!TextUtils.isEmpty(message)) {
                 new SendMessageTask(app.getOkHttpClient(), app.getUserManager(), this, chatroom).execute(message);
+            }
+        });
+
+        int brandAccentColor = ContextCompat.getColor(getContext(), R.color.brand_accent);
+        int sendButtonDisabledColor = ContextCompat.getColor(getContext(), R.color.send_button_disabled);
+
+        sendButton.setColorFilter(sendButtonDisabledColor, PorterDuff.Mode.SRC_ATOP);
+        sendButton.setClickable(false);
+
+        messageField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    if (!sendButton.isClickable()) {
+                        animateSendButton(sendButtonDisabledColor, brandAccentColor);
+                        sendButton.setClickable(true);
+                    }
+                } else {
+                    if (sendButton.isClickable()) {
+                        animateSendButton(brandAccentColor, sendButtonDisabledColor);
+                        sendButton.setClickable(false);
+                    }
+                }
+            }
+
+            private void animateSendButton(int fromColor, int toColor) {
+                final float[] from = new float[3];
+                final float[] to = new float[3];
+
+                Color.colorToHSV(fromColor, from);
+                Color.colorToHSV(toColor, to);
+
+                ValueAnimator anim = ValueAnimator.ofFloat(0, 1);
+                anim.setDuration(300);
+
+                final float[] hsv = new float[3];
+                anim.addUpdateListener(animation -> {
+                    hsv[0] = from[0] + (to[0] - from[0]) * animation.getAnimatedFraction();
+                    hsv[1] = from[1] + (to[1] - from[1]) * animation.getAnimatedFraction();
+                    hsv[2] = from[2] + (to[2] - from[2]) * animation.getAnimatedFraction();
+
+                    sendButton.setColorFilter(Color.HSVToColor(hsv), PorterDuff.Mode.SRC_ATOP);
+                });
+
+                anim.start();
             }
         });
 
