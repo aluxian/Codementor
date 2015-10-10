@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.R;
@@ -36,9 +37,7 @@ public class DrawerFragment extends Fragment
 
     private ChatroomsAdapter chatroomsAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-
     private boolean fromSavedInstanceState;
-    private boolean hasSelectedChatroom;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -147,10 +146,6 @@ public class DrawerFragment extends Fragment
 
     @Override
     public void onRefreshFinished() {
-//        if (!hasSelectedChatroom && !chatroomsAdapter.isEmpty()) {
-//            new Handler().postDelayed(() -> onChatroomSelected(chatroomsAdapter.getFirstChatroom()), 250);
-//        }
-
         swipeRefreshLayout.setRefreshing(false);
     }
 
@@ -163,14 +158,12 @@ public class DrawerFragment extends Fragment
         if (mListener != null) {
             mListener.onChatroomSelected(chatroom);
         }
-
-        hasSelectedChatroom = true;
     }
 
     @Override
     public void onError(Exception e) {
         Log.e(TAG, e.getMessage(), e);
-//        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     public interface Listener {

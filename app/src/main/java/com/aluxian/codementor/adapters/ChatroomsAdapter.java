@@ -114,14 +114,6 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         new GetChatroomsTask(okHttpClient, this).execute();
     }
 
-    public boolean isEmpty() {
-        return chatrooms.size() == 0;
-    }
-
-    public Chatroom getFirstChatroom() {
-        return chatrooms.get(0);
-    }
-
     public class EmptyViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
