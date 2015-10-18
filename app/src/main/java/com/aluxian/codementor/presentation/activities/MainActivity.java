@@ -105,4 +105,13 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (emptyStateMsgView.getVisibility() != View.VISIBLE && chatroomsFragment.isDrawerOpen()) {
+            chatroomsFragment.closeDrawer();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 }

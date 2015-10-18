@@ -97,6 +97,12 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
         }
     }
 
+    public boolean isDrawerOpen() {
+        return drawerLayout != null
+                && fragmentContainerView != null
+                && drawerLayout.isDrawerOpen(fragmentContainerView);
+    }
+
     @Override
     public void openDrawer() {
         if (drawerLayout != null && fragmentContainerView != null) {
