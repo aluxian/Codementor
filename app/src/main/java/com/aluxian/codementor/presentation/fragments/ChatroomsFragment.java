@@ -14,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
@@ -131,7 +130,6 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     @Override
     public void showEmptyState(boolean show) {
         // TODO: toggle a view
-        Toast.makeText(getContext(), "Empty", Toast.LENGTH_LONG).show();
     }
 
     /**

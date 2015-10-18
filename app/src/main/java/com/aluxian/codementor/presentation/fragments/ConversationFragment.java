@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.aluxian.codementor.MessageFieldTextWatcher;
 import com.aluxian.codementor.R;
@@ -105,7 +104,6 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     @Override
     public void showEmptyState(boolean show) {
         // TODO: toggle a view
-        Toast.makeText(getContext(), "Empty", Toast.LENGTH_LONG).show();
     }
 
     @Override
