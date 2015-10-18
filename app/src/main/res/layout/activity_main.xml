@@ -19,7 +19,7 @@
             android:layout_marginLeft="64dp"
             android:layout_marginRight="64dp"
             android:drawablePadding="48dp"
-            android:drawableTop="@drawable/message"
+            android:drawableTop="@drawable/img_message"
             android:gravity="center_horizontal"
             android:text="@string/msg_no_conversations"
             android:textColor="@color/neutral_gray"
