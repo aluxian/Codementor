@@ -2,9 +2,11 @@ package com.aluxian.codementor.data.tasks;
 
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ChatroomsList;
+import com.aluxian.codementor.data.models.ChatroomsListData;
 import com.aluxian.codementor.data.models.firebase.FirebaseMessage;
 import com.aluxian.codementor.data.models.firebase.FirebaseServerMessage;
 import com.aluxian.codementor.utils.CamelCaseNamingStrategy;
+import com.aluxian.codementor.utils.UserManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.MediaType;
@@ -21,9 +23,11 @@ public class ServerApiTasks {
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json;charset=UTF-8");
 
     private OkHttpClient okHttpClient;
+    private UserManager userManager;
 
-    public ServerApiTasks(OkHttpClient okHttpClient) {
+    public ServerApiTasks(OkHttpClient okHttpClient, UserManager userManager) {
         this.okHttpClient = okHttpClient;
+        this.userManager = userManager;
     }
 
     /**
@@ -35,7 +39,9 @@ public class ServerApiTasks {
             Response response = okHttpClient.newCall(request).execute();
 
             String responseBody = response.body().string();
-            return new Gson().fromJson(responseBody, ChatroomsList.class);
+            ChatroomsListData data = new Gson().fromJson(responseBody, ChatroomsListData.class);
+
+            return new ChatroomsList(data, userManager.getUsername());
         });
     }
 
