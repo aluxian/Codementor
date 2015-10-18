@@ -39,15 +39,15 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     private @Nullable ActionBarDrawerToggle drawerToggle;
     private @Nullable View fragmentContainerView;
 
-    private boolean fromSavedInstanceState;
     private ChatroomsAdapter chatroomsAdapter;
+    private boolean drawerShouldBeOpen;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (savedInstanceState != null) {
-            fromSavedInstanceState = true;
+        if (savedInstanceState == null) {
+            drawerShouldBeOpen = true;
         }
 
         chatroomsAdapter = new ChatroomsAdapter();
@@ -158,8 +158,9 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout,
                 R.string.drawer_open, R.string.drawer_close);
 
-        if (!fromSavedInstanceState) {
+        if (drawerShouldBeOpen) {
             openDrawer();
+            drawerShouldBeOpen = false;
         }
 
         // Defer code dependent on the restoration of the previous instance state

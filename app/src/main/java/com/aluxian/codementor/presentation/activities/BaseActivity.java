@@ -1,7 +1,6 @@
 package com.aluxian.codementor.presentation.activities;
 
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aluxian.codementor.App;
@@ -56,18 +55,6 @@ public abstract class BaseActivity<P extends Presenter> extends AppCompatActivit
     @SuppressWarnings("NullableProblems")
     protected P getPresenter() {
         return presenter;
-    }
-
-    /**
-     * Adds a {@link Fragment} to this activity's layout.
-     *
-     * @param containerViewId The container view where to add the fragment.
-     * @param fragment        The fragment to be added.
-     */
-    protected void replaceFragment(int containerViewId, Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(containerViewId, fragment)
-                .commit();
     }
 
     /**

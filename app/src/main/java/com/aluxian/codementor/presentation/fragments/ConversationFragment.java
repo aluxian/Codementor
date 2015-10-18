@@ -72,7 +72,6 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
         swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.brand_accent));
         swipeRefreshLayout.setEnabled(false);
-//        swipeRefreshLayout.setOnRefreshListener(getPresenter()); TODO
 
         messageField.requestFocus();
         messageField.setOnFocusChangeListener(this::onFocusChanged);

@@ -10,21 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/empty_state_msg"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginBottom="48dp"
-            android:layout_marginLeft="64dp"
-            android:layout_marginRight="64dp"
-            android:drawablePadding="48dp"
-            android:drawableTop="@drawable/img_message"
-            android:gravity="center_horizontal"
-            android:text="@string/msg_no_conversations"
-            android:textColor="@color/neutral_gray"
-            android:textSize="16sp"
-            android:visibility="gone" />
+        <include layout="@layout/include_empty_state"/>
 
     </FrameLayout>
 

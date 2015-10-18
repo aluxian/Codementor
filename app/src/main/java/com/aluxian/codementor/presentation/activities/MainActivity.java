@@ -24,7 +24,9 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements ChatroomSelectedListener {
 
-    @Bind(R.id.empty_state_msg) TextView emptyStateMsgView;
+    private static final String STATE_HAS_CHATROOM_SELECTED = "has_chatroom_selected";
+
+    @Bind(R.id.tv_empty_state) TextView emptyStateView;
     @Bind(R.id.navigation_drawer) View fragmentContainerView;
     @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
 
@@ -53,8 +55,10 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
         chatroomsFragment.init(fragmentContainerView, drawerLayout);
         chatroomsFragment.setChatroomSelectedListener(this);
 
-        if (savedInstanceState == null) {
-            emptyStateMsgView.setVisibility(View.VISIBLE);
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean(STATE_HAS_CHATROOM_SELECTED)) {
+                emptyStateView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -67,8 +71,17 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
             actionBar.setSubtitle(null);
         }
 
-        emptyStateMsgView.setVisibility(View.GONE);
-        replaceFragment(R.id.container, ConversationFragment.newInstance(chatroom));
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container, ConversationFragment.newInstance(chatroom))
+                .commit();
+
+        emptyStateView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_HAS_CHATROOM_SELECTED, emptyStateView.getVisibility() == View.GONE);
     }
 
     @Override
@@ -107,7 +120,7 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
 
     @Override
     public void onBackPressed() {
-        if (emptyStateMsgView.getVisibility() != View.VISIBLE && chatroomsFragment.isDrawerOpen()) {
+        if (chatroomsFragment.isDrawerOpen()) {
             chatroomsFragment.closeDrawer();
         } else {
             super.onBackPressed();

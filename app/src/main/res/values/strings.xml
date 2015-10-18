@@ -23,7 +23,7 @@
     <string name="auth_step_firebase">Connecting to Firebase…</string>
 
     <string name="msg_send_hint">Send a message…</string>
-    <string name="msg_no_conversations">Your messages will appear here. Pick a conversation from the drawer and
+    <string name="msg_no_conversations">Your messages will appear here.\nPick a conversation from the drawer and
         chat away!</string>
 
     <string name="status_available">Instant Session</string>

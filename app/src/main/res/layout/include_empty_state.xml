@@ -1,0 +1,15 @@
+<TextView
+    android:id="@+id/tv_empty_state"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:layout_marginBottom="48dp"
+    android:layout_marginLeft="64dp"
+    android:layout_marginRight="64dp"
+    android:drawablePadding="48dp"
+    android:drawableTop="@drawable/img_message"
+    android:gravity="center_horizontal"
+    android:text="@string/msg_no_conversations"
+    android:textColor="@color/neutral_gray"
+    android:textSize="16sp" />
