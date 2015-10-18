@@ -26,6 +26,8 @@ import java.util.List;
 
 import bolts.Task;
 
+import static bolts.Task.UI_THREAD_EXECUTOR;
+
 public class ConversationPresenter extends Presenter<ConversationView> {
 
     private @Nullable Task firebaseReAuthTask;
@@ -102,7 +104,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> serverApiTasks.sendMessage(firebaseMessage, task.getResult()))
-                .continueWith(task -> taskContinuations.logAndToastError());
+                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
     }
 
     private void updateStatus(@Nullable String status) {
@@ -149,14 +151,14 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                         removeFirebaseListeners();
                         addFirebaseListeners();
                         return null;
-                    })
+                    }, UI_THREAD_EXECUTOR)
                     .continueWith(task -> {
                         if (task.isFaulted()) {
                             errorHandler.logAndToast(firebaseError.toException());
                         }
 
                         return null;
-                    });
+                    }, UI_THREAD_EXECUTOR);
         } else {
             errorHandler.logAndToast(firebaseError.toException());
         }
@@ -187,7 +189,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                             bus.post(new NewMessageEvent(chatroom, lastMessage));
 
                             serverApiTasks.markConversationRead(chatroom)
-                                    .continueWith(serverTask -> taskContinuations.logAndToastError());
+                                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
                         }
 
                         conversationAdapter.updateList(messages);
@@ -195,8 +197,8 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                         getView().setRefreshing(false);
 
                         return null;
-                    })
-                    .continueWith(task -> taskContinuations.logAndToastError());
+                    }, UI_THREAD_EXECUTOR)
+                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
         }
 
         @Override

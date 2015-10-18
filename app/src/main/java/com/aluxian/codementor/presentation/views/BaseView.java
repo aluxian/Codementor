@@ -1,6 +1,6 @@
 package com.aluxian.codementor.presentation.views;
 
-public interface BaseView {
-
-
-}
+/**
+ * Base view interface that the other views shall implement.
+ */
+public interface BaseView {}

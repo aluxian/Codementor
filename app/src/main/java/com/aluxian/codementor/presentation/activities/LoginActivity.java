@@ -50,8 +50,9 @@ public class LoginActivity extends BaseActivity<LoginActivityPresenter>
     }
 
     @Override
-    public void showProgressDialog() {
+    public void showProgressDialog(int messageResId) {
         progressDialog = new AlertDialog.Builder(this, R.style.AppTheme_Login_Dialog)
+                .setMessage(messageResId)
                 .setOnCancelListener(this)
                 .show();
     }

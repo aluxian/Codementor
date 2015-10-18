@@ -14,6 +14,8 @@ import com.squareup.otto.Subscribe;
 
 import bolts.Task;
 
+import static bolts.Task.UI_THREAD_EXECUTOR;
+
 public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRefreshListener {
 
     private @Nullable Task chatroomsListTask;
@@ -83,8 +85,8 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
                     getView().showEmptyState(chatroomsAdapter.getItemCount() == 0);
                     getView().setRefreshing(false);
                     return null;
-                })
-                .continueWith(task -> taskContinuations.logAndToastError());
+                }, UI_THREAD_EXECUTOR)
+                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
     }
 
 }

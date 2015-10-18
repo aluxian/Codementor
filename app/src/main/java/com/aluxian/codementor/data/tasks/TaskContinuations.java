@@ -15,7 +15,7 @@ public class TaskContinuations {
     /**
      * A simple task which logs the error and shows a toast (if it exists).
      */
-    public Continuation<Object, Void> logAndToastError() {
+    public <T, C> Continuation<T, C> logAndToastError() {
         return task -> {
             if (task.isFaulted()) {
                 errorHandler.logAndToast(task.getError());
