@@ -98,7 +98,11 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
     @Override
     public void setRefreshing(boolean refreshing) {
-        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(refreshing));
+        swipeRefreshLayout.post(() -> {
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(refreshing);
+            }
+        });
     }
 
     @Override
