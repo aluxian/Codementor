@@ -1,33 +1,33 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
-    android:elevation="16dp">
-
-    <ImageButton
-        android:id="@+id/btn_send"
-        android:layout_width="32dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="16dp"
-        android:background="?android:attr/selectableItemBackgroundBorderless"
-        android:contentDescription="@null"
-        android:paddingEnd="0dp"
-        android:paddingStart="4dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/ic_send" />
+    android:elevation="16dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
 
     <EditText
         android:id="@+id/tv_message"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_toStartOf="@id/btn_send"
+        android:layout_marginEnd="48dp"
         android:background="@android:color/transparent"
-        android:hint="@string/msg_send_hint" />
+        android:hint="@string/msg_send_hint"
+        android:paddingBottom="16dp"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:paddingTop="16dp" />
+
+    <ImageButton
+        android:id="@+id/btn_send"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/tv_message"
+        android:layout_alignParentEnd="true"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@null"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_send" />
 
 </RelativeLayout>
