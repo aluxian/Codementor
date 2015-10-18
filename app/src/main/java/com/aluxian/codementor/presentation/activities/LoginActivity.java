@@ -6,7 +6,9 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatButton;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.presentation.presenters.LoginActivityPresenter;
@@ -29,18 +31,12 @@ public class LoginActivity extends BaseActivity<LoginActivityPresenter>
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
 
-        getCoreServices().getCookieStore().removeAll();
+        ButterKnife.bind(this);
         setPresenter(new LoginActivityPresenter(this, getCoreServices()));
 
-//        TODO: Make this work
-//        passwordField.setOnEditorActionListener((v, actionId, event) -> {
-//            getPresenter().logIn();
-//            return true;
-//        });
-
         loginButton.setOnClickListener(this::loginButtonClicked);
+        passwordField.setOnEditorActionListener(this::editorActionListener);
     }
 
     @Override
@@ -79,14 +75,18 @@ public class LoginActivity extends BaseActivity<LoginActivityPresenter>
 
     @Override
     public void onCancel(DialogInterface dialog) {
-//        dialog.dismiss(); TODO: is required?
         getPresenter().dialogCancelled();
     }
 
     private void loginButtonClicked(View buttonView) {
         String username = usernameField.getText().toString().trim().toLowerCase();
-        String password = passwordField.getText().toString().trim();
+        String password = passwordField.getText().toString();
         getPresenter().logIn(username, password);
+    }
+
+    private boolean editorActionListener(TextView textView, int actionId, KeyEvent event) {
+        loginButtonClicked(null);
+        return false;
     }
 
 }

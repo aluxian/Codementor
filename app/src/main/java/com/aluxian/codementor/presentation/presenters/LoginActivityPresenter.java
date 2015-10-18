@@ -7,6 +7,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.tasks.CodementorTasks;
 import com.aluxian.codementor.data.tasks.FirebaseTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.lib.PersistentCookieStore;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
 import com.aluxian.codementor.utils.UserManager;
 import com.firebase.client.AuthData;
@@ -22,6 +23,8 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
     private FirebaseTasks firebaseTasks;
     private CodementorTasks codementorTasks;
     private TaskContinuations taskContinuations;
+
+    private PersistentCookieStore cookieStore;
     private UserManager userManager;
     private boolean cancelled;
 
@@ -31,7 +34,11 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
         firebaseTasks = coreServices.getFirebaseTasks();
         codementorTasks = coreServices.getCodementorTasks();
         taskContinuations = coreServices.getTaskContinuations();
+
+        cookieStore = coreServices.getCookieStore();
         userManager = coreServices.getUserManager();
+
+        cookieStore.removeAll();
     }
 
     public void logIn(String username, String password) {
@@ -82,6 +89,7 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
     private <T> Continuation<T, T> updateUnlessCancelled(int stringResId) {
         return task -> {
             if (cancelled) {
+                cookieStore.removeAll();
                 throw new CancellationException();
             }
 
@@ -94,6 +102,7 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
     }
 
     public void dialogCancelled() {
+        cookieStore.removeAll();
         cancelled = true;
     }
 
