@@ -46,14 +46,14 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
         }
 
         cancelled = false;
-        getView().showProgressDialog(R.string.auth_step_codementor_connect);
+        getView().showProgressDialog(R.string.auth_step_codementor);
 
         codementorTasks.extractAuthCode()
-                .onSuccess(updateUnlessCancelled(R.string.auth_step_codementor_auth), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(0), UI_THREAD_EXECUTOR)
                 .onSuccessTask(task -> codementorTasks.signIn(username, password, task.getResult()))
-                .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase_extract), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase), UI_THREAD_EXECUTOR)
                 .onSuccessTask(task -> codementorTasks.extractToken())
-                .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase_auth), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(0), UI_THREAD_EXECUTOR)
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), false))
                 .onSuccess(loggedIn(username), UI_THREAD_EXECUTOR)
                 .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
@@ -85,7 +85,10 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
                 throw new CancellationException();
             }
 
-            getView().updateProgressDialogMessage(stringResId);
+            if (stringResId != 0) {
+                getView().updateProgressDialogMessage(stringResId);
+            }
+
             return task.getResult();
         };
     }
