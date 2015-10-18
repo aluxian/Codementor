@@ -8,7 +8,6 @@ import com.aluxian.codementor.data.tasks.CodementorTasks;
 import com.aluxian.codementor.data.tasks.FirebaseTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
-import com.aluxian.codementor.utils.ErrorHandler;
 import com.aluxian.codementor.utils.UserManager;
 
 import java.util.concurrent.CancellationException;
@@ -18,8 +17,6 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
     private FirebaseTasks firebaseTasks;
     private CodementorTasks codementorTasks;
     private TaskContinuations taskContinuations;
-
-    private ErrorHandler errorHandler;
     private UserManager userManager;
     private boolean cancelled;
 
@@ -29,8 +26,6 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
         firebaseTasks = coreServices.getFirebaseTasks();
         codementorTasks = coreServices.getCodementorTasks();
         taskContinuations = coreServices.getTaskContinuations();
-
-        errorHandler = coreServices.getErrorHandler();
         userManager = coreServices.getUserManager();
     }
 
