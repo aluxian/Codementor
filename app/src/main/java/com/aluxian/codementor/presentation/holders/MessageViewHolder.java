@@ -1,7 +1,5 @@
 package com.aluxian.codementor.presentation.holders;
 
-import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -13,6 +11,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Message;
 
 import butterknife.Bind;
+import butterknife.BindColor;
 import butterknife.ButterKnife;
 
 public class MessageViewHolder extends RecyclerView.ViewHolder {
@@ -21,17 +20,15 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.container) LinearLayout linearLayout;
     @Bind(R.id.tv_message) TextView messageTextView;
 
-    protected int senderChatTextColor;
-    protected int senderChatBackgroundColor;
-    protected int defaultDarkTextColor;
+    @BindColor(R.color.sender_text) int senderTextColor;
+    @BindColor(R.color.sender_background) int senderBackgroundColor;
+
+    @BindColor(R.color.receiver_text) int receiverTextColor;
+    @BindColor(R.color.receiver_background) int receiverBackgroundColor;
 
     public MessageViewHolder(View view) {
         super(view);
         ButterKnife.bind(this, itemView);
-
-        senderChatTextColor = ContextCompat.getColor(itemView.getContext(), R.color.sender_text);
-        senderChatBackgroundColor = ContextCompat.getColor(itemView.getContext(), R.color.sender_background);
-        defaultDarkTextColor = messageTextView.getCurrentTextColor();
     }
 
     public void loadMessage(Message message) {
@@ -62,11 +59,11 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         View cardChild = cardView.getChildAt(0);
 
         if (alignRight) {
-            cardChild.setBackgroundColor(senderChatBackgroundColor);
-            messageTextView.setTextColor(senderChatTextColor);
+            cardChild.setBackgroundColor(senderBackgroundColor);
+            messageTextView.setTextColor(senderTextColor);
         } else {
-            cardChild.setBackgroundColor(Color.WHITE);
-            messageTextView.setTextColor(defaultDarkTextColor);
+            cardChild.setBackgroundColor(receiverBackgroundColor);
+            messageTextView.setTextColor(receiverTextColor);
         }
     }
 

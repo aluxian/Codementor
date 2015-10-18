@@ -44,10 +44,10 @@ public class FileMessageViewHolder extends MessageViewHolder {
 
         if (alignRight) {
             subtextView.setGravity(Gravity.END);
-            subtextView.setTextColor(senderChatTextColor);
+            subtextView.setTextColor(senderTextColor);
         } else {
             subtextView.setGravity(Gravity.START);
-            subtextView.setTextColor(defaultDarkTextColor);
+            subtextView.setTextColor(receiverTextColor);
         }
     }
 

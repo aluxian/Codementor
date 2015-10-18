@@ -3,9 +3,11 @@
     <color name="brand_darker">#1E374D</color>
     <color name="brand_accent">#EF3B1F</color>
 
-
     <color name="sender_text">#3C566A</color>
     <color name="sender_background">#E6F4FF</color>
+
+    <color name="receiver_text">#95000000</color>
+    <color name="receiver_background">#FFF</color>
 
     <color name="neutral_gray">#AAA</color>
 </resources>
