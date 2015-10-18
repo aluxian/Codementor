@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
         chatroomsFragment.init(fragmentContainerView, drawerLayout);
         chatroomsFragment.setChatroomSelectedListener(this);
 
-        if (savedInstanceState != null) {
+        if (savedInstanceState == null) {
             emptyStateMsgView.setVisibility(View.VISIBLE);
         }
     }
@@ -67,6 +67,7 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
             actionBar.setSubtitle(null);
         }
 
+        emptyStateMsgView.setVisibility(View.GONE);
         replaceFragment(R.id.container, ConversationFragment.newInstance(chatroom));
     }
 
