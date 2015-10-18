@@ -130,7 +130,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     @Override
     public void setRefreshing(boolean refreshing) {
-        swipeRefreshLayout.setRefreshing(refreshing);
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(refreshing));
     }
 
     @Override
