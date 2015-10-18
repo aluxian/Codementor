@@ -27,7 +27,7 @@
         android:elevation="16dp">
 
         <ImageButton
-            android:id="@+id/send"
+            android:id="@+id/btn_send"
             android:layout_width="32dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -40,14 +40,14 @@
             android:src="@drawable/ic_send" />
 
         <EditText
-            android:id="@+id/message"
+            android:id="@+id/tv_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="12dp"
-            android:layout_toStartOf="@id/send"
+            android:layout_toStartOf="@id/btn_send"
             android:background="@android:color/transparent"
             android:hint="@string/msg_send_hint" />
 

@@ -16,7 +16,7 @@ import butterknife.ButterKnife;
 
 public class FileMessageViewHolder extends MessageViewHolder {
 
-    @Bind(R.id.subtext) TextView subtextView;
+    @Bind(R.id.tv_subtext) TextView subtextView;
 
     public FileMessageViewHolder(View view) {
         super(view);

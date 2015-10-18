@@ -30,7 +30,7 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="8dp"
             android:hint="@string/hint_password"
-            android:imeActionId="@+id/login"
+            android:imeActionId="@+id/action_log_in"
             android:imeActionLabel="@string/action_log_in"
             android:inputType="textPassword"
             android:maxLines="1"

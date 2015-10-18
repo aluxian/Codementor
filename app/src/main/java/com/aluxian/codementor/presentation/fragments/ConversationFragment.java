@@ -36,8 +36,8 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
     private ConversationAdapter conversationAdapter;
 
-    @Bind(R.id.send) ImageButton sendButton;
-    @Bind(R.id.message) EditText messageField;
+    @Bind(R.id.btn_send) ImageButton sendButton;
+    @Bind(R.id.tv_message) EditText messageField;
     @Bind(R.id.recycler) RecyclerView recyclerView;
     @Bind(R.id.swipe_container) SwipeRefreshLayout swipeRefreshLayout;
 

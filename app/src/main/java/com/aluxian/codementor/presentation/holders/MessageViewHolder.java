@@ -17,9 +17,9 @@ import butterknife.ButterKnife;
 
 public class MessageViewHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.card) CardView cardView;
+    @Bind(R.id.card_container) CardView cardView;
     @Bind(R.id.container) LinearLayout linearLayout;
-    @Bind(R.id.message) TextView messageTextView;
+    @Bind(R.id.tv_message) TextView messageTextView;
 
     protected int senderChatTextColor;
     protected int senderChatBackgroundColor;

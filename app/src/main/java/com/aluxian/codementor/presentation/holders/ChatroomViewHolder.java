@@ -15,9 +15,9 @@ import butterknife.ButterKnife;
 
 public class ChatroomViewHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.avatar) SimpleDraweeView avatarImageView;
-    @Bind(R.id.subtitle) TextView subtitleTextView;
-    @Bind(R.id.title) TextView titleTextView;
+    @Bind(R.id.img_avatar) SimpleDraweeView avatarImageView;
+    @Bind(R.id.tv_subtitle) TextView subtitleTextView;
+    @Bind(R.id.tv_title) TextView titleTextView;
 
     public ChatroomViewHolder(View itemView) {
         super(itemView);

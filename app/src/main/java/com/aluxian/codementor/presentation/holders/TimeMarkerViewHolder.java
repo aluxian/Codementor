@@ -12,7 +12,7 @@ import butterknife.ButterKnife;
 
 public class TimeMarkerViewHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.timestamp) RelativeTimeTextView timestampTextView;
+    @Bind(R.id.tv_timestamp) RelativeTimeTextView timestampTextView;
 
     public TimeMarkerViewHolder(View itemView) {
         super(itemView);
