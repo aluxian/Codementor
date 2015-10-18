@@ -35,7 +35,6 @@ import java.util.Set;
 /**
  * @source https://gist.github.com/franmontiel/ed12a2295566b7076161
  */
-@SuppressWarnings("ForLoopReplaceableByForEach")
 public class PersistentCookieStore implements CookieStore {
 
     private static final String TAG = PersistentCookieStore.class.getSimpleName();
@@ -135,8 +134,8 @@ public class PersistentCookieStore implements CookieStore {
     @Override
     public synchronized List<HttpCookie> getCookies() {
         List<HttpCookie> allValidCookies = new ArrayList<>();
-        for (Iterator<URI> it = allCookies.keySet().iterator(); it.hasNext(); ) {
-            allValidCookies.addAll(getValidCookies(it.next()));
+        for (URI uri : allCookies.keySet()) {
+            allValidCookies.addAll(getValidCookies(uri));
         }
 
         return allValidCookies;
@@ -146,8 +145,7 @@ public class PersistentCookieStore implements CookieStore {
         Set<HttpCookie> targetCookies = new HashSet<>();
         // If the stored URI does not have a path then it must match any URI in
         // the same domain
-        for (Iterator<URI> it = allCookies.keySet().iterator(); it.hasNext(); ) {
-            URI storedUri = it.next();
+        for (URI storedUri : allCookies.keySet()) {
             // Check ith the domains match according to RFC 6265
             if (checkDomainsMatch(storedUri.getHost(), uri.getHost())) {
                 // Check if the paths match according to RFC 6265

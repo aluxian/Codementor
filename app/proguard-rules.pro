@@ -32,9 +32,16 @@
 -keep class com.squareup.okhttp.** { *; }
 -keep interface com.squareup.okhttp.** { *; }
 
+# Otto
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @com.squareup.otto.Subscribe public *;
+    @com.squareup.otto.Produce public *;
+}
+
 # Gson
 -keep public class com.google.gson
--keep class com.aluxian.codementor.models.** { *; }
+-keep class com.aluxian.codementor.chatroomData.models.** { *; }
 
 # ButterKnife
 -keep class butterknife.** { *; }

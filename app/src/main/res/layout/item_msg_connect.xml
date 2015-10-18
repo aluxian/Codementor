@@ -14,7 +14,7 @@
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="1dp">
 
-        <com.aluxian.codementor.views.WrapWidthTextView
+        <com.aluxian.codementor.WrapWidthTextView
             android:id="@+id/message"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

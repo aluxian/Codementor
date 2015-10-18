@@ -23,16 +23,17 @@
             android:gravity="center_horizontal"
             android:text="@string/msg_no_conversations"
             android:textColor="@color/neutral_gray"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:visibility="gone" />
 
     </FrameLayout>
 
     <fragment
         android:id="@+id/navigation_drawer"
-        android:name="com.aluxian.codementor.fragments.DrawerFragment"
+        android:name="com.aluxian.codementor.presentation.fragments.ChatroomsFragment"
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        tools:layout="@layout/fragment_drawer" />
+        tools:layout="@layout/fragment_chatrooms" />
 
 </android.support.v4.widget.DrawerLayout>

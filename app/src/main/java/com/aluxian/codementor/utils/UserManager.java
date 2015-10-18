@@ -1,8 +1,6 @@
 package com.aluxian.codementor.utils;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 public class UserManager {
 
@@ -16,9 +14,8 @@ public class UserManager {
     private String firebaseToken;
     private String username;
 
-    public UserManager(Context context) {
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
-
+    public UserManager(SharedPreferences sharedPrefs) {
+        this.sharedPrefs = sharedPrefs;
         loggedIn = sharedPrefs.getBoolean(KEY_LOGGED_IN, false);
         firebaseToken = sharedPrefs.getString(KEY_FIREBASE_TOKEN, null);
         username = sharedPrefs.getString(KEY_USERNAME, null);
