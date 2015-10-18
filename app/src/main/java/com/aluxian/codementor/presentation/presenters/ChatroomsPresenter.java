@@ -36,40 +36,22 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
     }
 
     @Override
-    public void create() {
-        super.create();
-        bus.register(this);
-    }
-
-    @Override
     public void resume() {
         super.resume();
+        bus.register(this);
         getView().setRefreshing(true);
         onRefresh();
     }
 
     @Override
-    public void destroy() {
-//        bus.unregister(this); TODO
-//        Caused by: java.lang.IllegalArgumentException: Missing event handler for an annotated method.
-// Is class com.aluxian.codementor.presentation.presenters.ChatroomsPresenter registered?
-//        at com.squareup.otto.Bus.unregister(Bus.java:290)
-//        at com.aluxian.codementor.presentation.presenters.ChatroomsPresenter.destroy(ChatroomsPresenter.java:52)
-//        at com.aluxian.codementor.presentation.fragments.BaseFragment.onDestroy(BaseFragment.java:46)
-//        at android.support.v4.app.Fragment.performDestroy(Fragment.java:2182)
-//        at android.support.v4.app.FragmentManagerImpl.moveToState(FragmentManager.java:1157)
-//        at android.support.v4.app.FragmentManagerImpl.moveToState(FragmentManager.java:1207)
-//        at android.support.v4.app.FragmentManagerImpl.moveToState(FragmentManager.java:1189)
-//        at android.support.v4.app.FragmentManagerImpl.dispatchDestroy(FragmentManager.java:2038)
-//        at android.support.v4.app.FragmentController.dispatchDestroy(FragmentController.java:235)
-//        at android.support.v4.app.FragmentActivity.onDestroy(FragmentActivity.java:290)
-//        at android.support.v7.app.AppCompatActivity.onDestroy(AppCompatActivity.java:161)
-//        at com.aluxian.codementor.presentation.activities.BaseActivity.onDestroy(BaseActivity.java:38)
-//        at android.app.Activity.performDestroy(Activity.java:6169)
+    public void pause() {
+        super.pause();
+        bus.unregister(this);
     }
 
     @Subscribe
     public void newMessageReceived(NewMessageEvent event) {
+        getView().setRefreshing(true);
         onRefresh();
     }
 
