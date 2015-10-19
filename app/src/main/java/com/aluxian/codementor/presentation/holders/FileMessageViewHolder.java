@@ -1,10 +1,11 @@
 package com.aluxian.codementor.presentation.holders;
 
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.text.method.LinkMovementMethod;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,9 +15,11 @@ import com.aluxian.codementor.data.models.Message;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class FileMessageViewHolder extends MessageViewHolder {
+public class FileMessageViewHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.tv_subtext) TextView subtextView;
+    @Bind(R.id.tv_message) TextView messageTextView;
+    @Bind(R.id.tv_timeSubText) TextView timeSubtextView;
+    @Bind(R.id.tv_sizeSubText) TextView sizeSubtextView;
 
     public FileMessageViewHolder(View view) {
         super(view);
@@ -25,30 +28,16 @@ public class FileMessageViewHolder extends MessageViewHolder {
     }
 
     public void loadMessage(Message message) {
-        boolean alignRight = message.sentByCurrentUser();
-        String body = message.getTypeContent();
-
-        adjustGravity(alignRight);
-        adjustColors(alignRight);
-
-        bindFileMessage(message, body, alignRight);
-        messageTextView.requestLayout();
-    }
-
-    private void bindFileMessage(Message message, String body, boolean alignRight) {
-        Spanned htmlBody = Html.fromHtml(body);
-        messageTextView.setText(htmlBody);
+        int flags = DateUtils.FORMAT_SHOW_DATE;
+        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), flags);
+        timeSubtextView.setText(time);
 
         String size = Formatter.formatShortFileSize(itemView.getContext(), message.getRequest().getSize());
-        subtextView.setText(size);
+        sizeSubtextView.setText(size);
 
-        if (alignRight) {
-            subtextView.setGravity(Gravity.END);
-            subtextView.setTextColor(senderTextColor);
-        } else {
-            subtextView.setGravity(Gravity.START);
-            subtextView.setTextColor(receiverTextColor);
-        }
+        Spanned htmlBody = Html.fromHtml(message.getTypeContent());
+        messageTextView.setText(htmlBody);
+        messageTextView.requestLayout();
     }
 
 }

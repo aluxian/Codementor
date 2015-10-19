@@ -1,10 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:gravity="start"
+    android:paddingEnd="48dp"
+    android:paddingRight="48dp"
+    tools:ignore="RtlSymmetry">
 
     <android.support.v7.widget.CardView
-        android:id="@+id/card_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
@@ -14,12 +18,22 @@
         card_view:cardCornerRadius="2dp"
         card_view:cardElevation="1dp">
 
-        <com.aluxian.codementor.WrapWidthTextView
+        <TextView
             android:id="@+id/tv_message"
             android:layout_width="match_parent"
+            android:textStyle="bold"
             android:layout_height="match_parent"
-            android:textStyle="bold|italic"
-            android:padding="8dp" />
+            android:autoLink="web"
+            android:background="@color/receiver_background"
+            android:gravity="start"
+            android:linksClickable="true"
+            android:padding="8dp"
+            android:textColor="@color/receiver_text"
+            android:textColorLink="@color/brand_accent" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </android.support.v7.widget.CardView>
 
