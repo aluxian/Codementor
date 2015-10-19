@@ -13,10 +13,10 @@
         android:layout_marginEnd="48dp"
         android:background="@android:color/transparent"
         android:hint="@string/msg_send_hint"
-        android:paddingBottom="16dp"
+        android:paddingBottom="14dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
-        android:paddingTop="16dp" />
+        android:paddingTop="14dp" />
 
     <ImageButton
         android:id="@+id/btn_send"
