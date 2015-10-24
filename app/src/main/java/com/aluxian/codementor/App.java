@@ -2,8 +2,11 @@ package com.aluxian.codementor;
 
 import android.app.Application;
 
+import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Firebase;
+
+import io.fabric.sdk.android.Fabric;
 
 public class App extends Application {
 
@@ -15,6 +18,7 @@ public class App extends Application {
 
         Fresco.initialize(this);
         Firebase.setAndroidContext(this);
+        Fabric.with(this, new Crashlytics());
 
         coreServices = new CoreServices(this);
     }

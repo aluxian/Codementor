@@ -28,6 +28,13 @@
             android:theme="@style/AppTheme.Login"
             android:windowSoftInputMode="adjustResize|stateVisible" />
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a081a015f6791b96d6a06893f2ea46976b54f14c" />
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a081a015f6791b96d6a06893f2ea46976b54f14c" />
+
     </application>
 
 </manifest>
