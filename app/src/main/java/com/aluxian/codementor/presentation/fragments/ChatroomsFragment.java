@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
@@ -33,6 +34,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     @Bind(R.id.recycler) RecyclerView recyclerView;
     @Bind(R.id.swipe_container) SwipeRefreshLayout swipeRefreshLayout;
+    @Bind(R.id.tv_empty_state) TextView emptyState;
 
     private @Nullable ChatroomSelectedListener chatroomSelectedListener;
     private @Nullable DrawerLayout drawerLayout;
@@ -141,7 +143,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     @Override
     public void showEmptyState(boolean show) {
-        // TODO: toggle a view
+        emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     /**

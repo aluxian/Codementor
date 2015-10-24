@@ -16,4 +16,16 @@
 
     </android.support.v4.widget.SwipeRefreshLayout>
 
+    <TextView
+        android:id="@+id/tv_empty_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center"
+        android:paddingTop="24dp"
+        android:text="@string/empty_chatrooms"
+        android:textColor="@color/neutral_gray"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
 </RelativeLayout>

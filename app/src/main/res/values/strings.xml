@@ -17,18 +17,19 @@
     <string name="error_unexpected">An unexpected error occurred</string>
 
     <string name="empty_chatrooms">No chatrooms.\nSwipe down to refresh.</string>
-    <string name="empty_conversation">No messages.</string>
+    <string name="empty_conversation">No messages.\nSend one yourself!</string>
+    <string name="empty_no_conversations">Your messages will appear here.\nPick a conversation from the drawer and
+        chat away!</string>
 
     <string name="auth_step_codementor">Authenticating…</string>
     <string name="auth_step_firebase">Connecting to Firebase…</string>
 
     <string name="msg_send_hint">Send a message…</string>
-    <string name="msg_no_conversations">Your messages will appear here.\nPick a conversation from the drawer and
-        chat away!</string>
 
     <string name="status_available">Instant Session</string>
     <string name="status_online">Online</string>
     <string name="status_away">Away</string>
     <string name="status_session">In Session</string>
     <string name="status_offline">Offline</string>
+
 </resources>

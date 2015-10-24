@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.aluxian.codementor.MessageFieldTextWatcher;
 import com.aluxian.codementor.R;
@@ -39,6 +40,7 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     @Bind(R.id.tv_message) EditText messageField;
     @Bind(R.id.recycler) RecyclerView recyclerView;
     @Bind(R.id.swipe_container) SwipeRefreshLayout swipeRefreshLayout;
+    @Bind(R.id.tv_empty_state) TextView emptyState;
 
     public static ConversationFragment newInstance(Chatroom chatroom) {
         Bundle args = new Bundle();
@@ -108,7 +110,7 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
     @Override
     public void showEmptyState(boolean show) {
-        // TODO: toggle a view
+        emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
     @Override

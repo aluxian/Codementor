@@ -9,6 +9,6 @@
     android:drawablePadding="32dp"
     android:drawableTop="@drawable/img_message"
     android:gravity="center_horizontal"
-    android:text="@string/msg_no_conversations"
+    android:text="@string/empty_no_conversations"
     android:textColor="@color/neutral_gray"
     android:textSize="16sp" />
