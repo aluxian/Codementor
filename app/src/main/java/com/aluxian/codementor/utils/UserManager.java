@@ -4,25 +4,22 @@ import android.content.SharedPreferences;
 
 public class UserManager {
 
-    private static final String KEY_LOGGED_IN = "um_logged_in";
     private static final String KEY_FIREBASE_TOKEN = "um_firebase_token";
     private static final String KEY_USERNAME = "um_username";
 
     private SharedPreferences sharedPrefs;
 
-    private boolean loggedIn;
     private String firebaseToken;
     private String username;
 
     public UserManager(SharedPreferences sharedPrefs) {
         this.sharedPrefs = sharedPrefs;
-        loggedIn = sharedPrefs.getBoolean(KEY_LOGGED_IN, false);
         firebaseToken = sharedPrefs.getString(KEY_FIREBASE_TOKEN, null);
         username = sharedPrefs.getString(KEY_USERNAME, null);
     }
 
     public boolean isLoggedIn() {
-        return loggedIn;
+        return username != null && firebaseToken != null;
     }
 
     public String getUsername() {
@@ -30,14 +27,12 @@ public class UserManager {
     }
 
     public void setLoggedIn(String username, String firebaseToken) {
-        this.loggedIn = true;
         this.firebaseToken = firebaseToken;
         this.username = username;
         persistState();
     }
 
     public void setLoggedOut() {
-        this.loggedIn = false;
         this.firebaseToken = null;
         this.username = null;
         persistState();
@@ -45,7 +40,6 @@ public class UserManager {
 
     private void persistState() {
         sharedPrefs.edit()
-                .putBoolean(KEY_LOGGED_IN, loggedIn)
                 .putString(KEY_FIREBASE_TOKEN, firebaseToken)
                 .putString(KEY_USERNAME, username)
                 .apply();
