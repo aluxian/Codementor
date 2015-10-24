@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.aluxian.codementor.BuildConfig;
+import com.crashlytics.android.Crashlytics;
 
 public class ErrorHandler {
 
@@ -22,7 +23,10 @@ public class ErrorHandler {
      */
     public void log(Exception e) {
         Log.e(tag(), e.getMessage(), e);
-        // TODO: Send to Crashlytics
+
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.logException(e);
+        }
     }
 
     /**
@@ -37,7 +41,10 @@ public class ErrorHandler {
 
         Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         Log.e(tag(), e.getMessage(), e);
-        // TODO: Send to Crashlytics
+
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.logException(e);
+        }
     }
 
     /**
