@@ -15,6 +15,7 @@ import com.aluxian.codementor.presentation.holders.MessageViewHolder;
 import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -103,10 +104,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             Message message1 = messages.get(i - 1);
             Message message2 = messages.get(i);
 
-            long timestamp1 = normalizeTimestamp(message1.getCreatedAt());
-            long timestamp2 = normalizeTimestamp(message2.getCreatedAt());
+            long timestamp1 = message1.getCreatedAt();
+            long timestamp2 = message2.getCreatedAt();
 
-            if (timestamp1 - timestamp2 > 60 * 60 * 1000) {
+            Date date1 = new Date(timestamp1);
+            Date date2 = new Date(timestamp2);
+
+            if (!isSameDay(date1, date2)) {
                 addTimeMarker(timestamp1);
             }
 
@@ -114,17 +118,27 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         Message lastMessage = items.get(items.size() - 1).getMessage();
-        long lastTimestamp = normalizeTimestamp(lastMessage.getCreatedAt());
+        long lastTimestamp = lastMessage.getCreatedAt();
+        Date lastDate = new Date(lastTimestamp);
 
-        if (new Date().getTime() - lastTimestamp > 60 * 60 * 1000) {
+        if (!isSameDay(lastDate, new Date())) {
             addTimeMarker(lastTimestamp);
         }
 
         notifyDataSetChanged();
     }
 
-    private long normalizeTimestamp(long timestamp) {
-        return new Date(timestamp).getTime();
+    private boolean isSameDay(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+
+        cal1.setTime(date1);
+        cal2.setTime(date2);
+
+        boolean sameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+        boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+
+        return sameYear && sameDay;
     }
 
     private void addMessage(Message message) {
