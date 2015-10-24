@@ -2,6 +2,7 @@ package com.aluxian.codementor.data.tasks;
 
 import android.text.TextUtils;
 
+import com.aluxian.codementor.Constants;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -33,7 +34,7 @@ public class CodementorTasks {
         return Task.callInBackground(() -> {
             String code = null;
 
-            Request request = new Request.Builder().url("https://www.codementor.io/users/sign_in").build();
+            Request request = new Request.Builder().url(Constants.CODEMENTOR_SIGN_IN_URL).build();
             Response response = okHttpClient.newCall(request).execute();
 
             String responseBody = response.body().string();
@@ -58,7 +59,7 @@ public class CodementorTasks {
         return Task.callInBackground(() -> {
             String token = null;
 
-            Request request = new Request.Builder().url("https://www.codementor.io/terms").build();
+            Request request = new Request.Builder().url(Constants.CODEMENTOR_FIREBASE_TOKEN_URL).build();
             Response response = okHttpClient.newCall(request).execute();
 
             String responseBody = response.body().string();
@@ -93,7 +94,7 @@ public class CodementorTasks {
 
             Request request = new Request.Builder()
                     .post(requestBody)
-                    .url("https://www.codementor.io/users/sign_in")
+                    .url(Constants.CODEMENTOR_SIGN_IN_URL)
                     .build();
 
             Response response = okHttpClient.newCall(request).execute();
@@ -108,7 +109,7 @@ public class CodementorTasks {
             }
 
             // Redirected to the same page
-            if (headers.get(0).equals("https://www.codementor.io/users/sign_in")) {
+            if (headers.get(0).equals(Constants.CODEMENTOR_SIGN_IN_URL)) {
                 throw new Exception("Wrong credentials");
             }
 

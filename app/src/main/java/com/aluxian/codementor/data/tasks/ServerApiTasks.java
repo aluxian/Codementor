@@ -1,5 +1,6 @@
 package com.aluxian.codementor.data.tasks;
 
+import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ChatroomsList;
 import com.aluxian.codementor.data.models.ChatroomsListData;
@@ -35,7 +36,7 @@ public class ServerApiTasks {
      */
     public Task<ChatroomsList> getChatroomsList() {
         return Task.callInBackground(() -> {
-            Request request = new Request.Builder().url("https://www.codementor.io/api/chatrooms/list").build();
+            Request request = new Request.Builder().url(Constants.getApiUrl("chatrooms", "list")).build();
             Response response = okHttpClient.newCall(request).execute();
 
             String responseBody = response.body().string();

@@ -53,7 +53,7 @@ public class CoreServices {
         bus = new Bus();
 
         // Network
-        firebaseRef = new Firebase("https://codementor.firebaseio.com/");
+        firebaseRef = new Firebase(Constants.FIREBASE_URL);
         okHttpClient = new OkHttpClient();
         okHttpClient.setCookieHandler(new CookieManager(cookieStore, CookiePolicy.ACCEPT_ALL));
         okHttpClient.setFollowRedirects(false);

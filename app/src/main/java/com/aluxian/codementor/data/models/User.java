@@ -1,5 +1,6 @@
 package com.aluxian.codementor.data.models;
 
+import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.data.annotations.GsonModel;
 import com.aluxian.codementor.data.annotations.JacksonModel;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -46,11 +47,11 @@ public class User implements Serializable {
     }
 
     public String getChatroomPath() {
-        return "https://www.codementor.io/api/chatrooms/" + getUsername();
+        return Constants.getApiUrl("chatrooms", getUsername());
     }
 
     public String getReadPath() {
-        return "https://www.codementor.io/api/chatrooms/" + getUsername() + "/read";
+        return Constants.getApiUrl("chatrooms", getUsername(), "read");
     }
 
     @Override
