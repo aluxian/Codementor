@@ -6,6 +6,7 @@ import com.aluxian.codementor.utils.ErrorHandler;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import static com.aluxian.codementor.data.models.ConversationItem.TYPE_CONNECT;
@@ -28,6 +29,22 @@ public class Message {
 
     public Message(MessageData messageData, ErrorHandler errorHandler, String loggedInUsername) {
         this.messageData = messageData;
+        this.errorHandler = errorHandler;
+        this.loggedInUsername = loggedInUsername;
+    }
+
+    public Message(FirebaseMessage firebaseMessage, ErrorHandler errorHandler, String loggedInUsername) {
+        this.messageData = new MessageData(
+                firebaseMessage.getId(),
+                firebaseMessage.getContent(),
+                firebaseMessage.getSender(),
+                firebaseMessage.getReceiver(),
+                firebaseMessage.getRequest(),
+                DATE_FORMAT.format(new Date()),
+                firebaseMessage.getReadAt(),
+                firebaseMessage.getType()
+        );
+
         this.errorHandler = errorHandler;
         this.loggedInUsername = loggedInUsername;
     }

@@ -28,16 +28,27 @@ public class FileMessageViewHolder extends RecyclerView.ViewHolder {
         messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    public void loadMessage(Message message) {
-        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
-        String size = Formatter.formatShortFileSize(itemView.getContext(), message.getRequest().getSize());
+    public void loadMessage(Message message, boolean lastSentMessage) {
+        setText(message);
+        setSubtext(message, lastSentMessage);
+        itemView.requestLayout();
+    }
 
-        String subtext = time + "  " + size;
-        subtextView.setText(subtext);
-
+    private void setText(Message message) {
         Spanned htmlBody = Html.fromHtml(message.getTypeContent());
         messageTextView.setText(htmlBody);
-        messageTextView.requestLayout();
+    }
+
+    private void setSubtext(Message message, boolean lastSentMessage) {
+        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
+        String size = Formatter.formatShortFileSize(itemView.getContext(), message.getRequest().getSize());
+        String subtext = time + "  " + size;
+
+        if (lastSentMessage && message.sentByCurrentUser() && message.hasBeenRead()) {
+            subtext += " SEEN";
+        }
+
+        subtextView.setText(subtext);
     }
 
 }

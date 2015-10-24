@@ -23,11 +23,24 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         ButterKnife.bind(this, itemView);
     }
 
-    public void loadMessage(Message message) {
-        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
-        subtextView.setText(time);
+    public void loadMessage(Message message, boolean lastSentMessage) {
+        setText(message);
+        setSubtext(message, lastSentMessage);
+        itemView.requestLayout();
+    }
+
+    private void setText(Message message) {
         messageTextView.setText(message.getTypeContent());
-        messageTextView.requestLayout();
+    }
+
+    private void setSubtext(Message message, boolean lastSentMessage) {
+        String subtext = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
+
+        if (lastSentMessage && message.sentByCurrentUser() && message.hasBeenRead()) {
+            subtext += " SEEN";
+        }
+
+        subtextView.setText(subtext);
     }
 
 }

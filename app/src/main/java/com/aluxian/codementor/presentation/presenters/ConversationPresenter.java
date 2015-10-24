@@ -16,6 +16,7 @@ import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.views.ConversationView;
 import com.aluxian.codementor.utils.ErrorHandler;
+import com.aluxian.codementor.utils.UserManager;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -34,6 +35,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
     private Bus bus;
     private ErrorHandler errorHandler;
+    private UserManager userManager;
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
@@ -52,6 +54,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         bus = coreServices.getBus();
         errorHandler = coreServices.getErrorHandler();
+        userManager = coreServices.getUserManager();
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
@@ -99,9 +102,11 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 chatroom.getChatroomId(),
                 Message.Type.MESSAGE,
                 messageBody,
-                chatroom.getCurrentUser(),
-                chatroom.getOtherUser());
+                null, chatroom.getCurrentUser(),
+                chatroom.getOtherUser()
+        );
 
+        conversationAdapter.addSentMessage(new Message(firebaseMessage, errorHandler, userManager.getUsername()));
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> serverApiTasks.sendMessage(firebaseMessage, task.getResult()))
                 .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);

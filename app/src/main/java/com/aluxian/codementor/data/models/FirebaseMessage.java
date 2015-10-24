@@ -12,11 +12,10 @@ import java.util.UUID;
 @GsonModel
 @JacksonModel
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class FirebaseMessage {
 
     private @JsonProperty("chatroom_id") String chatroomId;
-    private @JsonProperty("created_at") Map<String, String> createdAt;
+    private @JsonProperty("created_at") @SuppressWarnings("unused") Map<String, String> createdAt;
     private @JsonProperty("read_at") String readAt = null;
 
     private String id;
@@ -24,8 +23,10 @@ public class FirebaseMessage {
     private User sender;
     private User receiver;
     private String content;
+    private Request request;
 
-    public FirebaseMessage(String chatroomId, Message.Type type, String content, User sender, User receiver) {
+    public FirebaseMessage(String chatroomId, Message.Type type, String content,
+                           Request request, User sender, User receiver) {
         Map<String, String> createdAt = new HashMap<>();
         createdAt.put(".sv", "timestamp");
 
@@ -34,6 +35,7 @@ public class FirebaseMessage {
 
         this.createdAt = createdAt;
         this.content = content;
+        this.request = request;
 
         this.sender = sender;
         this.receiver = receiver;
@@ -41,8 +43,32 @@ public class FirebaseMessage {
         this.id = UUID.randomUUID().toString();
     }
 
+    public String getReadAt() {
+        return readAt;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
     public User getReceiver() {
         return receiver;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Request getRequest() {
+        return request;
     }
 
     @Override

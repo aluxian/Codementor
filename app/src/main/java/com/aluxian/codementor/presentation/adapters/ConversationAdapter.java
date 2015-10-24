@@ -68,10 +68,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             timeMarkerViewHolder.loadTimeMarker(item.getTimeMarker());
         } else if (holder instanceof FileMessageViewHolder) {
             FileMessageViewHolder fileMessageViewHolder = (FileMessageViewHolder) holder;
-            fileMessageViewHolder.loadMessage(item.getMessage());
+            fileMessageViewHolder.loadMessage(item.getMessage(), position == 0);
         } else {
             MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
-            messageViewHolder.loadMessage(item.getMessage());
+            messageViewHolder.loadMessage(item.getMessage(), position == 0);
         }
     }
 
@@ -88,6 +88,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    public void addSentMessage(Message message) {
+        items.add(0, new ConversationItem(message));
     }
 
     public void updateList(List<Message> messages) {

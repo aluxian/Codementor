@@ -1,12 +1,8 @@
 package com.aluxian.codementor.data.models;
 
 import com.aluxian.codementor.data.annotations.GsonModel;
-import com.aluxian.codementor.data.annotations.JacksonModel;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 
 @GsonModel
-@JacksonModel
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class FirebaseServerMessage {
 
     private String name;
