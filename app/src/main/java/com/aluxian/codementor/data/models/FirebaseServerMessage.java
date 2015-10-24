@@ -1,4 +1,4 @@
-package com.aluxian.codementor.data.models.firebase;
+package com.aluxian.codementor.data.models;
 
 import com.aluxian.codementor.data.annotations.GsonModel;
 import com.aluxian.codementor.data.annotations.JacksonModel;

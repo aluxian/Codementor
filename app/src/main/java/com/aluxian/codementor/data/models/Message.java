@@ -8,6 +8,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import static com.aluxian.codementor.data.models.ConversationItem.TYPE_CONNECT;
+import static com.aluxian.codementor.data.models.ConversationItem.TYPE_FILE;
+import static com.aluxian.codementor.data.models.ConversationItem.TYPE_MESSAGE;
+import static com.aluxian.codementor.data.models.ConversationItem.TYPE_SIGNATURE;
+
 public class Message {
 
     private static final SimpleDateFormat DATE_FORMAT =
@@ -25,10 +30,6 @@ public class Message {
         this.messageData = messageData;
         this.errorHandler = errorHandler;
         this.loggedInUsername = loggedInUsername;
-
-        type = parseType();
-        createdAt = parseDate();
-        typeContent = parseTypeContent();
     }
 
     public String getId() {
@@ -52,16 +53,19 @@ public class Message {
     }
 
     public long getCreatedAt() {
+        if (createdAt == 0) {
+            createdAt = parseDate();
+        }
+
         return createdAt;
     }
 
     public Type getType() {
-        return type;
-    }
+        if (type == null) {
+            type = parseType();
+        }
 
-    public int getViewType() {
-        boolean alignLeft = getSender().equals(getOtherUser());
-        return getType().id * 10 + (alignLeft ? 1 : 2);
+        return type;
     }
 
     public User getCurrentUser() {
@@ -89,31 +93,32 @@ public class Message {
     }
 
     public String getTypeContent() {
+        if (typeContent == null) {
+            typeContent = parseTypeContent();
+        }
+
         return typeContent;
     }
 
     public enum Type {
-        MESSAGE(1), CONNECT(2), FILE(3), SIGNATURE(4), OTHER(5);
+        MESSAGE(TYPE_MESSAGE),
+        CONNECT(ConversationItem.TYPE_CONNECT),
+        FILE(ConversationItem.TYPE_FILE),
+        SIGNATURE(ConversationItem.TYPE_SIGNATURE),
+        OTHER(ConversationItem.TYPE_OTHER);
 
-        private final int id;
+        public final int typeFlag;
 
-        Type(int id) {
-            this.id = id;
+        Type(int typeFlag) {
+            this.typeFlag = typeFlag;
         }
 
-        public static Type getByid(int id) {
-            switch (id) {
-                case 1:
-                    return MESSAGE;
-                case 2:
-                    return CONNECT;
-                case 3:
-                    return FILE;
-                case 4:
-                    return SIGNATURE;
-                default:
-                    return OTHER;
-            }
+        public static Type getByFlag(int flag) {
+            if ((TYPE_MESSAGE & flag) == TYPE_MESSAGE) return MESSAGE;
+            if ((TYPE_CONNECT & flag) == TYPE_CONNECT) return CONNECT;
+            if ((TYPE_FILE & flag) == TYPE_FILE) return FILE;
+            if ((TYPE_SIGNATURE & flag) == TYPE_SIGNATURE) return SIGNATURE;
+            return OTHER;
         }
     }
 
@@ -166,11 +171,11 @@ public class Message {
         Object val = messageData.created_at;
 
         try {
-            return DATE_FORMAT.parse((String) val).getTime();
-        } catch (ParseException e) {
+            return Double.valueOf(String.valueOf(val)).longValue();
+        } catch (NumberFormatException e1) {
             try {
-                return Double.valueOf(String.valueOf(val)).longValue();
-            } catch (Exception ex) {
+                return DATE_FORMAT.parse((String) val).getTime();
+            } catch (ParseException e2) {
                 return 0;
             }
         }

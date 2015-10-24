@@ -1,9 +1,7 @@
-package com.aluxian.codementor.data.models.firebase;
+package com.aluxian.codementor.data.models;
 
 import com.aluxian.codementor.data.annotations.GsonModel;
 import com.aluxian.codementor.data.annotations.JacksonModel;
-import com.aluxian.codementor.data.models.Message;
-import com.aluxian.codementor.data.models.User;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

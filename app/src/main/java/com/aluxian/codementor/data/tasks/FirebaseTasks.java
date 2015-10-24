@@ -1,9 +1,9 @@
 package com.aluxian.codementor.data.tasks;
 
 import com.aluxian.codementor.data.models.Chatroom;
+import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.MessageData;
-import com.aluxian.codementor.data.models.firebase.FirebaseMessage;
 import com.aluxian.codementor.utils.ErrorHandler;
 import com.aluxian.codementor.utils.UserManager;
 import com.firebase.client.AuthData;

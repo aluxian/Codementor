@@ -4,9 +4,11 @@
     <color name="brand_accent">#EF3B1F</color>
 
     <color name="sender_text">#3C566A</color>
+    <color name="sender_text_faded">#bb3C566A</color>
     <color name="sender_background">#E6F4FF</color>
 
-    <color name="receiver_text">#95000000</color>
+    <color name="receiver_text">#0D0D0D</color>
+    <color name="receiver_text_faded">#990D0D0D</color>
     <color name="receiver_background">#FFF</color>
 
     <color name="neutral_gray">#AAA</color>

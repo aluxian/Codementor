@@ -15,11 +15,12 @@ import com.aluxian.codementor.data.models.Message;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+import static android.text.format.DateUtils.FORMAT_SHOW_TIME;
+
 public class FileMessageViewHolder extends RecyclerView.ViewHolder {
 
     @Bind(R.id.tv_message) TextView messageTextView;
-    @Bind(R.id.tv_timeSubText) TextView timeSubtextView;
-    @Bind(R.id.tv_sizeSubText) TextView sizeSubtextView;
+    @Bind(R.id.tv_subtext) TextView subtextView;
 
     public FileMessageViewHolder(View view) {
         super(view);
@@ -28,12 +29,11 @@ public class FileMessageViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void loadMessage(Message message) {
-        int flags = DateUtils.FORMAT_SHOW_DATE;
-        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), flags);
-        timeSubtextView.setText(time);
-
+        String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
         String size = Formatter.formatShortFileSize(itemView.getContext(), message.getRequest().getSize());
-        sizeSubtextView.setText(size);
+
+        String subtext = time + "  " + size;
+        subtextView.setText(subtext);
 
         Spanned htmlBody = Html.fromHtml(message.getTypeContent());
         messageTextView.setText(htmlBody);

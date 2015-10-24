@@ -17,4 +17,63 @@
         <item name="android:background">@color/brand</item>
     </style>
 
+    <style name="AppWidget" />
+
+    <style name="AppWidget.Card">
+        <item name="android:layout_marginBottom">4dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="cardCornerRadius">2dp</item>
+        <item name="cardElevation">1dp</item>
+    </style>
+
+    <style name="AppWidget.Card.Left">
+        <item name="android:layout_marginLeft">12dp</item>
+        <item name="android:layout_marginRight">52dp</item>
+        <item name="android:background">@color/receiver_background</item>
+    </style>
+
+    <style name="AppWidget.Card.Right">
+        <item name="android:layout_marginLeft">52dp</item>
+        <item name="android:layout_marginRight">12dp</item>
+        <item name="android:background">@color/sender_background</item>
+    </style>
+
+    <style name="AppWidget.CardInner">
+        <item name="android:padding">8dp</item>
+    </style>
+
+    <style name="AppWidget.CardInner.Left">
+        <item name="android:background">@color/receiver_background</item>
+    </style>
+
+    <style name="AppWidget.CardInner.Right">
+        <item name="android:gravity">end</item>
+        <item name="android:background">@color/sender_background</item>
+    </style>
+
+    <style name="AppWidget.CardMainText">
+        <item name="android:textColorLink">@color/brand_accent</item>
+    </style>
+
+    <style name="AppWidget.CardMainText.Left">
+        <item name="android:textColor">@color/receiver_text</item>
+    </style>
+
+    <style name="AppWidget.CardMainText.Right">
+        <item name="android:textColor">@color/sender_text</item>
+    </style>
+
+    <style name="AppWidget.CardSubText">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textStyle">italic</item>
+    </style>
+
+    <style name="AppWidget.CardSubText.Left">
+        <item name="android:textColor">@color/receiver_text_faded</item>
+    </style>
+
+    <style name="AppWidget.CardSubText.Right">
+        <item name="android:textColor">@color/sender_text_faded</item>
+    </style>
+
 </resources>
