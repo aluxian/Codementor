@@ -195,7 +195,10 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
                         if (messages.size() > 0) {
                             Message lastMessage = messages.get(messages.size() - 1);
-                            bus.post(new NewMessageEvent(chatroom, lastMessage));
+
+                            if (conversationAdapter.getItemCount() > 0) {
+                                bus.post(new NewMessageEvent(chatroom, lastMessage));
+                            }
 
                             serverApiTasks.markConversationRead(chatroom)
                                     .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
