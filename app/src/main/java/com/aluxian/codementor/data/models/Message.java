@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.utils.MessageParsers;
 
-import java.util.Date;
-
 public class Message implements Comparable<Message> {
 
     private MessageData messageData;
@@ -19,20 +17,6 @@ public class Message implements Comparable<Message> {
     public Message(MessageData messageData, String loggedInUsername) {
         this.messageData = messageData;
         this.loggedInUsername = loggedInUsername;
-    }
-
-    public Message(FirebaseMessage firebaseMessage, String loggedInUsername) {
-        this.loggedInUsername = loggedInUsername;
-        this.messageData = new MessageData(
-                firebaseMessage.getId(),
-                firebaseMessage.getContent(),
-                firebaseMessage.getSender(),
-                firebaseMessage.getReceiver(),
-                firebaseMessage.getRequest(),
-                MessageParsers.DATE_FORMAT.format(new Date()),
-                firebaseMessage.getReadAt(),
-                firebaseMessage.getType()
-        );
     }
 
     public String getId() {
