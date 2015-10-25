@@ -64,6 +64,10 @@ public class MessageParsers {
                                                   User otherUser, Request request) {
         switch (type) {
             case MESSAGE:
+                if (sentByCurrentUser) {
+                    return "<i>You:</i> " + content;
+                }
+
                 return content;
 
             case CONNECT:
