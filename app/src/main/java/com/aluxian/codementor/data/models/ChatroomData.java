@@ -13,9 +13,10 @@ public class ChatroomData implements Serializable {
     public final User receiver;
     public final String chatroom_id;
     public final String chatroom_firebase_id;
+    public final Request request;
 
     public ChatroomData(String type, float created_at, float read_at, String id, String content, User sender,
-                        User receiver, String chatroom_id, String chatroom_firebase_id) {
+                        User receiver, String chatroom_id, String chatroom_firebase_id, Request request) {
         this.type = type;
         this.created_at = created_at;
         this.read_at = read_at;
@@ -25,6 +26,7 @@ public class ChatroomData implements Serializable {
         this.receiver = receiver;
         this.chatroom_id = chatroom_id;
         this.chatroom_firebase_id = chatroom_firebase_id;
+        this.request = request;
     }
 
     @Override

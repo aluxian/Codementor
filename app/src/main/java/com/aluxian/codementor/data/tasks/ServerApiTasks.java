@@ -6,6 +6,7 @@ import com.aluxian.codementor.data.models.ChatroomsListData;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.FirebaseServerMessage;
 import com.aluxian.codementor.data.utils.CamelCaseNamingStrategy;
+import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.utils.Constants;
 import com.google.gson.Gson;
@@ -23,10 +24,12 @@ public class ServerApiTasks {
     private static final MediaType TEXT_PLAIN_MEDIA_TYPE = MediaType.parse("text/plain");
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json;charset=UTF-8");
 
+    private ErrorHandler errorHandler;
     private OkHttpClient okHttpClient;
     private UserManager userManager;
 
-    public ServerApiTasks(OkHttpClient okHttpClient, UserManager userManager) {
+    public ServerApiTasks(OkHttpClient okHttpClient, UserManager userManager, ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
         this.okHttpClient = okHttpClient;
         this.userManager = userManager;
     }
@@ -42,7 +45,7 @@ public class ServerApiTasks {
             String responseBody = response.body().string();
             ChatroomsListData data = new Gson().fromJson(responseBody, ChatroomsListData.class);
 
-            return new ChatroomsList(data, userManager.getUsername());
+            return new ChatroomsList(data, errorHandler, userManager.getUsername());
         });
     }
 

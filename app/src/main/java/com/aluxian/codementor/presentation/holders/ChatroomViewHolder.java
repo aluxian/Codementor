@@ -2,6 +2,7 @@ package com.aluxian.codementor.presentation.holders;
 
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.View;
 import android.widget.TextView;
 
@@ -49,13 +50,7 @@ public class ChatroomViewHolder extends RecyclerView.ViewHolder {
     private void setText(Chatroom chatroom) {
         User otherUser = chatroom.getOtherUser();
         titleTextView.setText(otherUser.getName());
-
-        if (chatroom.sentByCurrentUser()) {
-            String content = "You: " + chatroom.getContent();
-            subtitleTextView.setText(content);
-        } else {
-            subtitleTextView.setText(chatroom.getContent());
-        }
+        subtitleTextView.setText(Html.fromHtml(chatroom.getTypeContent()));
     }
 
     private void setAvatar(Chatroom chatroom) {
