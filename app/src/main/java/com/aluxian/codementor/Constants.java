@@ -23,11 +23,19 @@ public class Constants {
     }
 
     public static String getPresencePath(String username) {
-        return "presence/" + username + "/magic";
+        return joinPath("presence", username, "magic");
+    }
+
+    public static String getChatroomPath(String chatroomFirebaseId, String chatroomId) {
+        return joinPath("chatrooms", chatroomFirebaseId, chatroomId);
     }
 
     private static String getApiUrl(String... segments) {
         return SERVER_API_URL + TextUtils.join("/", segments);
+    }
+
+    private static String joinPath(String... segments) {
+        return TextUtils.join("/", segments);
     }
 
 }

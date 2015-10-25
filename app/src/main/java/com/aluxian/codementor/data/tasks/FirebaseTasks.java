@@ -12,16 +12,10 @@ import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import bolts.Task;
 
@@ -70,27 +64,12 @@ public class FirebaseTasks {
      */
     public Task<List<Message>> parseMessagesSnapshot(DataSnapshot snapshot) {
         return Task.callInBackground(() -> {
-            Type listType = new TypeToken<List<MessageData>>() {}.getType();
-            Gson gson = new Gson();
-
-            Map<String, Object> data = snapshot.getValue(new GenericTypeIndicator<Map<String, Object>>() {});
-            List<MessageData> messageDataList = gson.fromJson(gson.toJsonTree(data.values()), listType);
             List<Message> messages = new ArrayList<>();
 
-            //noinspection Convert2streamapi
-            for (MessageData messageData : messageDataList) {
-                messages.add(new Message(messageData, errorHandler, userManager.getUsername()));
+            for (DataSnapshot child : snapshot.getChildren()) {
+                MessageData messageData = child.getValue(MessageData.class);
+                messages.add(0, new Message(messageData, errorHandler, userManager.getUsername()));
             }
-
-            Collections.sort(messages, (lhs, rhs) -> {
-                if (lhs.getCreatedAt() < rhs.getCreatedAt()) {
-                    return 1;
-                } else if (lhs.getCreatedAt() > rhs.getCreatedAt()) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            });
 
             return messages;
         });

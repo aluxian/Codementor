@@ -1,15 +1,11 @@
 package com.aluxian.codementor.data.models;
 
 import com.aluxian.codementor.Constants;
-import com.aluxian.codementor.data.annotations.GsonModel;
-import com.aluxian.codementor.data.annotations.JacksonModel;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 
-@GsonModel
-@JacksonModel
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements Serializable {
@@ -19,6 +15,10 @@ public class User implements Serializable {
     private String first_name;
     private String avatar_url;
 
+    @SuppressWarnings("unused")
+    public User() {}
+
+    @SuppressWarnings("unused")
     public User(String username, String name, String first_name, String avatar_url) {
         this.username = username;
         this.name = name;

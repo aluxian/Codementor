@@ -1,8 +1,5 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.data.annotations.GsonModel;
-
-@GsonModel
 public class Request {
 
     private String filename;

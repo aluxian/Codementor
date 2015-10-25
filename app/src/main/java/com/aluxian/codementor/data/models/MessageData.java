@@ -1,18 +1,23 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.data.annotations.GsonModel;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@GsonModel
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessageData {
 
-    public final String id;
-    public final String content;
-    public final User sender;
-    public final User receiver;
-    public final Request request;
-    public final String created_at;
-    public final String read_at;
-    public final String type;
+    private String id;
+    private String content;
+    private User sender;
+    private User receiver;
+    private Request request;
+    private String created_at;
+    private String read_at;
+    private String type;
+
+    @SuppressWarnings("unused")
+    public MessageData() {}
 
     public MessageData(String id, String content, User sender, User receiver, Request request, String created_at,
                        String read_at, String type) {
@@ -24,6 +29,38 @@ public class MessageData {
         this.created_at = created_at;
         this.read_at = read_at;
         this.type = type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public String getCreatedAt() {
+        return created_at;
+    }
+
+    public String getReadAt() {
+        return read_at;
+    }
+
+    public String getType() {
+        return type;
     }
 
     @Override

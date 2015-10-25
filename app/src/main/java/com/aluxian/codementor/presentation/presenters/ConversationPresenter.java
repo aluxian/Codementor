@@ -21,6 +21,7 @@ import com.aluxian.codementor.utils.UserManager;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.squareup.otto.Bus;
 
@@ -47,7 +48,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private ConversationAdapter conversationAdapter;
 
     private Firebase presenceRef;
-    private Firebase messagesRef;
+    private Query messagesRef;
 
     public ConversationPresenter(ConversationView baseView, CoreServices coreServices,
                                  Chatroom chatroom, ConversationAdapter conversationAdapter) {
@@ -64,7 +65,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         String presencePath = Constants.getPresencePath(chatroom.getOtherUser().getUsername());
         presenceRef = coreServices.getFirebaseRef().child(presencePath);
-        messagesRef = coreServices.getFirebaseRef().child(chatroom.getFirebasePath());
+        messagesRef = coreServices.getFirebaseRef().child(chatroom.getFirebasePath()).orderByChild("created_at");
 
         this.chatroom = chatroom;
         this.conversationAdapter = conversationAdapter;

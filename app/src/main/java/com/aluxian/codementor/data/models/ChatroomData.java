@@ -1,10 +1,7 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.data.annotations.GsonModel;
-
 import java.io.Serializable;
 
-@GsonModel
 public class ChatroomData implements Serializable {
 
     public final String type;

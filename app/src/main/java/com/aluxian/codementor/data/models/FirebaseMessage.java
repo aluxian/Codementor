@@ -1,7 +1,5 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.data.annotations.GsonModel;
-import com.aluxian.codementor.data.annotations.JacksonModel;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@GsonModel
-@JacksonModel
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class FirebaseMessage {
 

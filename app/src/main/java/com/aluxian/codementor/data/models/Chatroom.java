@@ -1,5 +1,7 @@
 package com.aluxian.codementor.data.models;
 
+import com.aluxian.codementor.Constants;
+
 import java.io.Serializable;
 
 public class Chatroom implements Serializable {
@@ -53,7 +55,7 @@ public class Chatroom implements Serializable {
     }
 
     public String getFirebasePath() {
-        return "chatrooms/" + chatroomData.chatroom_firebase_id + "/" + chatroomData.chatroom_id;
+        return Constants.getChatroomPath(chatroomData.chatroom_firebase_id, chatroomData.chatroom_id);
     }
 
     @Override

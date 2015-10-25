@@ -50,23 +50,23 @@ public class Message {
     }
 
     public String getId() {
-        return messageData.id;
+        return messageData.getId();
     }
 
     public User getSender() {
-        return messageData.sender;
+        return messageData.getSender();
     }
 
     public User getReceiver() {
-        return messageData.receiver;
+        return messageData.getReceiver();
     }
 
     public String getContent() {
-        return messageData.content;
+        return messageData.getContent();
     }
 
     public Request getRequest() {
-        return messageData.request;
+        return messageData.getRequest();
     }
 
     public long getCreatedAt() {
@@ -102,7 +102,7 @@ public class Message {
     }
 
     public boolean hasBeenRead() {
-        return messageData.read_at != null;
+        return messageData.getReadAt() != null;
     }
 
     public boolean sentByCurrentUser() {
@@ -166,7 +166,7 @@ public class Message {
     }
 
     private Type parseType() {
-        String rawType = messageData.type.toUpperCase();
+        String rawType = messageData.getType().toUpperCase();
 
         if (rawType.equals("PENDING_MSG")) {
             rawType = "MESSAGE";
@@ -185,7 +185,7 @@ public class Message {
     }
 
     private long parseDate() {
-        Object val = messageData.created_at;
+        Object val = messageData.getCreatedAt();
 
         try {
             return Double.valueOf(String.valueOf(val)).longValue();

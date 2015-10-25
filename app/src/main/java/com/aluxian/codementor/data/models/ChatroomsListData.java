@@ -1,10 +1,7 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.data.annotations.GsonModel;
-
 import java.util.List;
 
-@GsonModel
 public class ChatroomsListData {
 
     public final List<ChatroomData> recent_chats;
