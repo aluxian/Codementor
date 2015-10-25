@@ -17,12 +17,12 @@ import butterknife.ButterKnife;
 
 import static android.text.format.DateUtils.FORMAT_SHOW_TIME;
 
-public class FileMessageViewHolder extends RecyclerView.ViewHolder {
+public class HtmlMessageViewHolder extends RecyclerView.ViewHolder {
 
     @Bind(R.id.tv_message) TextView messageTextView;
     @Bind(R.id.tv_subtext) TextView subtextView;
 
-    public FileMessageViewHolder(View view) {
+    public HtmlMessageViewHolder(View view) {
         super(view);
         ButterKnife.bind(this, itemView);
         messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -41,8 +41,14 @@ public class FileMessageViewHolder extends RecyclerView.ViewHolder {
 
     private void setSubtext(Message message, boolean lastSentMessage) {
         String time = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
-        String size = Formatter.formatShortFileSize(itemView.getContext(), message.getRequest().getSize());
-        String subtext = time + "  " + size;
+        String sizeText = "";
+
+        long size = message.getRequest().getSize();
+        if (size > 0) {
+            sizeText = " " + Formatter.formatShortFileSize(itemView.getContext(), size);
+        }
+
+        String subtext = time + sizeText;
 
         if (lastSentMessage && message.sentByCurrentUser() && message.hasBeenRead()) {
             subtext += " SEEN";

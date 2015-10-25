@@ -4,13 +4,14 @@ import java.util.UUID;
 
 public class ConversationItem {
 
-    public static final int TYPE_ALIGN_RIGHT = 0x1000000;
-    public static final int TYPE_TIME_MARKER = 0x0000001;
-    public static final int TYPE_MESSAGE = 0x0000010;
-    public static final int TYPE_CONNECT = 0x0000100;
-    public static final int TYPE_FILE = 0x0001000;
-    public static final int TYPE_SIGNATURE = 0x0010000;
-    public static final int TYPE_OTHER = 0x0100000;
+    public static final int TYPE_ALIGN_RIGHT = 0x10000000;
+    public static final int TYPE_TIME_MARKER = 0x00000001;
+    public static final int TYPE_MESSAGE = 0x00000010;
+    public static final int TYPE_CONNECT = 0x00000100;
+    public static final int TYPE_FILE = 0x00001000;
+    public static final int TYPE_REQUEST = 0x00010000;
+    public static final int TYPE_SIGNATURE = 0x00100000;
+    public static final int TYPE_OTHER = 0x01000000;
 
     private Message message;
     private TimeMarker timeMarker;

@@ -4,6 +4,7 @@ import android.text.Html;
 
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.services.ErrorHandler;
+import com.aluxian.codementor.utils.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -126,9 +127,29 @@ public class Message {
                 return getOtherUser().getShortestName() + " requested to start a session.";
 
             case FILE:
-                String url = escapeHtml(getRequest().getUrl());
-                String text = escapeHtml(getRequest().getFilename());
-                return "<a href=\"" + url + "\">" + text + "</a>";
+                String fileUrl = escapeHtml(getRequest().getUrl());
+                String fileText = escapeHtml(getRequest().getFilename());
+                return "<a href=\"" + fileUrl + "\">" + fileText + "</a>";
+
+            case REQUEST:
+                String attachedMessage = getOtherUser().getShortestName() + " attached a request: ";
+
+                if (sentByCurrentUser()) {
+                    attachedMessage = "You attached a request: ";
+                }
+
+                String reqUrl = escapeHtml(Constants.getRequestUrl(getRequest().getId()));
+                String reqText = escapeHtml(getRequest().getTitle());
+                String attachedText = escapeHtml(attachedMessage);
+
+                return "<i><b>" + attachedText + "</b></i><a href=\"" + reqUrl + "\">" + reqText + "</a>";
+
+            case SIGNATURE:
+                if (sentByCurrentUser()) {
+                    return "You initiated a Non-Disclosure Agreement request.";
+                }
+
+                return getOtherUser().getShortestName() + " initiated a Non-Disclosure Agreement request.";
 
             default:
                 return "This message type is not yet supported.";

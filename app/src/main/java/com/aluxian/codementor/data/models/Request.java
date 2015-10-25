@@ -11,6 +11,10 @@ public class Request {
     private long size;
     private String url;
 
+    private String type;
+    private String id;
+    private String title;
+
     @SuppressWarnings("unused")
     public Request() {}
 
@@ -19,6 +23,13 @@ public class Request {
         this.filename = filename;
         this.size = size;
         this.url = url;
+    }
+
+    @SuppressWarnings("unused")
+    public Request(String type, String id, String title) {
+        this.type = type;
+        this.id = id;
+        this.title = title;
     }
 
     public String getFilename() {
@@ -31,6 +42,18 @@ public class Request {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     @Override

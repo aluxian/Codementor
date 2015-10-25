@@ -22,6 +22,10 @@ public class Constants {
         return getApiUrl("chatrooms", username, "read");
     }
 
+    public static String getRequestUrl(String requestId) {
+        return "https://www.codementor.io/questions/" + requestId;
+    }
+
     public static String getPresencePath(String username) {
         return joinPath("presence", username, "magic");
     }

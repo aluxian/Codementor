@@ -11,7 +11,7 @@ import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.data.types.MessageType;
-import com.aluxian.codementor.presentation.holders.FileMessageViewHolder;
+import com.aluxian.codementor.presentation.holders.HtmlMessageViewHolder;
 import com.aluxian.codementor.presentation.holders.MessageViewHolder;
 import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
 
@@ -49,12 +49,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return new MessageViewHolder(rootView);
 
             case FILE:
-                layoutId = alignRight ? R.layout.item_msg_file_right : R.layout.item_msg_file_left;
+            case REQUEST:
+                layoutId = alignRight ? R.layout.item_msg_html_right : R.layout.item_msg_html_left;
                 rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-                return new FileMessageViewHolder(rootView);
+                return new HtmlMessageViewHolder(rootView);
 
             default:
-                layoutId = alignRight ? R.layout.item_msg_other_right : R.layout.item_msg_other_left;
+                layoutId = alignRight ? R.layout.item_msg_system_right : R.layout.item_msg_system_left;
                 rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
                 return new MessageViewHolder(rootView);
         }
@@ -67,9 +68,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (holder instanceof TimeMarkerViewHolder) {
             TimeMarkerViewHolder timeMarkerViewHolder = (TimeMarkerViewHolder) holder;
             timeMarkerViewHolder.loadTimeMarker(item.getTimeMarker());
-        } else if (holder instanceof FileMessageViewHolder) {
-            FileMessageViewHolder fileMessageViewHolder = (FileMessageViewHolder) holder;
-            fileMessageViewHolder.loadMessage(item.getMessage(), position == 0);
+        } else if (holder instanceof HtmlMessageViewHolder) {
+            HtmlMessageViewHolder htmlMessageViewHolder = (HtmlMessageViewHolder) holder;
+            htmlMessageViewHolder.loadMessage(item.getMessage(), position == 0);
         } else {
             MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
             messageViewHolder.loadMessage(item.getMessage(), position == 0);

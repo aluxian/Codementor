@@ -118,7 +118,7 @@ public class FirebaseTasks {
     }
 
     /**
-     * @param username    The username of the user whose status to set.
+     * @param username        The username of the user whose status to set.
      * @param newPresenceType The new status.
      */
     public Task<Void> setPresence(String username, PresenceType newPresenceType) {
