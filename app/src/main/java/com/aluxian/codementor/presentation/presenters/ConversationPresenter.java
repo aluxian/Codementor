@@ -35,7 +35,7 @@ import static bolts.Task.UI_THREAD_EXECUTOR;
 public class ConversationPresenter extends Presenter<ConversationView> {
 
     private static final String ORDER_BY_CREATED_AT = "created_at";
-    private static final int ITEMS_BATCH_SIZE = 50;
+    private static final int ITEMS_BATCH_SIZE = 100;
 
     private @Nullable Task firebaseReAuthTask;
 
@@ -191,10 +191,10 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         public void onDataChange(DataSnapshot dataSnapshot) {
             firebaseTasks.parseMessagesSnapshot(dataSnapshot)
                     .onSuccess(task -> {
-                        List<Message> messages = task.getResult();
+                        List<Message> newMessages = task.getResult();
 
-                        if (messages.size() > 0) {
-                            Message lastMessage = messages.get(messages.size() - 1);
+                        if (newMessages.size() > 0) {
+                            Message lastMessage = newMessages.get(newMessages.size() - 1);
 
                             if (conversationAdapter.getItemCount() > 0) {
                                 bus.post(new NewMessageEvent(chatroom, lastMessage));
@@ -204,7 +204,11 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                                     .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
                         }
 
-                        conversationAdapter.addMessages(messages);
+                        if (newMessages.size() < ITEMS_BATCH_SIZE) {
+                            getView().setAllMessagesLoaded(true);
+                        }
+
+                        conversationAdapter.addMessages(newMessages);
                         getView().showEmptyState(conversationAdapter.getItemCount() == 0);
 
                         return null;
@@ -227,11 +231,13 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         public void onDataChange(DataSnapshot dataSnapshot) {
             firebaseTasks.parseMessagesSnapshot(dataSnapshot)
                     .onSuccess(task -> {
-                        List<Message> messages = task.getResult();
+                        List<Message> newMessages = task.getResult();
 
-                        if (messages.size() > 0) {
-                            conversationAdapter.addMessages(messages);
-                        } else {
+                        if (newMessages.size() > 0) {
+                            conversationAdapter.addMessages(newMessages);
+                        }
+
+                        if (newMessages.size() < ITEMS_BATCH_SIZE) {
                             getView().setAllMessagesLoaded(true);
                         }
 
