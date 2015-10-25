@@ -94,10 +94,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         return items.size();
     }
 
-    public void addSentMessage(Message message) {
-        items.add(0, new ConversationItem(message));
-    }
-
     public void addMessages(List<Message> newMessages) {
         if (newMessages.size() == 0) {
             return;
