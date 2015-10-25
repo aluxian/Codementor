@@ -5,22 +5,27 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.CoreServices;
+import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.User;
-import com.aluxian.codementor.data.tasks.FirebaseTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.utils.ErrorHandler;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public class ChatroomViewHolder extends RecyclerView.ViewHolder {
 
-    private FirebaseTasks firebaseTasks;
-    private TaskContinuations taskContinuations;
-    private User currentUser;
+    private ErrorHandler errorHandler;
+    private Firebase firebaseRef;
+    private Firebase presenceRef;
 
     @Bind(R.id.img_avatar) SimpleDraweeView avatarImageView;
     @Bind(R.id.tv_subtitle) TextView subtitleTextView;
@@ -31,15 +36,14 @@ public class ChatroomViewHolder extends RecyclerView.ViewHolder {
         super(itemView);
         ButterKnife.bind(this, itemView);
 
-        firebaseTasks = coreServices.getFirebaseTasks();
-        taskContinuations = coreServices.getTaskContinuations();
+        errorHandler = coreServices.getErrorHandler();
+        firebaseRef = coreServices.getFirebaseRef();
     }
 
     public void loadChatroom(Chatroom chatroom) {
-        currentUser = chatroom.getOtherUser();
         setText(chatroom);
         setAvatar(chatroom);
-        updatePresence(chatroom.getOtherUser());
+        setPresenceListener(chatroom);
     }
 
     private void setText(Chatroom chatroom) {
@@ -60,20 +64,28 @@ public class ChatroomViewHolder extends RecyclerView.ViewHolder {
         avatarImageView.setImageURI(avatarUri);
     }
 
-    private void updatePresence(User forUser) {
-        presenceView.setBackgroundResource(R.drawable.presence_offline);
-        firebaseTasks.getPresence(forUser.getUsername())
-                .onSuccess(task -> {
-                    if (!forUser.equals(currentUser)) {
-                        return null;
-                    }
+    private void setPresenceListener(Chatroom chatroom) {
+        if (presenceRef != null) {
+            presenceRef.removeEventListener(presenceListener);
+        }
 
-                    int presenceResId = task.getResult().presenceResId;
-                    presenceView.setBackgroundResource(presenceResId);
-
-                    return null;
-                })
-                .continueWith(taskContinuations.logAndToastError());
+        String otherUsername = chatroom.getOtherUser().getUsername();
+        presenceRef = firebaseRef.child(Constants.getPresencePath(otherUsername));
+        presenceRef.addValueEventListener(presenceListener);
     }
+
+    private ValueEventListener presenceListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            String status = dataSnapshot.getValue(String.class);
+            Presence presence = Presence.parse(status);
+            presenceView.setBackgroundResource(presence.backgroundResId);
+        }
+
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+            errorHandler.logAndToast(firebaseError.toException());
+        }
+    };
 
 }

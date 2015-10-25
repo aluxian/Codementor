@@ -1,5 +1,7 @@
 package com.aluxian.codementor;
 
+import android.text.TextUtils;
+
 public enum Presence {
 
     AVAILABLE(R.string.status_available, R.drawable.presence_online),
@@ -13,11 +15,19 @@ public enum Presence {
     OFFLINE(R.string.status_offline, R.drawable.presence_offline);
 
     public final int statusResId;
-    public final int presenceResId;
+    public final int backgroundResId;
 
-    Presence(int statusResId, int presenceResId) {
+    Presence(int statusResId, int backgroundResId) {
         this.statusResId = statusResId;
-        this.presenceResId = presenceResId;
+        this.backgroundResId = backgroundResId;
+    }
+
+    public static Presence parse(String status) {
+        if (TextUtils.isEmpty(status)) {
+            return OFFLINE;
+        }
+
+        return valueOf(status.toUpperCase());
     }
 
 }
