@@ -42,16 +42,12 @@ public class User implements Serializable {
         return first_name != null ? first_name : name;
     }
 
-    public String getPresencePath() {
-        return "presence/" + username + "/magic";
-    }
-
     public String getChatroomPath() {
-        return Constants.getApiUrl("chatrooms", getUsername());
+        return Constants.getChatroomUrl(getUsername());
     }
 
     public String getReadPath() {
-        return Constants.getApiUrl("chatrooms", getUsername(), "read");
+        return Constants.getChatroomReadUrl(getUsername());
     }
 
     @Override

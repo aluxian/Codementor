@@ -36,7 +36,7 @@ public class ServerApiTasks {
      */
     public Task<ChatroomsList> getChatroomsList() {
         return Task.callInBackground(() -> {
-            Request request = new Request.Builder().url(Constants.getApiUrl("chatrooms", "list")).build();
+            Request request = new Request.Builder().url(Constants.getChatroomsListUrl()).build();
             Response response = okHttpClient.newCall(request).execute();
 
             String responseBody = response.body().string();

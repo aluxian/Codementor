@@ -17,12 +17,15 @@ import com.aluxian.codementor.lib.PersistentCookieStore;
 import com.aluxian.codementor.presentation.fragments.ChatroomsFragment;
 import com.aluxian.codementor.presentation.fragments.ConversationFragment;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
+import com.aluxian.codementor.presentation.presenters.MainActivityPresenter;
+import com.aluxian.codementor.presentation.views.MainActivityView;
 import com.aluxian.codementor.utils.UserManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MainActivity extends BaseActivity implements ChatroomSelectedListener {
+public class MainActivity extends BaseActivity<MainActivityPresenter>
+        implements ChatroomSelectedListener, MainActivityView {
 
     private static final String STATE_HAS_CHATROOM_SELECTED = "has_chatroom_selected";
 
@@ -60,6 +63,8 @@ public class MainActivity extends BaseActivity implements ChatroomSelectedListen
                 emptyStateView.setVisibility(View.GONE);
             }
         }
+
+        setPresenter(new MainActivityPresenter(this, coreServices));
     }
 
     @Override

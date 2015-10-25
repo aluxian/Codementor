@@ -3,8 +3,9 @@ package com.aluxian.codementor.presentation.presenters;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.CoreServices;
-import com.aluxian.codementor.R;
+import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
@@ -61,7 +62,8 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         serverApiTasks = coreServices.getServerApiTasks();
         taskContinuations = coreServices.getTaskContinuations();
 
-        presenceRef = coreServices.getFirebaseRef().child(chatroom.getOtherUser().getPresencePath());
+        String presencePath = Constants.getPresencePath(chatroom.getOtherUser().getUsername());
+        presenceRef = coreServices.getFirebaseRef().child(presencePath);
         messagesRef = coreServices.getFirebaseRef().child(chatroom.getFirebasePath());
 
         this.chatroom = chatroom;
@@ -118,30 +120,15 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             return;
         }
 
-        int resId = 0;
-        switch (status) {
-            case "available":
-                resId = R.string.status_available;
-                break;
-            case "online":
-                resId = R.string.status_online;
-                break;
-            case "away":
-                resId = R.string.status_away;
-                break;
-            case "session":
-                resId = R.string.status_session;
-                break;
-            case "offline":
-                resId = R.string.status_offline;
-                break;
+        Presence presence;
+        try {
+            presence = Presence.valueOf(status.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            presence = Presence.OFFLINE;
         }
 
-        if (resId != 0) {
-            getView().setSubtitle(resId);
-        } else {
-            getView().setSubtitle(null);
-        }
+        int resId = presence.status;
+        getView().setSubtitle(resId);
     }
 
     private void handleFirebaseError(FirebaseError firebaseError) {
