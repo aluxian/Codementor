@@ -51,7 +51,7 @@ public class HtmlMessageViewHolder extends RecyclerView.ViewHolder {
         String subtext = time + sizeText;
 
         if (lastSentMessage && message.sentByCurrentUser() && message.hasBeenRead()) {
-            subtext += " SEEN";
+            subtext += "  SEEN";
         }
 
         subtextView.setText(subtext);

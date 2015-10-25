@@ -37,7 +37,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder {
         String subtext = DateUtils.formatDateTime(itemView.getContext(), message.getCreatedAt(), FORMAT_SHOW_TIME);
 
         if (lastSentMessage && message.sentByCurrentUser() && message.hasBeenRead()) {
-            subtext += " SEEN";
+            subtext += "  SEEN";
         }
 
         subtextView.setText(subtext);
