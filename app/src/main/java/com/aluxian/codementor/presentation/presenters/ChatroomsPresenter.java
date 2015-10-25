@@ -65,10 +65,13 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
                 .onSuccess(task -> {
                     chatroomsAdapter.updateList(task.getResult().getRecentChats());
                     getView().showEmptyState(chatroomsAdapter.getItemCount() == 0);
-                    getView().setRefreshing(false);
                     return null;
                 }, UI_THREAD_EXECUTOR)
-                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
+                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
+                .continueWith(task -> {
+                    getView().setRefreshing(false);
+                    return null;
+                }, UI_THREAD_EXECUTOR);
     }
 
 }

@@ -34,11 +34,15 @@ import static bolts.Task.UI_THREAD_EXECUTOR;
 
 public class ConversationPresenter extends Presenter<ConversationView> {
 
+    private static final String ORDER_BY_CREATED_AT = "created_at";
+    private static final int ITEMS_BATCH_SIZE = 50;
+
     private @Nullable Task firebaseReAuthTask;
 
     private Bus bus;
     private ErrorHandler errorHandler;
     private UserManager userManager;
+    private Firebase firebaseRef;
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
@@ -58,15 +62,17 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         bus = coreServices.getBus();
         errorHandler = coreServices.getErrorHandler();
         userManager = coreServices.getUserManager();
+        firebaseRef = coreServices.getFirebaseRef();
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
         serverApiTasks = coreServices.getServerApiTasks();
         taskContinuations = coreServices.getTaskContinuations();
 
-        String presencePath = Constants.getPresencePath(chatroom.getOtherUser().getUsername());
-        presenceRef = coreServices.getFirebaseRef().child(presencePath);
-        messagesRef = coreServices.getFirebaseRef().child(chatroom.getFirebasePath()).orderByChild("created_at");
+        presenceRef = firebaseRef.child(Constants.getPresencePath(chatroom.getOtherUser().getUsername()));
+        messagesRef = firebaseRef.child(chatroom.getFirebasePath())
+                .orderByChild(ORDER_BY_CREATED_AT)
+                .limitToLast(ITEMS_BATCH_SIZE);
 
         this.chatroom = chatroom;
         this.conversationAdapter = conversationAdapter;
@@ -84,6 +90,15 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         super.pause();
         getView().setRefreshing(false);
         removeFirebaseListeners();
+    }
+
+    public void loadMore() {
+        getView().setRefreshing(true);
+        firebaseRef.child(chatroom.getFirebasePath())
+                .orderByChild(ORDER_BY_CREATED_AT)
+                .limitToLast(ITEMS_BATCH_SIZE)
+                .endAt(conversationAdapter.getOldestMessage().getCreatedAt() - 1)
+                .addListenerForSingleValueEvent(olderMessagesEventListener);
     }
 
     private void addFirebaseListeners() {
@@ -186,13 +201,44 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                                     .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
                         }
 
-                        conversationAdapter.updateList(messages);
+                        conversationAdapter.addMessages(messages);
                         getView().showEmptyState(conversationAdapter.getItemCount() == 0);
-                        getView().setRefreshing(false);
 
                         return null;
                     }, UI_THREAD_EXECUTOR)
-                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
+                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
+                    .continueWith(task -> {
+                        getView().setRefreshing(false);
+                        return null;
+                    }, UI_THREAD_EXECUTOR);
+        }
+
+        @Override
+        public void onCancelled(FirebaseError firebaseError) {
+            handleFirebaseError(firebaseError);
+        }
+    };
+
+    private ValueEventListener olderMessagesEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+                    .onSuccess(task -> {
+                        List<Message> messages = task.getResult();
+
+                        if (messages.size() > 0) {
+                            conversationAdapter.addMessages(messages);
+                        } else {
+                            getView().setAllMessagesLoaded(true);
+                        }
+
+                        return null;
+                    }, UI_THREAD_EXECUTOR)
+                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
+                    .continueWith(task -> {
+                        getView().setRefreshing(false);
+                        return null;
+                    }, UI_THREAD_EXECUTOR);
         }
 
         @Override

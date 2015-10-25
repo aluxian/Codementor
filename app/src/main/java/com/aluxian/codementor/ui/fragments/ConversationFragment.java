@@ -23,6 +23,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.presenters.ConversationPresenter;
+import com.aluxian.codementor.presentation.utils.EndlessRecyclerOnScrollListener;
 import com.aluxian.codementor.presentation.views.ConversationView;
 import com.aluxian.codementor.ui.MessageFieldTextWatcher;
 
@@ -35,6 +36,7 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
     private ConversationAdapter conversationAdapter;
+    private boolean allMessagesLoaded;
 
     @Bind(R.id.btn_send) ImageButton sendButton;
     @Bind(R.id.tv_message) EditText messageField;
@@ -68,12 +70,29 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
         View rootView = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this, rootView);
 
-        recyclerView.setAdapter(conversationAdapter);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), VERTICAL, true));
-
         swipeRefreshLayout.setColorSchemeColors(ContextCompat.getColor(getContext(), R.color.brand_accent));
         swipeRefreshLayout.setEnabled(false);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext(), VERTICAL, true);
+        recyclerView.setAdapter(conversationAdapter);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(layoutManager) {
+            @Override
+            public void loadMore() {
+                getPresenter().loadMore();
+            }
+
+            @Override
+            public boolean isFullyLoaded() {
+                return allMessagesLoaded;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return swipeRefreshLayout.isRefreshing();
+            }
+        });
 
         messageField.requestFocus();
         messageField.setOnFocusChangeListener(this::onFocusChanged);
@@ -129,6 +148,11 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     @Override
     public void setMessageFieldText(String text) {
         messageField.setText(text);
+    }
+
+    @Override
+    public void setAllMessagesLoaded(boolean loaded) {
+        allMessagesLoaded = loaded;
     }
 
     private void onFocusChanged(View view, boolean hasFocus) {

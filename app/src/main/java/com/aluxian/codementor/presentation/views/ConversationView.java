@@ -37,4 +37,11 @@ public interface ConversationView extends BaseView {
      */
     void setMessageFieldText(String text);
 
+    /**
+     * Mark the conversation as fully loaded.
+     *
+     * @param loaded Whether all the messages in the conversation have been loaded.
+     */
+    void setAllMessagesLoaded(boolean loaded);
+
 }

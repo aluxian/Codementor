@@ -19,12 +19,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static com.aluxian.codementor.data.models.ConversationItem.TYPE_ALIGN_RIGHT;
 import static com.aluxian.codementor.data.models.ConversationItem.TYPE_TIME_MARKER;
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private SortedSet<Message> messages = new TreeSet<>();
     private List<ConversationItem> items = new ArrayList<>();
 
     @Override
@@ -96,19 +99,26 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         items.add(0, new ConversationItem(message));
     }
 
-    public void updateList(List<Message> messages) {
-        items.clear();
-
-        if (messages.size() == 0) {
-            notifyDataSetChanged();
+    public void addMessages(List<Message> newMessages) {
+        if (newMessages.size() == 0) {
             return;
         }
 
-        addMessage(messages.get(0));
+        messages.addAll(newMessages);
+        generateItems();
+        notifyDataSetChanged();
+    }
 
-        for (int i = 1; i < messages.size(); i++) {
-            Message message1 = messages.get(i - 1);
-            Message message2 = messages.get(i);
+    private void generateItems() {
+        items.clear();
+        Message message1 = null;
+
+        for (Message message2 : messages) {
+            if (message1 == null) {
+                message1 = message2;
+                addMessage(message2);
+                continue;
+            }
 
             long timestamp1 = message1.getCreatedAt();
             long timestamp2 = message2.getCreatedAt();
@@ -121,17 +131,15 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             }
 
             addMessage(message2);
+            message1 = message2;
         }
 
-        Message lastMessage = items.get(items.size() - 1).getMessage();
-        long lastTimestamp = lastMessage.getCreatedAt();
+        long lastTimestamp = messages.last().getCreatedAt();
         Date lastDate = new Date(lastTimestamp);
 
         if (!isSameDay(lastDate, new Date())) {
             addTimeMarker(lastTimestamp);
         }
-
-        notifyDataSetChanged();
     }
 
     private boolean isSameDay(Date date1, Date date2) {
@@ -153,6 +161,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private void addTimeMarker(long timestamp) {
         items.add(new ConversationItem(new TimeMarker(timestamp)));
+    }
+
+    public Message getOldestMessage() {
+        return messages.last();
     }
 
 }

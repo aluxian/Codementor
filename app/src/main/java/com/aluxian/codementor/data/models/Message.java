@@ -1,12 +1,14 @@
 package com.aluxian.codementor.data.models;
 
+import android.support.annotation.NonNull;
+
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.utils.MessageParsers;
 import com.aluxian.codementor.services.ErrorHandler;
 
 import java.util.Date;
 
-public class Message {
+public class Message implements Comparable<Message> {
 
     private MessageData messageData;
     private ErrorHandler errorHandler;
@@ -120,6 +122,17 @@ public class Message {
     @Override
     public int hashCode() {
         return messageData != null ? messageData.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(@NonNull Message another) {
+        if (getCreatedAt() < another.getCreatedAt()) {
+            return 1;
+        } else if (getCreatedAt() > another.getCreatedAt()) {
+            return -1;
+        } else {
+            return 0;
+        }
     }
 
 }
