@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.holders.ChatroomViewHolder;
@@ -19,6 +20,11 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<ChatroomViewHolder> {
 
     private List<Chatroom> chatrooms = new ArrayList<>();
     private @Nullable ChatroomSelectedListener chatroomSelectedListener;
+    private CoreServices coreServices;
+
+    public ChatroomsAdapter(CoreServices coreServices) {
+        this.coreServices = coreServices;
+    }
 
     @Override
     public long getItemId(int position) {
@@ -29,7 +35,7 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<ChatroomViewHolder> {
     @Override
     public ChatroomViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chatroom, parent, false);
-        return new ChatroomViewHolder(rootView);
+        return new ChatroomViewHolder(rootView, coreServices);
     }
 
     @Override

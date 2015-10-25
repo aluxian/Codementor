@@ -52,7 +52,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
             drawerShouldBeOpen = true;
         }
 
-        chatroomsAdapter = new ChatroomsAdapter();
+        chatroomsAdapter = new ChatroomsAdapter(getCoreServices());
         chatroomsAdapter.setChatroomSelectedListener(this);
         chatroomsAdapter.setHasStableIds(true);
 

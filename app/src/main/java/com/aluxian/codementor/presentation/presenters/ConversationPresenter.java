@@ -127,7 +127,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             presence = Presence.OFFLINE;
         }
 
-        int resId = presence.status;
+        int resId = presence.statusResId;
         getView().setSubtitle(resId);
     }
 

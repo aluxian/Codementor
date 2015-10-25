@@ -9,22 +9,36 @@
     android:paddingRight="16dp"
     android:paddingTop="12dp">
 
-    <com.facebook.drawee.view.SimpleDraweeView
-        android:id="@+id/img_avatar"
+    <FrameLayout
+        android:id="@+id/avatar_container"
         android:layout_width="42dp"
         android:layout_height="42dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginRight="12dp"
-        android:adjustViewBounds="true"
-        fresco:placeholderImage="@drawable/avatar_placeholder"
-        fresco:roundAsCircle="true" />
+        android:layout_marginRight="12dp">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/img_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            fresco:placeholderImage="@drawable/avatar_placeholder"
+            fresco:roundAsCircle="true" />
+
+        <View
+            android:id="@+id/view_presence"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/presence_offline" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/img_avatar"
-        android:layout_toRightOf="@id/img_avatar"
+        android:layout_toEndOf="@id/avatar_container"
+        android:layout_toRightOf="@id/avatar_container"
         android:textAppearance="?android:attr/textAppearanceListItem" />
 
     <TextView
@@ -32,8 +46,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_title"
-        android:layout_toEndOf="@id/img_avatar"
-        android:layout_toRightOf="@id/img_avatar"
+        android:layout_toEndOf="@id/avatar_container"
+        android:layout_toRightOf="@id/avatar_container"
         android:ellipsize="end"
         android:lines="1"
         android:textAppearance="?android:attr/textAppearanceSmall" />

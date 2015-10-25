@@ -11,5 +11,9 @@
     <color name="receiver_text_faded">#9333</color>
     <color name="receiver_background">#FFF</color>
 
+    <color name="presence_online">#6EB711</color>
+    <color name="presence_away">#F9C928</color>
+    <color name="presence_busy">#B94A48</color>
+
     <color name="neutral_gray">#AAA</color>
 </resources>
