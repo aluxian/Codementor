@@ -6,11 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.holders.ChatroomViewHolder;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
+import com.aluxian.codementor.services.CoreServices;
 
 import java.util.ArrayList;
 import java.util.List;

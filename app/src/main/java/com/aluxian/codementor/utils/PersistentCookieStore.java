@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.aluxian.codementor.lib;
+package com.aluxian.codementor.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

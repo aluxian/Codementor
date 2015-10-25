@@ -3,12 +3,12 @@ package com.aluxian.codementor.presentation.presenters;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 
-import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.tasks.ServerApiTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
+import com.aluxian.codementor.services.CoreServices;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 

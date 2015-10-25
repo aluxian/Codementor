@@ -1,4 +1,4 @@
-package com.aluxian.codementor.presentation.fragments;
+package com.aluxian.codementor.ui.fragments;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -18,10 +18,10 @@ import android.widget.TextView;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
-import com.aluxian.codementor.lib.DividerItemDecoration;
 import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.presenters.ChatroomsPresenter;
+import com.aluxian.codementor.presentation.utils.DividerItemDecoration;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
 
 import butterknife.Bind;

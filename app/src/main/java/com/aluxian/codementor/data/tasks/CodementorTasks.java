@@ -2,7 +2,7 @@ package com.aluxian.codementor.data.tasks;
 
 import android.text.TextUtils;
 
-import com.aluxian.codementor.Constants;
+import com.aluxian.codementor.utils.Constants;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;

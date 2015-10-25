@@ -1,6 +1,6 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.Constants;
+import com.aluxian.codementor.utils.Constants;
 
 import java.io.Serializable;
 

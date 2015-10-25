@@ -1,13 +1,15 @@
 package com.aluxian.codementor.presentation.presenters;
 
-import com.aluxian.codementor.CoreServices;
-import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.data.tasks.FirebaseTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.views.MainActivityView;
-import com.aluxian.codementor.utils.UserManager;
+import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.UserManager;
 
 import java.util.Arrays;
+
+import static bolts.Task.UI_THREAD_EXECUTOR;
 
 public class MainActivityPresenter extends Presenter<MainActivityView> {
 
@@ -26,32 +28,26 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
     @Override
     public void resume() {
         super.resume();
-        setStatus(Presence.ONLINE, Presence.OFFLINE, Presence.AWAY);
-    }
-
-    @Override
-    public void pause() {
-        super.pause();
-        setStatus(Presence.AWAY, Presence.ONLINE);
+        setStatus(PresenceType.ONLINE, PresenceType.OFFLINE, PresenceType.AWAY);
     }
 
     @Override
     public void destroy() {
         super.destroy();
-        setStatus(Presence.OFFLINE, Presence.AWAY);
+        setStatus(PresenceType.OFFLINE, PresenceType.AVAILABLE, PresenceType.ONLINE, PresenceType.AWAY);
     }
 
-    private void setStatus(Presence newPresence, Presence... requiredPresence) {
+    private void setStatus(PresenceType newPresenceType, PresenceType... requiredPresenceType) {
         String username = userManager.getUsername();
         firebaseTasks.getPresence(username)
                 .onSuccessTask(task -> {
-                    if (Arrays.asList(requiredPresence).contains(task.getResult())) {
-                        return firebaseTasks.setPresence(username, newPresence);
+                    if (Arrays.asList(requiredPresenceType).contains(task.getResult())) {
+                        return firebaseTasks.setPresence(username, newPresenceType);
                     }
 
                     return null;
-                })
-                .continueWith(taskContinuations.logAndToastError());
+                }, UI_THREAD_EXECUTOR)
+                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
 
     }
 

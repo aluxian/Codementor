@@ -1,5 +1,6 @@
 package com.aluxian.codementor.data.models;
 
+import com.aluxian.codementor.data.types.MessageType;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +22,7 @@ public class FirebaseMessage {
     private String content;
     private Request request;
 
-    public FirebaseMessage(String chatroomId, Message.Type type, String content,
+    public FirebaseMessage(String chatroomId, MessageType type, String content,
                            Request request, User sender, User receiver) {
         Map<String, String> createdAt = new HashMap<>();
         createdAt.put(".sv", "timestamp");

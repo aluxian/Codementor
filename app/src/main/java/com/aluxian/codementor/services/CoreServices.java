@@ -1,4 +1,4 @@
-package com.aluxian.codementor;
+package com.aluxian.codementor.services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,9 +8,8 @@ import com.aluxian.codementor.data.tasks.CodementorTasks;
 import com.aluxian.codementor.data.tasks.FirebaseTasks;
 import com.aluxian.codementor.data.tasks.ServerApiTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
-import com.aluxian.codementor.lib.PersistentCookieStore;
-import com.aluxian.codementor.utils.ErrorHandler;
-import com.aluxian.codementor.utils.UserManager;
+import com.aluxian.codementor.utils.Constants;
+import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.Firebase;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.otto.Bus;

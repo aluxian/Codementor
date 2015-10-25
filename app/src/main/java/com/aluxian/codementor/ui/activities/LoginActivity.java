@@ -1,4 +1,4 @@
-package com.aluxian.codementor.presentation.activities;
+package com.aluxian.codementor.ui.activities;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;

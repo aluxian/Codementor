@@ -1,11 +1,11 @@
-package com.aluxian.codementor.presentation.activities;
+package com.aluxian.codementor.ui.activities;
 
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aluxian.codementor.App;
-import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.presentation.presenters.Presenter;
+import com.aluxian.codementor.services.CoreServices;
 
 /**
  * Base class for every activity in this application.
@@ -29,6 +29,14 @@ public abstract class BaseActivity<P extends Presenter> extends AppCompatActivit
         super.onPause();
         if (presenter != null) {
             presenter.pause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (presenter != null) {
+            presenter.stop();
         }
     }
 

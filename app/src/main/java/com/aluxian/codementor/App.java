@@ -2,6 +2,7 @@ package com.aluxian.codementor;
 
 import android.app.Application;
 
+import com.aluxian.codementor.services.CoreServices;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Firebase;

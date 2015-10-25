@@ -1,4 +1,4 @@
-package com.aluxian.codementor.presentation.fragments;
+package com.aluxian.codementor.ui.fragments;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -19,12 +19,12 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.aluxian.codementor.MessageFieldTextWatcher;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.presenters.ConversationPresenter;
 import com.aluxian.codementor.presentation.views.ConversationView;
+import com.aluxian.codementor.ui.MessageFieldTextWatcher;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

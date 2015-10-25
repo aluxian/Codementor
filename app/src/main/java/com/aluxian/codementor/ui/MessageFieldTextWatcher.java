@@ -1,4 +1,4 @@
-package com.aluxian.codementor;
+package com.aluxian.codementor.ui;
 
 import android.animation.ValueAnimator;
 import android.graphics.Color;

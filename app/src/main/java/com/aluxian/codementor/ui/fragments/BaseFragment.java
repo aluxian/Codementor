@@ -1,12 +1,12 @@
-package com.aluxian.codementor.presentation.fragments;
+package com.aluxian.codementor.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import com.aluxian.codementor.App;
-import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.presentation.presenters.Presenter;
+import com.aluxian.codementor.services.CoreServices;
 
 /**
  * Base class for every fragment in this application.
@@ -36,6 +36,14 @@ public abstract class BaseFragment<P extends Presenter> extends Fragment {
         super.onPause();
         if (presenter != null) {
             presenter.pause();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (presenter != null) {
+            presenter.stop();
         }
     }
 

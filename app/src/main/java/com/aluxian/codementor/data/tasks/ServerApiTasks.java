@@ -1,13 +1,13 @@
 package com.aluxian.codementor.data.tasks;
 
-import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ChatroomsList;
 import com.aluxian.codementor.data.models.ChatroomsListData;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.FirebaseServerMessage;
-import com.aluxian.codementor.utils.CamelCaseNamingStrategy;
-import com.aluxian.codementor.utils.UserManager;
+import com.aluxian.codementor.data.utils.CamelCaseNamingStrategy;
+import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.squareup.okhttp.MediaType;

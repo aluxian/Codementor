@@ -1,4 +1,4 @@
-package com.aluxian.codementor.presentation.activities;
+package com.aluxian.codementor.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,16 +10,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.aluxian.codementor.CoreServices;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
-import com.aluxian.codementor.lib.PersistentCookieStore;
-import com.aluxian.codementor.presentation.fragments.ChatroomsFragment;
-import com.aluxian.codementor.presentation.fragments.ConversationFragment;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.presenters.MainActivityPresenter;
 import com.aluxian.codementor.presentation.views.MainActivityView;
-import com.aluxian.codementor.utils.UserManager;
+import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.ui.fragments.ChatroomsFragment;
+import com.aluxian.codementor.ui.fragments.ConversationFragment;
+import com.aluxian.codementor.utils.PersistentCookieStore;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

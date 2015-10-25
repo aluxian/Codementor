@@ -1,11 +1,20 @@
 package com.aluxian.codementor.data.models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Request {
 
     private String filename;
     private long size;
     private String url;
 
+    @SuppressWarnings("unused")
+    public Request() {}
+
+    @SuppressWarnings("unused")
     public Request(String filename, long size, String url) {
         this.filename = filename;
         this.size = size;

@@ -36,6 +36,11 @@ public abstract class Presenter<T extends BaseView> {
     public void pause() {}
 
     /**
+     * Method that controls the lifecycle of the view. It should be called in the view's onStop() method.
+     */
+    public void stop() {}
+
+    /**
      * Method that controls the lifecycle of the view. It should be called in the view's onDestroy() method.
      */
     public void destroy() {}

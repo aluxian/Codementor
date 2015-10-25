@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".presentation.activities.MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,14 +23,11 @@
         </activity>
 
         <activity
-            android:name=".presentation.activities.LoginActivity"
+            android:name=".ui.activities.LoginActivity"
             android:label="@string/title_activity_login"
             android:theme="@style/AppTheme.Login"
             android:windowSoftInputMode="adjustResize|stateVisible" />
 
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="a081a015f6791b96d6a06893f2ea46976b54f14c" />
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="a081a015f6791b96d6a06893f2ea46976b54f14c" />

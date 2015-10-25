@@ -2,17 +2,13 @@ package com.aluxian.codementor.data.models;
 
 import android.text.Html;
 
-import com.aluxian.codementor.utils.ErrorHandler;
+import com.aluxian.codementor.data.types.MessageType;
+import com.aluxian.codementor.services.ErrorHandler;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_CONNECT;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_FILE;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_MESSAGE;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_SIGNATURE;
 
 public class Message {
 
@@ -23,7 +19,7 @@ public class Message {
     private ErrorHandler errorHandler;
     private String loggedInUsername;
 
-    private Type type;
+    private MessageType type;
     private long createdAt;
     private String typeContent;
 
@@ -77,7 +73,7 @@ public class Message {
         return createdAt;
     }
 
-    public Type getType() {
+    public MessageType getType() {
         if (type == null) {
             type = parseType();
         }
@@ -117,28 +113,6 @@ public class Message {
         return typeContent;
     }
 
-    public enum Type {
-        MESSAGE(TYPE_MESSAGE),
-        CONNECT(ConversationItem.TYPE_CONNECT),
-        FILE(ConversationItem.TYPE_FILE),
-        SIGNATURE(ConversationItem.TYPE_SIGNATURE),
-        OTHER(ConversationItem.TYPE_OTHER);
-
-        public final int typeFlag;
-
-        Type(int typeFlag) {
-            this.typeFlag = typeFlag;
-        }
-
-        public static Type getByFlag(int flag) {
-            if ((TYPE_MESSAGE & flag) == TYPE_MESSAGE) return MESSAGE;
-            if ((TYPE_CONNECT & flag) == TYPE_CONNECT) return CONNECT;
-            if ((TYPE_FILE & flag) == TYPE_FILE) return FILE;
-            if ((TYPE_SIGNATURE & flag) == TYPE_SIGNATURE) return SIGNATURE;
-            return OTHER;
-        }
-    }
-
     private String parseTypeContent() {
         switch (getType()) {
             case MESSAGE:
@@ -165,7 +139,7 @@ public class Message {
         return Html.fromHtml(html).toString();
     }
 
-    private Type parseType() {
+    private MessageType parseType() {
         String rawType = messageData.getType().toUpperCase();
 
         if (rawType.equals("PENDING_MSG")) {
@@ -177,10 +151,10 @@ public class Message {
         }
 
         try {
-            return Type.valueOf(rawType);
+            return MessageType.valueOf(rawType);
         } catch (IllegalArgumentException e) {
             errorHandler.log(e);
-            return Type.OTHER;
+            return MessageType.OTHER;
         }
     }
 

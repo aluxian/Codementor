@@ -1,4 +1,4 @@
-package com.aluxian.codementor.utils;
+package com.aluxian.codementor.data.utils;
 
 import android.text.TextUtils;
 

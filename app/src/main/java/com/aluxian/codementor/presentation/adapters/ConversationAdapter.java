@@ -10,6 +10,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.TimeMarker;
+import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.presentation.holders.FileMessageViewHolder;
 import com.aluxian.codementor.presentation.holders.MessageViewHolder;
 import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
@@ -39,7 +40,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
         boolean alignRight = (viewType & TYPE_ALIGN_RIGHT) == TYPE_ALIGN_RIGHT;
-        Message.Type type = Message.Type.getByFlag(viewType);
+        MessageType type = MessageType.getByFlag(viewType);
 
         switch (type) {
             case MESSAGE:

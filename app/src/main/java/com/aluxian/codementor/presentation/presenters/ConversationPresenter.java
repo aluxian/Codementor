@@ -3,9 +3,6 @@ package com.aluxian.codementor.presentation.presenters;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
-import com.aluxian.codementor.Constants;
-import com.aluxian.codementor.CoreServices;
-import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
@@ -14,10 +11,14 @@ import com.aluxian.codementor.data.tasks.CodementorTasks;
 import com.aluxian.codementor.data.tasks.FirebaseTasks;
 import com.aluxian.codementor.data.tasks.ServerApiTasks;
 import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.data.types.MessageType;
+import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.views.ConversationView;
-import com.aluxian.codementor.utils.ErrorHandler;
-import com.aluxian.codementor.utils.UserManager;
+import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
+import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.utils.Constants;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -103,7 +104,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         getView().setMessageFieldText("");
         FirebaseMessage firebaseMessage = new FirebaseMessage(
                 chatroom.getChatroomId(),
-                Message.Type.MESSAGE,
+                MessageType.MESSAGE,
                 messageBody,
                 null, chatroom.getCurrentUser(),
                 chatroom.getOtherUser()
@@ -121,14 +122,14 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             return;
         }
 
-        Presence presence;
+        PresenceType presenceType;
         try {
-            presence = Presence.valueOf(status.toUpperCase());
+            presenceType = PresenceType.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {
-            presence = Presence.OFFLINE;
+            presenceType = PresenceType.OFFLINE;
         }
 
-        int resId = presence.statusResId;
+        int resId = presenceType.statusResId;
         getView().setSubtitle(resId);
     }
 

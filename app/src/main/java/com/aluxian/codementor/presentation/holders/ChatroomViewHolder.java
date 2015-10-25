@@ -5,13 +5,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import com.aluxian.codementor.Constants;
-import com.aluxian.codementor.CoreServices;
-import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.User;
-import com.aluxian.codementor.utils.ErrorHandler;
+import com.aluxian.codementor.data.types.PresenceType;
+import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
+import com.aluxian.codementor.utils.Constants;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -78,8 +78,8 @@ public class ChatroomViewHolder extends RecyclerView.ViewHolder {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             String status = dataSnapshot.getValue(String.class);
-            Presence presence = Presence.parse(status);
-            presenceView.setBackgroundResource(presence.backgroundResId);
+            PresenceType presenceType = PresenceType.parse(status);
+            presenceView.setBackgroundResource(presenceType.backgroundResId);
         }
 
         @Override

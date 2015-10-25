@@ -1,8 +1,10 @@
-package com.aluxian.codementor;
+package com.aluxian.codementor.data.types;
 
 import android.text.TextUtils;
 
-public enum Presence {
+import com.aluxian.codementor.R;
+
+public enum PresenceType {
 
     AVAILABLE(R.string.status_available, R.drawable.presence_online),
 
@@ -17,12 +19,12 @@ public enum Presence {
     public final int statusResId;
     public final int backgroundResId;
 
-    Presence(int statusResId, int backgroundResId) {
+    PresenceType(int statusResId, int backgroundResId) {
         this.statusResId = statusResId;
         this.backgroundResId = backgroundResId;
     }
 
-    public static Presence parse(String status) {
+    public static PresenceType parse(String status) {
         if (TextUtils.isEmpty(status)) {
             return OFFLINE;
         }
