@@ -1,5 +1,7 @@
 package com.aluxian.codementor.data.tasks;
 
+import android.text.TextUtils;
+
 import com.aluxian.codementor.Constants;
 import com.aluxian.codementor.Presence;
 import com.aluxian.codementor.data.models.Chatroom;
@@ -126,6 +128,11 @@ public class FirebaseTasks {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String status = dataSnapshot.getValue(String.class);
+
+                if (TextUtils.isEmpty(status)) {
+                    status = "offline";
+                }
+
                 Presence presence = Presence.valueOf(status.toUpperCase());
                 taskSource.setResult(presence);
             }
