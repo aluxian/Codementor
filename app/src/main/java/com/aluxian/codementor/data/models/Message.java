@@ -111,7 +111,6 @@ public class Message implements Comparable<Message> {
 
         Message message = (Message) o;
         return !(messageData != null ? !messageData.equals(message.messageData) : message.messageData != null);
-
     }
 
     @Override
@@ -121,6 +120,10 @@ public class Message implements Comparable<Message> {
 
     @Override
     public int compareTo(@NonNull Message another) {
+        if (equals(another)) {
+            return 0;
+        }
+
         if (getCreatedAt() < another.getCreatedAt()) {
             return 1;
         } else if (getCreatedAt() > another.getCreatedAt()) {

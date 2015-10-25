@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static com.aluxian.codementor.data.models.ConversationItem.TYPE_ALIGN_RIGHT;
@@ -27,7 +26,7 @@ import static com.aluxian.codementor.data.models.ConversationItem.TYPE_TIME_MARK
 
 public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private SortedSet<Message> messages = new TreeSet<>();
+    private TreeSet<Message> messages = new TreeSet<>();
     private List<ConversationItem> items = new ArrayList<>();
 
     @Override
