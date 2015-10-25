@@ -3,9 +3,11 @@ package com.aluxian.codementor.data.models;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Request {
+public class Request implements Serializable {
 
     private String filename;
     private long size;

@@ -21,7 +21,7 @@ public class ErrorHandler {
      *
      * @param e The error to log.
      */
-    public void log(Exception e) {
+    public static void log(Exception e) {
         Log.e(tag(), e.getMessage(), e);
 
         if (!BuildConfig.DEBUG) {

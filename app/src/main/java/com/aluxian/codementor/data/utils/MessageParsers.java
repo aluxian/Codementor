@@ -103,7 +103,7 @@ public class MessageParsers {
         return Html.fromHtml(html).toString();
     }
 
-    public static MessageType parseType(String rawType, ErrorHandler errorHandler) {
+    public static MessageType parseType(String rawType) {
         rawType = rawType.toUpperCase();
 
         if (rawType.equals("PENDING_MSG")) {
@@ -117,7 +117,7 @@ public class MessageParsers {
         try {
             return MessageType.valueOf(rawType);
         } catch (IllegalArgumentException e) {
-            errorHandler.log(e);
+            ErrorHandler.log(e);
             return MessageType.OTHER;
         }
     }

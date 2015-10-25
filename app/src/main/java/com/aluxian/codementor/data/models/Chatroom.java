@@ -2,7 +2,6 @@ package com.aluxian.codementor.data.models;
 
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.utils.MessageParsers;
-import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.utils.Constants;
 
 import java.io.Serializable;
@@ -10,15 +9,13 @@ import java.io.Serializable;
 public class Chatroom implements Serializable {
 
     private ChatroomData chatroomData;
-    private ErrorHandler errorHandler;
     private String loggedInUsername;
 
     private MessageType lastMessageType;
     private String typeContent;
 
-    public Chatroom(ChatroomData chatroomData, ErrorHandler errorHandler, String loggedInUsername) {
+    public Chatroom(ChatroomData chatroomData, String loggedInUsername) {
         this.chatroomData = chatroomData;
-        this.errorHandler = errorHandler;
         this.loggedInUsername = loggedInUsername;
     }
 
@@ -72,7 +69,7 @@ public class Chatroom implements Serializable {
 
     public MessageType getLastMessageType() {
         if (lastMessageType == null) {
-            lastMessageType = MessageParsers.parseType(chatroomData.type, errorHandler);
+            lastMessageType = MessageParsers.parseType(chatroomData.type);
         }
 
         return lastMessageType;

@@ -4,27 +4,25 @@ import android.support.annotation.NonNull;
 
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.utils.MessageParsers;
-import com.aluxian.codementor.services.ErrorHandler;
 
 import java.util.Date;
 
 public class Message implements Comparable<Message> {
 
     private MessageData messageData;
-    private ErrorHandler errorHandler;
     private String loggedInUsername;
 
     private MessageType type;
     private long createdAt;
     private String typeContent;
 
-    public Message(MessageData messageData, ErrorHandler errorHandler, String loggedInUsername) {
+    public Message(MessageData messageData, String loggedInUsername) {
         this.messageData = messageData;
-        this.errorHandler = errorHandler;
         this.loggedInUsername = loggedInUsername;
     }
 
-    public Message(FirebaseMessage firebaseMessage, ErrorHandler errorHandler, String loggedInUsername) {
+    public Message(FirebaseMessage firebaseMessage, String loggedInUsername) {
+        this.loggedInUsername = loggedInUsername;
         this.messageData = new MessageData(
                 firebaseMessage.getId(),
                 firebaseMessage.getContent(),
@@ -35,9 +33,6 @@ public class Message implements Comparable<Message> {
                 firebaseMessage.getReadAt(),
                 firebaseMessage.getType()
         );
-
-        this.errorHandler = errorHandler;
-        this.loggedInUsername = loggedInUsername;
     }
 
     public String getId() {
@@ -70,7 +65,7 @@ public class Message implements Comparable<Message> {
 
     public MessageType getType() {
         if (type == null) {
-            type = MessageParsers.parseType(messageData.getType(), errorHandler);
+            type = MessageParsers.parseType(messageData.getType());
         }
 
         return type;

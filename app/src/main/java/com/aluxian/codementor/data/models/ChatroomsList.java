@@ -1,21 +1,16 @@
 package com.aluxian.codementor.data.models;
 
-import com.aluxian.codementor.services.ErrorHandler;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChatroomsList {
 
     private ChatroomsListData chatroomsListData;
-    private ErrorHandler errorHandler;
-
     private List<Chatroom> recentChats;
     private String loggedInUsername;
 
-    public ChatroomsList(ChatroomsListData chatroomsListData, ErrorHandler errorHandler, String loggedInUsername) {
+    public ChatroomsList(ChatroomsListData chatroomsListData, String loggedInUsername) {
         this.chatroomsListData = chatroomsListData;
-        this.errorHandler = errorHandler;
         this.loggedInUsername = loggedInUsername;
         recentChats = dataToChatrooms(chatroomsListData.recent_chats);
     }
@@ -29,7 +24,7 @@ public class ChatroomsList {
 
         //noinspection Convert2streamapi
         for (ChatroomData data : dataList) {
-            chatrooms.add(new Chatroom(data, errorHandler, loggedInUsername));
+            chatrooms.add(new Chatroom(data, loggedInUsername));
         }
 
         return chatrooms;

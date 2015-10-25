@@ -68,7 +68,7 @@ public class FirebaseTasks {
 
             for (DataSnapshot child : snapshot.getChildren()) {
                 MessageData messageData = child.getValue(MessageData.class);
-                messages.add(0, new Message(messageData, errorHandler, userManager.getUsername()));
+                messages.add(0, new Message(messageData, userManager.getUsername()));
             }
 
             return messages;

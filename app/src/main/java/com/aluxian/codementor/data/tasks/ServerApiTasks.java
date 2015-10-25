@@ -45,7 +45,7 @@ public class ServerApiTasks {
             String responseBody = response.body().string();
             ChatroomsListData data = new Gson().fromJson(responseBody, ChatroomsListData.class);
 
-            return new ChatroomsList(data, errorHandler, userManager.getUsername());
+            return new ChatroomsList(data, userManager.getUsername());
         });
     }
 
