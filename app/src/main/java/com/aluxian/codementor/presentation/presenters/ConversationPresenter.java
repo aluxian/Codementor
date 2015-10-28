@@ -9,6 +9,7 @@ import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
+import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
@@ -20,6 +21,7 @@ import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.Constants;
+import com.aluxian.codementor.utils.Helpers;
 import com.aluxian.codementor.utils.SortedListCallback;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -28,6 +30,7 @@ import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.squareup.otto.Bus;
 
+import java.util.Date;
 import java.util.List;
 
 import bolts.Task;
@@ -176,8 +179,38 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     }
 
     @SuppressWarnings("unchecked")
-    private List<ConversationItem> castList(List<? extends ConversationItem> items) {
-        return (List<ConversationItem>) items;
+    private void addItemsToList(List<? extends ConversationItem> itemsList) {
+        List<ConversationItem> itemsToAdd = (List<ConversationItem>) itemsList;
+        ConversationItem item1 = null;
+
+        for (ConversationItem item2 : itemsToAdd) {
+            if (item1 == null) {
+                long firstTimestamp = item2.getTimestamp();
+                Date firstDate = new Date(firstTimestamp);
+
+                if (!Helpers.isSameDay(firstDate, new Date())) {
+                    items.add(new TimeMarker(firstTimestamp - 1));
+                }
+
+                item1 = item2;
+                items.add(item2);
+
+                continue;
+            }
+
+            long timestamp1 = item1.getTimestamp();
+            long timestamp2 = item2.getTimestamp();
+
+            Date date1 = new Date(timestamp1);
+            Date date2 = new Date(timestamp2);
+
+            if (!Helpers.isSameDay(date1, date2)) {
+                items.add(new TimeMarker(timestamp1 - 1));
+            }
+
+            items.add(item2);
+            item1 = item2;
+        }
     }
 
     private Void onMessagesLoaded(Task<List<Message>> task) {
@@ -196,7 +229,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             getView().setAllMessagesLoaded(true);
         }
 
-        items.addAll(castList(messages));
+        addItemsToList(messages);
         getView().showEmptyState(items.size() == 0);
 
         return null;
@@ -204,7 +237,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
     private Void onOldMessagesLoaded(Task<List<Message>> task) {
         List<Message> messages = task.getResult();
-        items.addAll(castList(messages));
+        addItemsToList(messages);
 
         if (messages.size() < BATCH_SIZE) {
             getView().setAllMessagesLoaded(true);
