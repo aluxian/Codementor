@@ -3,6 +3,7 @@ package com.aluxian.codementor.presentation.presenters;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.views.MainActivityView;
 import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.FirebaseTasks;
 
@@ -14,14 +15,14 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
 
     private UserManager userManager;
     private FirebaseTasks firebaseTasks;
-    private TaskContinuations taskContinuations;
+    private ErrorHandler errorHandler;
 
     public MainActivityPresenter(MainActivityView baseView, CoreServices coreServices) {
         super(baseView);
 
         userManager = coreServices.getUserManager();
         firebaseTasks = coreServices.getFirebaseTasks();
-        taskContinuations = coreServices.getTaskContinuations();
+        errorHandler = coreServices.getErrorHandler();
     }
 
     @Override
@@ -46,7 +47,7 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
 
                     return null;
                 }, UI)
-                .continueWith(taskContinuations::logAndToastError, UI);
+                .continueWith(errorHandler::logAndToastTask, UI);
 
     }
 

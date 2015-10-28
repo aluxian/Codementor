@@ -36,7 +36,6 @@ public class CoreServices {
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
     private ServerApiTasks serverApiTasks;
-    private TaskContinuations taskContinuations;
 
     public CoreServices(Context context) {
         this.context = context;
@@ -60,7 +59,6 @@ public class CoreServices {
         codementorTasks = new CodementorTasks(okHttpClient);
         firebaseTasks = new FirebaseTasks(firebaseRef, userManager);
         serverApiTasks = new ServerApiTasks(okHttpClient, userManager);
-        taskContinuations = new TaskContinuations(errorHandler);
     }
 
     public Context getContext() {
@@ -85,10 +83,6 @@ public class CoreServices {
 
     public ServerApiTasks getServerApiTasks() {
         return serverApiTasks;
-    }
-
-    public TaskContinuations getTaskContinuations() {
-        return taskContinuations;
     }
 
     public UserManager getUserManager() {

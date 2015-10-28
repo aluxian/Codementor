@@ -46,7 +46,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
     private ServerApiTasks serverApiTasks;
-    private TaskContinuations taskContinuations;
 
     private Firebase presenceRef;
     private Query messagesRef;
@@ -66,7 +65,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
         serverApiTasks = coreServices.getServerApiTasks();
-        taskContinuations = coreServices.getTaskContinuations();
 
         Firebase firebaseRef = coreServices.getFirebaseRef();
         presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
@@ -134,7 +132,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         items.add(new Message(firebaseMessage, userManager.getUsername()));
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> serverApiTasks.sendMessage(firebaseMessage, task.getResult()))
-                .continueWith(taskContinuations::logAndToastError, UI);
+                .continueWith(errorHandler::logAndToastTask, UI);
     }
 
     private void updateStatus(@Nullable String status) {
@@ -191,7 +189,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             }
 
             serverApiTasks.markConversationRead(chatroom)
-                    .continueWith(taskContinuations::logAndToastError, UI);
+                    .continueWith(errorHandler::logAndToastTask, UI);
         }
 
         if (messages.size() < BATCH_SIZE) {
@@ -241,7 +239,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         public void onDataChange(DataSnapshot dataSnapshot) {
             firebaseTasks.parseMessagesSnapshot(dataSnapshot)
                     .onSuccess(ConversationPresenter.this::onMessagesLoaded, UI)
-                    .continueWith(taskContinuations::logAndToastError, UI)
+                    .continueWith(errorHandler::logAndToastTask, UI)
                     .continueWith(ConversationPresenter.this::onLoadingFinished, UI);
         }
 
@@ -253,7 +251,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         public void onDataChange(DataSnapshot dataSnapshot) {
             firebaseTasks.parseMessagesSnapshot(dataSnapshot)
                     .onSuccess(ConversationPresenter.this::onOldMessagesLoaded, UI)
-                    .continueWith(taskContinuations::logAndToastError, UI)
+                    .continueWith(errorHandler::logAndToastTask, UI)
                     .continueWith(ConversationPresenter.this::onLoadingFinished, UI);
         }
 

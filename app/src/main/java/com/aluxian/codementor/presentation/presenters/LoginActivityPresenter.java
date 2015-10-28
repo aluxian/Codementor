@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
 import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
@@ -22,10 +23,11 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
 
     private FirebaseTasks firebaseTasks;
     private CodementorTasks codementorTasks;
-    private TaskContinuations taskContinuations;
 
+    private ErrorHandler errorHandler;
     private PersistentCookieStore cookieStore;
     private UserManager userManager;
+
     private boolean cancelled;
 
     public LoginActivityPresenter(LoginActivityView baseView, CoreServices coreServices) {
@@ -33,8 +35,8 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
 
         firebaseTasks = coreServices.getFirebaseTasks();
         codementorTasks = coreServices.getCodementorTasks();
-        taskContinuations = coreServices.getTaskContinuations();
 
+        errorHandler = coreServices.getErrorHandler();
         cookieStore = coreServices.getCookieStore();
         userManager = coreServices.getUserManager();
 
@@ -63,7 +65,7 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
                 .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), false))
                 .onSuccess(loggedIn(username), UI)
-                .continueWith(taskContinuations::logAndToastError, UI)
+                .continueWith(errorHandler::logAndToastTask, UI)
                 .continueWith(this::onDismissDialog, UI);
 
     }

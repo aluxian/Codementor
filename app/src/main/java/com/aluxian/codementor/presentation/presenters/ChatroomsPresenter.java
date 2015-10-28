@@ -11,6 +11,7 @@ import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
 import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.SortedListCallback;
 import com.squareup.otto.Bus;
@@ -25,7 +26,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
 
     private Bus bus;
     private ServerApiTasks serverApiTasks;
-    private TaskContinuations taskContinuations;
+    private ErrorHandler errorHandler;
 
     private @Nullable Task chatroomsListTask;
     private SortedList<Chatroom> chatrooms;
@@ -35,7 +36,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
 
         bus = coreServices.getBus();
         serverApiTasks = coreServices.getServerApiTasks();
-        taskContinuations = coreServices.getTaskContinuations();
+        errorHandler = coreServices.getErrorHandler();
 
         initAdapter();
     }
@@ -82,7 +83,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
         getView().setRefreshing(true);
         chatroomsListTask = serverApiTasks.getChatroomsList()
                 .onSuccess(this::onGotChatroomsList, UI)
-                .continueWith(taskContinuations::logAndToastError, UI)
+                .continueWith(errorHandler::logAndToastTask, UI)
                 .continueWith(this::onLoadingFinished, UI);
     }
 
