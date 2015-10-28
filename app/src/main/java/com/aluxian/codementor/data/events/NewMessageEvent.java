@@ -5,8 +5,8 @@ import com.aluxian.codementor.data.models.Message;
 
 public class NewMessageEvent {
 
-    private Chatroom chatroom;
-    private Message message;
+    private final Chatroom chatroom;
+    private final Message message;
 
     public NewMessageEvent(Chatroom chatroom, Message message) {
         this.chatroom = chatroom;

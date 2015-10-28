@@ -2,7 +2,6 @@ package com.aluxian.codementor.ui.fragments;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,8 +20,8 @@ import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.presenters.ChatroomsPresenter;
-import com.aluxian.codementor.presentation.utils.DividerItemDecoration;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
+import com.aluxian.codementor.utils.DividerItemDecoration;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,27 +35,22 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     @Bind(R.id.swipe_container) SwipeRefreshLayout swipeRefreshLayout;
     @Bind(R.id.tv_empty_state) TextView emptyState;
 
-    private @Nullable ChatroomSelectedListener chatroomSelectedListener;
-    private @Nullable DrawerLayout drawerLayout;
-    private @Nullable ActionBarDrawerToggle drawerToggle;
-    private @Nullable View fragmentContainerView;
-
+    private ChatroomSelectedListener chatroomSelectedListener;
     private ChatroomsAdapter chatroomsAdapter;
     private boolean drawerShouldBeOpen;
+
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle drawerToggle;
+    private View fragmentContainerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (savedInstanceState == null) {
             drawerShouldBeOpen = true;
         }
 
-        chatroomsAdapter = new ChatroomsAdapter(getCoreServices());
-        chatroomsAdapter.setChatroomSelectedListener(this);
-        chatroomsAdapter.setHasStableIds(true);
-
-        setPresenter(new ChatroomsPresenter(this, getCoreServices(), chatroomsAdapter));
+        setPresenter(new ChatroomsPresenter(this, getCoreServices()));
     }
 
     @Override
@@ -91,18 +85,15 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     }
 
     @Override
-    public void onChatroomSelected(Chatroom chatroom) {
-        closeDrawer();
+    public void setAdapter(ChatroomsAdapter adapter) {
+        chatroomsAdapter = adapter;
+    }
 
+    @Override
+    public void onChatroomSelected(Chatroom chatroom) {
         if (chatroomSelectedListener != null) {
             chatroomSelectedListener.onChatroomSelected(chatroom);
         }
-    }
-
-    public boolean isDrawerOpen() {
-        return drawerLayout != null
-                && fragmentContainerView != null
-                && drawerLayout.isDrawerOpen(fragmentContainerView);
     }
 
     @Override
@@ -147,6 +138,15 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     }
 
     /**
+     * @return Whether the drawer is currently open.
+     */
+    public boolean isDrawerOpen() {
+        return drawerLayout != null
+                && fragmentContainerView != null
+                && drawerLayout.isDrawerOpen(fragmentContainerView);
+    }
+
+    /**
      * Users of this fragment must call this method to set up the navigation drawer interactions.
      *
      * @param fragmentContainerView The container view of the drawer fragment.
@@ -175,7 +175,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
      *
      * @param chatroomSelectedListener The callback listener.
      */
-    public void setChatroomSelectedListener(@Nullable ChatroomSelectedListener chatroomSelectedListener) {
+    public void setChatroomSelectedListener(ChatroomSelectedListener chatroomSelectedListener) {
         this.chatroomSelectedListener = chatroomSelectedListener;
     }
 

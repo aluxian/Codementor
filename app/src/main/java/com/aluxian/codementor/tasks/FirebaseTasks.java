@@ -1,11 +1,10 @@
-package com.aluxian.codementor.data.tasks;
+package com.aluxian.codementor.tasks;
 
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.data.types.PresenceType;
-import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.utils.Constants;
 import com.firebase.client.AuthData;
@@ -22,12 +21,10 @@ import bolts.Task;
 public class FirebaseTasks {
 
     private Firebase firebaseRef;
-    private ErrorHandler errorHandler;
     private UserManager userManager;
 
-    public FirebaseTasks(Firebase firebaseRef, ErrorHandler errorHandler, UserManager userManager) {
+    public FirebaseTasks(Firebase firebaseRef, UserManager userManager) {
         this.firebaseRef = firebaseRef;
-        this.errorHandler = errorHandler;
         this.userManager = userManager;
     }
 
@@ -68,7 +65,7 @@ public class FirebaseTasks {
 
             for (DataSnapshot child : snapshot.getChildren()) {
                 MessageData messageData = child.getValue(MessageData.class);
-                messages.add(0, new Message(messageData, userManager.getUsername()));
+                messages.add(new Message(messageData, userManager.getUsername()));
             }
 
             return messages;
@@ -100,7 +97,7 @@ public class FirebaseTasks {
     public Task<PresenceType> getPresence(String username) {
         Task<PresenceType>.TaskCompletionSource taskSource = Task.<PresenceType>create();
 
-        Firebase presenceRef = firebaseRef.child(Constants.getPresencePath(username));
+        Firebase presenceRef = firebaseRef.child(Constants.presencePath(username));
         presenceRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -124,7 +121,7 @@ public class FirebaseTasks {
     public Task<Void> setPresence(String username, PresenceType newPresenceType) {
         Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
 
-        Firebase presenceRef = firebaseRef.child(Constants.getPresencePath(username));
+        Firebase presenceRef = firebaseRef.child(Constants.presencePath(username));
         presenceRef.setValue(newPresenceType.name().toLowerCase(), (firebaseError, firebase) -> {
             if (firebaseError != null) {
                 taskSource.setError(firebaseError.toException());

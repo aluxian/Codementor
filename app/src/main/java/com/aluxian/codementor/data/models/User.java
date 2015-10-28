@@ -1,29 +1,30 @@
 package com.aluxian.codementor.data.models;
 
+import android.support.annotation.NonNull;
+
+import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.utils.Constants;
+import com.aluxian.codementor.utils.ContentComparable;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 
 import java.io.Serializable;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class User implements Serializable {
+public class User implements Serializable, ContentComparable<User> {
 
-    private String username;
-    private String name;
+    private @JsonIgnore PresenceType presenceType;
     private String first_name;
     private String avatar_url;
+    private String username;
+    private String name;
 
-    @SuppressWarnings("unused")
-    public User() {}
-
-    @SuppressWarnings("unused")
-    public User(String username, String name, String first_name, String avatar_url) {
-        this.username = username;
-        this.name = name;
-        this.first_name = first_name;
-        this.avatar_url = avatar_url;
+    public User() {
+        presenceType = PresenceType.OFFLINE;
     }
 
     public String getUsername() {
@@ -43,25 +44,42 @@ public class User implements Serializable {
     }
 
     public String getChatroomPath() {
-        return Constants.getChatroomUrl(getUsername());
+        return Constants.chatroomUrl(getUsername());
     }
 
     public String getReadPath() {
-        return Constants.getChatroomReadUrl(getUsername());
+        return Constants.chatroomReadUrl(getUsername());
+    }
+
+    public PresenceType getPresenceType() {
+        return presenceType;
+    }
+
+    public void setPresenceType(PresenceType presenceType) {
+        this.presenceType = presenceType;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
-
         User user = (User) o;
-        return !(username != null ? !username.equals(user.username) : user.username != null);
+        return Objects.equal(username, user.username);
     }
 
     @Override
     public int hashCode() {
-        return username != null ? username.hashCode() : 0;
+        return Objects.hashCode(username);
+    }
+
+    @Override
+    public int compareTo(@NonNull User another) {
+        return ComparisonChain.start().compare(getName(), another.getName()).result();
+    }
+
+    @Override
+    public boolean compareContentTo(User another) {
+        return getPresenceType() == another.getPresenceType();
     }
 
 }

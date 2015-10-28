@@ -1,6 +1,6 @@
 package com.aluxian.codementor.presentation.adapters;
 
-import android.content.Context;
+import android.support.v7.util.SortedList;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,80 +8,37 @@ import android.view.ViewGroup;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.ConversationItem;
-import com.aluxian.codementor.data.models.Message;
-import com.aluxian.codementor.data.models.TimeMarker;
-import com.aluxian.codementor.data.types.MessageType;
-import com.aluxian.codementor.presentation.holders.HtmlMessageViewHolder;
+import com.aluxian.codementor.presentation.holders.ConversationItemViewHolder;
 import com.aluxian.codementor.presentation.holders.MessageViewHolder;
 import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.TreeSet;
+public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemViewHolder> {
 
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_ALIGN_RIGHT;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_TIME_MARKER;
+    private SortedList<ConversationItem> items;
 
-public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-    private TreeSet<Message> messages = new TreeSet<>();
-    private List<ConversationItem> items = new ArrayList<>();
+    public void setList(SortedList<ConversationItem> items) {
+        this.items = items;
+    }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
+    public ConversationItemViewHolder onCreateViewHolder(ViewGroup parent, int layoutId) {
+        View rootView = LayoutInflater.from(parent.getContext()).inflate(layoutId, parent, false);
 
-        View rootView;
-        int layoutId;
-
-        if ((viewType & TYPE_TIME_MARKER) == TYPE_TIME_MARKER) {
-            rootView = LayoutInflater.from(context).inflate(R.layout.item_time_marker, parent, false);
+        if (layoutId == R.layout.item_time_marker) {
             return new TimeMarkerViewHolder(rootView);
-        }
-
-        boolean alignRight = (viewType & TYPE_ALIGN_RIGHT) == TYPE_ALIGN_RIGHT;
-        MessageType type = MessageType.getByFlag(viewType);
-
-        switch (type) {
-            case MESSAGE:
-                layoutId = alignRight ? R.layout.item_msg_text_right : R.layout.item_msg_text_left;
-                rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-                return new MessageViewHolder(rootView);
-
-            case FILE:
-            case REQUEST:
-                layoutId = alignRight ? R.layout.item_msg_html_right : R.layout.item_msg_html_left;
-                rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-                return new HtmlMessageViewHolder(rootView);
-
-            default:
-                layoutId = alignRight ? R.layout.item_msg_system_right : R.layout.item_msg_system_left;
-                rootView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-                return new MessageViewHolder(rootView);
+        } else {
+            return new MessageViewHolder(rootView);
         }
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        ConversationItem item = items.get(position);
-
-        if (holder instanceof TimeMarkerViewHolder) {
-            TimeMarkerViewHolder timeMarkerViewHolder = (TimeMarkerViewHolder) holder;
-            timeMarkerViewHolder.loadTimeMarker(item.getTimeMarker());
-        } else if (holder instanceof HtmlMessageViewHolder) {
-            HtmlMessageViewHolder htmlMessageViewHolder = (HtmlMessageViewHolder) holder;
-            htmlMessageViewHolder.loadMessage(item.getMessage(), position == 0);
-        } else {
-            MessageViewHolder messageViewHolder = (MessageViewHolder) holder;
-            messageViewHolder.loadMessage(item.getMessage(), position == 0);
-        }
+    public void onBindViewHolder(ConversationItemViewHolder holder, int position) {
+        holder.bindItem(items.get(position), position == 0);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return items.get(position).getViewType();
+        return items.get(position).getLayoutId();
     }
 
     @Override
@@ -92,74 +49,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemCount() {
         return items.size();
-    }
-
-    public void addMessages(List<Message> newMessages) {
-        if (newMessages.size() == 0) {
-            return;
-        }
-
-        messages.addAll(newMessages);
-        generateItems();
-        notifyDataSetChanged();
-    }
-
-    private void generateItems() {
-        items.clear();
-        Message message1 = null;
-
-        for (Message message2 : messages) {
-            if (message1 == null) {
-                message1 = message2;
-                addMessage(message2);
-                continue;
-            }
-
-            long timestamp1 = message1.getCreatedAt();
-            long timestamp2 = message2.getCreatedAt();
-
-            Date date1 = new Date(timestamp1);
-            Date date2 = new Date(timestamp2);
-
-            if (!isSameDay(date1, date2)) {
-                addTimeMarker(timestamp1);
-            }
-
-            addMessage(message2);
-            message1 = message2;
-        }
-
-        long lastTimestamp = messages.last().getCreatedAt();
-        Date lastDate = new Date(lastTimestamp);
-
-        if (!isSameDay(lastDate, new Date())) {
-            addTimeMarker(lastTimestamp);
-        }
-    }
-
-    private boolean isSameDay(Date date1, Date date2) {
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
-
-        cal1.setTime(date1);
-        cal2.setTime(date2);
-
-        boolean sameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
-        boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
-
-        return sameYear && sameDay;
-    }
-
-    private void addMessage(Message message) {
-        items.add(new ConversationItem(message));
-    }
-
-    private void addTimeMarker(long timestamp) {
-        items.add(new ConversationItem(new TimeMarker(timestamp)));
-    }
-
-    public Message getOldestMessage() {
-        return messages.last();
     }
 
 }

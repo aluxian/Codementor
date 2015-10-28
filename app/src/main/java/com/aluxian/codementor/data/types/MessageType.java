@@ -1,35 +1,42 @@
 package com.aluxian.codementor.data.types;
 
-import com.aluxian.codementor.data.models.ConversationItem;
-
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_CONNECT;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_FILE;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_MESSAGE;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_REQUEST;
-import static com.aluxian.codementor.data.models.ConversationItem.TYPE_SIGNATURE;
+import com.aluxian.codementor.R;
+import com.aluxian.codementor.services.ErrorHandler;
 
 public enum MessageType {
 
-    MESSAGE(TYPE_MESSAGE),
-    CONNECT(ConversationItem.TYPE_CONNECT),
-    FILE(ConversationItem.TYPE_FILE),
-    REQUEST(ConversationItem.TYPE_REQUEST),
-    SIGNATURE(ConversationItem.TYPE_SIGNATURE),
-    OTHER(ConversationItem.TYPE_OTHER);
+    MESSAGE(R.layout.item_msg_text_left, R.layout.item_msg_text_right),
+    CONNECT(R.layout.item_msg_system_left, R.layout.item_msg_system_left),
+    FILE(R.layout.item_msg_html_left, R.layout.item_msg_html_left),
+    REQUEST(R.layout.item_msg_html_left, R.layout.item_msg_html_left),
+    SIGNATURE(R.layout.item_msg_system_left, R.layout.item_msg_system_left),
+    OTHER(R.layout.item_msg_system_left, R.layout.item_msg_system_left);
 
-    public final int typeFlag;
+    public final int leftLayoutId;
+    public final int rightLayoutId;
 
-    MessageType(int typeFlag) {
-        this.typeFlag = typeFlag;
+    MessageType(int leftLayoutId, int rightLayoutId) {
+        this.leftLayoutId = leftLayoutId;
+        this.rightLayoutId = rightLayoutId;
     }
 
-    public static MessageType getByFlag(int flag) {
-        if ((TYPE_MESSAGE & flag) == TYPE_MESSAGE) return MESSAGE;
-        if ((TYPE_CONNECT & flag) == TYPE_CONNECT) return CONNECT;
-        if ((TYPE_FILE & flag) == TYPE_FILE) return FILE;
-        if ((TYPE_REQUEST & flag) == TYPE_REQUEST) return REQUEST;
-        if ((TYPE_SIGNATURE & flag) == TYPE_SIGNATURE) return SIGNATURE;
-        return OTHER;
+    public static MessageType parse(String rawType) {
+        rawType = rawType.toUpperCase();
+
+        if (rawType.contains("MSG")) {
+            rawType = "MESSAGE";
+        }
+
+        if (rawType.equals("SESSIONLINK") || rawType.equals("CONNECT")) {
+            rawType = "CONNECT";
+        }
+
+        try {
+            return valueOf(rawType);
+        } catch (IllegalArgumentException e) {
+            ErrorHandler.log(e);
+            return OTHER;
+        }
     }
 
 }

@@ -14,8 +14,7 @@ public class UserManager {
 
     public UserManager(SharedPreferences sharedPrefs) {
         this.sharedPrefs = sharedPrefs;
-        firebaseToken = sharedPrefs.getString(KEY_FIREBASE_TOKEN, null);
-        username = sharedPrefs.getString(KEY_USERNAME, null);
+        restoreState();
     }
 
     public boolean isLoggedIn() {
@@ -36,6 +35,11 @@ public class UserManager {
         this.firebaseToken = null;
         this.username = null;
         persistState();
+    }
+
+    private void restoreState() {
+        firebaseToken = sharedPrefs.getString(KEY_FIREBASE_TOKEN, null);
+        username = sharedPrefs.getString(KEY_USERNAME, null);
     }
 
     private void persistState() {

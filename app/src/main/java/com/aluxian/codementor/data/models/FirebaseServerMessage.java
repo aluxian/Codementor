@@ -1,5 +1,7 @@
 package com.aluxian.codementor.data.models;
 
+import com.google.common.base.Objects;
+
 public class FirebaseServerMessage {
 
     private String name;
@@ -14,18 +16,14 @@ public class FirebaseServerMessage {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FirebaseServerMessage)) return false;
-
         FirebaseServerMessage that = (FirebaseServerMessage) o;
-        return !(name != null ? !name.equals(that.name) : that.name != null) && !(message != null ? !message.equals
-                (that.message) : that.message != null);
-
+        return Objects.equal(name, that.name) &&
+                Objects.equal(message, that.message);
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (message != null ? message.hashCode() : 0);
-        return result;
+        return Objects.hashCode(name, message);
     }
 
 }

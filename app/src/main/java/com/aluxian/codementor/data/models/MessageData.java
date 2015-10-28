@@ -2,6 +2,7 @@ package com.aluxian.codementor.data.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Objects;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -9,25 +10,26 @@ public class MessageData {
 
     private String id;
     private String content;
+    private Request request;
+
     private User sender;
     private User receiver;
-    private Request request;
+
     private String created_at;
     private String read_at;
     private String type;
 
-    @SuppressWarnings("unused")
     public MessageData() {}
 
-    public MessageData(String id, String content, User sender, User receiver, Request request, String created_at,
-                       String read_at, String type) {
+    public MessageData(String id, String content, Request request, User sender, User receiver, String createdAt,
+                       String readAt, String type) {
         this.id = id;
         this.content = content;
+        this.request = request;
         this.sender = sender;
         this.receiver = receiver;
-        this.request = request;
-        this.created_at = created_at;
-        this.read_at = read_at;
+        this.created_at = createdAt;
+        this.read_at = readAt;
         this.type = type;
     }
 
@@ -67,15 +69,13 @@ public class MessageData {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MessageData)) return false;
-
         MessageData that = (MessageData) o;
-        return !(id != null ? !id.equals(that.id) : that.id != null);
-
+        return Objects.equal(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return Objects.hashCode(id);
     }
 
 }

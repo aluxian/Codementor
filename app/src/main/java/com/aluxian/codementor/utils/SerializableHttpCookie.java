@@ -1,23 +1,6 @@
-/*
- * Copyright (c) 2011 James Smith <james@loopj.com>
- * Copyright (c) 2015 Fran Montiel
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.aluxian.codementor.utils;
 
-import android.util.Log;
+import com.aluxian.codementor.services.ErrorHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,9 +16,7 @@ import java.net.HttpCookie;
  */
 public class SerializableHttpCookie implements Serializable {
 
-    private static final String TAG = SerializableHttpCookie.class.getSimpleName();
     private static final long serialVersionUID = 6374381323722046732L;
-
     private transient HttpCookie cookie;
 
     // Workaround httpOnly: The httpOnly attribute is not accessible so when we
@@ -51,7 +32,7 @@ public class SerializableHttpCookie implements Serializable {
             ObjectOutputStream outputStream = new ObjectOutputStream(os);
             outputStream.writeObject(this);
         } catch (IOException e) {
-            Log.d(TAG, "IOException in encodeCookie", e);
+            ErrorHandler.logDebug("IOException in encodeCookie", e);
             return null;
         }
 
@@ -67,9 +48,9 @@ public class SerializableHttpCookie implements Serializable {
             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
             cookie = ((SerializableHttpCookie) objectInputStream.readObject()).cookie;
         } catch (IOException e) {
-            Log.d(TAG, "IOException in decodeCookie", e);
+            ErrorHandler.logDebug("IOException in decodeCookie", e);
         } catch (ClassNotFoundException e) {
-            Log.d(TAG, "ClassNotFoundException in decodeCookie", e);
+            ErrorHandler.logDebug("ClassNotFoundException in decodeCookie", e);
         }
 
         return cookie;
@@ -80,11 +61,10 @@ public class SerializableHttpCookie implements Serializable {
         try {
             initFieldHttpOnly();
             return (boolean) fieldHttpOnly.get(cookie);
-        } catch (Exception e) {
-            // NoSuchFieldException || IllegalAccessException ||
-            // IllegalArgumentException
-            Log.w(TAG, e);
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+            ErrorHandler.logWarn(e);
         }
+
         return false;
     }
 
@@ -93,10 +73,8 @@ public class SerializableHttpCookie implements Serializable {
         try {
             initFieldHttpOnly();
             fieldHttpOnly.set(cookie, httpOnly);
-        } catch (Exception e) {
-            // NoSuchFieldException || IllegalAccessException ||
-            // IllegalArgumentException
-            Log.w(TAG, e);
+        } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
+            ErrorHandler.logWarn(e);
         }
     }
 
@@ -137,12 +115,11 @@ public class SerializableHttpCookie implements Serializable {
     }
 
     /**
-     * Using some super basic byte array &lt;-&gt; hex conversions so we don't
-     * have to rely on any large Base64 libraries. Can be overridden if you
-     * like!
+     * Using some super basic byte array &lt;-&gt; hex conversions so we don't have to rely on any large Base64
+     * libraries. Can be overridden if you like!
      *
-     * @param bytes byte array to be converted
-     * @return string containing hex values
+     * @param bytes The byte array to be converted.
+     * @return A string containing hex values.
      */
     private String byteArrayToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder(bytes.length * 2);
@@ -157,17 +134,18 @@ public class SerializableHttpCookie implements Serializable {
     }
 
     /**
-     * Converts hex values from strings to byte array
+     * Convert hex values from strings to byte array.
      *
-     * @param hexString string of hex-encoded values
-     * @return decoded byte array
+     * @param hexString String of hex-encoded values.
+     * @return A decoded byte array.
      */
     private byte[] hexStringToByteArray(String hexString) {
         int len = hexString.length();
         byte[] data = new byte[len / 2];
         for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character
-                    .digit(hexString.charAt(i + 1), 16));
+            int a = Character.digit(hexString.charAt(i), 16);
+            int b = Character.digit(hexString.charAt(i + 1), 16);
+            data[i / 2] = (byte) ((a << 4) + b);
         }
         return data;
     }

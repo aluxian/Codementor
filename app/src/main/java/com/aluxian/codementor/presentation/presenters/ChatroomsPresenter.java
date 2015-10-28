@@ -2,45 +2,56 @@ package com.aluxian.codementor.presentation.presenters;
 
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.util.SortedList;
 
 import com.aluxian.codementor.data.events.NewMessageEvent;
-import com.aluxian.codementor.data.tasks.ServerApiTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.data.models.Chatroom;
+import com.aluxian.codementor.data.models.ChatroomsList;
 import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
+import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
 import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.tasks.ServerApiTasks;
+import com.aluxian.codementor.utils.SortedListCallback;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
 
 import bolts.Task;
 
-import static bolts.Task.UI_THREAD_EXECUTOR;
+import static com.aluxian.codementor.utils.Constants.UI;
 
-public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRefreshListener {
+public class ChatroomsPresenter extends Presenter<ChatroomsView>
+        implements OnRefreshListener, ChatroomSelectedListener {
 
-    private @Nullable Task chatroomsListTask;
-    private ChatroomsAdapter chatroomsAdapter;
-
+    private Bus bus;
     private ServerApiTasks serverApiTasks;
     private TaskContinuations taskContinuations;
-    private Bus bus;
 
-    public ChatroomsPresenter(ChatroomsView baseView, CoreServices coreServices, ChatroomsAdapter chatroomsAdapter) {
+    private @Nullable Task chatroomsListTask;
+    private SortedList<Chatroom> chatrooms;
+
+    public ChatroomsPresenter(ChatroomsView baseView, CoreServices coreServices) {
         super(baseView);
 
+        bus = coreServices.getBus();
         serverApiTasks = coreServices.getServerApiTasks();
         taskContinuations = coreServices.getTaskContinuations();
-        bus = coreServices.getBus();
 
-        this.chatroomsAdapter = chatroomsAdapter;
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        ChatroomsAdapter adapter = new ChatroomsAdapter(this);
+        getView().setAdapter(adapter);
+        chatrooms = new SortedList<>(Chatroom.class, new SortedListCallback<>(adapter));
+        adapter.setHasStableIds(true);
+        adapter.setList(chatrooms);
     }
 
     @Override
     public void resume() {
         super.resume();
         bus.register(this);
-        getView().setRefreshing(true);
-        onRefresh();
     }
 
     @Override
@@ -49,29 +60,45 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
         bus.unregister(this);
     }
 
+    @Override
+    public void onChatroomSelected(Chatroom chatroom) {
+        getView().closeDrawer();
+        getView().onChatroomSelected(chatroom);
+    }
+
     @Subscribe
     public void newMessageReceived(NewMessageEvent event) {
-        getView().setRefreshing(true);
-        onRefresh();
+        Chatroom chatroom = event.getChatroom();
+        chatroom.updateContentDescription(event.getMessage());
+        chatrooms.add(chatroom);
     }
 
     @Override
     public void onRefresh() {
-        if (chatroomsListTask != null && !chatroomsListTask.isCompleted()) {
+        if (isAlreadyLoading()) {
             return;
         }
 
+        getView().setRefreshing(true);
         chatroomsListTask = serverApiTasks.getChatroomsList()
-                .onSuccess(task -> {
-                    chatroomsAdapter.updateList(task.getResult().getRecentChats());
-                    getView().showEmptyState(chatroomsAdapter.getItemCount() == 0);
-                    return null;
-                }, UI_THREAD_EXECUTOR)
-                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
-                .continueWith(task -> {
-                    getView().setRefreshing(false);
-                    return null;
-                }, UI_THREAD_EXECUTOR);
+                .onSuccess(this::onGotChatroomsList, UI)
+                .continueWith(taskContinuations::logAndToastError, UI)
+                .continueWith(this::onLoadingFinished, UI);
+    }
+
+    private boolean isAlreadyLoading() {
+        return chatroomsListTask != null && !chatroomsListTask.isCompleted();
+    }
+
+    private Void onGotChatroomsList(Task<ChatroomsList> task) {
+        chatrooms.addAll(task.getResult().getRecentChats());
+        getView().showEmptyState(chatrooms.size() == 0);
+        return null;
+    }
+
+    private Void onLoadingFinished(Task task) {
+        getView().setRefreshing(false);
+        return null;
     }
 
 }

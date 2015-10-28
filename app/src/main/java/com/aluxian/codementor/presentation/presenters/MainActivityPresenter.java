@@ -1,15 +1,14 @@
 package com.aluxian.codementor.presentation.presenters;
 
-import com.aluxian.codementor.data.tasks.FirebaseTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.views.MainActivityView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.tasks.FirebaseTasks;
 
 import java.util.Arrays;
 
-import static bolts.Task.UI_THREAD_EXECUTOR;
+import static com.aluxian.codementor.utils.Constants.UI;
 
 public class MainActivityPresenter extends Presenter<MainActivityView> {
 
@@ -46,8 +45,8 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
                     }
 
                     return null;
-                }, UI_THREAD_EXECUTOR)
-                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
+                }, UI)
+                .continueWith(taskContinuations::logAndToastError, UI);
 
     }
 

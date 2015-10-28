@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 public class WrapWidthTextView extends TextView {
 
+    // TODO: make this work
+
     public WrapWidthTextView(Context context) {
         super(context);
     }

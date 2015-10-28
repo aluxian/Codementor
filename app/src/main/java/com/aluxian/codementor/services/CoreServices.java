@@ -4,10 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import com.aluxian.codementor.data.tasks.CodementorTasks;
-import com.aluxian.codementor.data.tasks.FirebaseTasks;
-import com.aluxian.codementor.data.tasks.ServerApiTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
+import com.aluxian.codementor.tasks.CodementorTasks;
+import com.aluxian.codementor.tasks.FirebaseTasks;
+import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.Firebase;
@@ -59,17 +58,13 @@ public class CoreServices {
 
         // Tasks
         codementorTasks = new CodementorTasks(okHttpClient);
-        firebaseTasks = new FirebaseTasks(firebaseRef, errorHandler, userManager);
-        serverApiTasks = new ServerApiTasks(okHttpClient, userManager, errorHandler);
+        firebaseTasks = new FirebaseTasks(firebaseRef, userManager);
+        serverApiTasks = new ServerApiTasks(okHttpClient, userManager);
         taskContinuations = new TaskContinuations(errorHandler);
     }
 
     public Context getContext() {
         return context;
-    }
-
-    public SharedPreferences getSharedPrefs() {
-        return sharedPrefs;
     }
 
     public PersistentCookieStore getCookieStore() {
@@ -78,10 +73,6 @@ public class CoreServices {
 
     public Firebase getFirebaseRef() {
         return firebaseRef;
-    }
-
-    public OkHttpClient getOkHttpClient() {
-        return okHttpClient;
     }
 
     public CodementorTasks getCodementorTasks() {

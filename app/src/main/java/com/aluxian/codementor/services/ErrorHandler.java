@@ -7,6 +7,8 @@ import android.widget.Toast;
 import com.aluxian.codementor.BuildConfig;
 import com.crashlytics.android.Crashlytics;
 
+import bolts.Task;
+
 public class ErrorHandler {
 
     private static final String TAG_INIT = "> ";
@@ -22,11 +24,32 @@ public class ErrorHandler {
      * @param e The error to log.
      */
     public static void log(Exception e) {
-        Log.e(tag(), e.getMessage(), e);
-
-        if (!BuildConfig.DEBUG) {
-            Crashlytics.logException(e);
+        if (e == null) {
+            return;
         }
+
+        Log.e(tag(), e.getMessage(), e);
+        reportToCrashlytics(e);
+    }
+
+    /**
+     * Log the given warning exception.
+     *
+     * @param e The error to log.
+     */
+    public static void logWarn(Exception e) {
+        Log.w(tag(), e);
+        reportToCrashlytics(e);
+    }
+
+    /**
+     * Log the given debug exception.
+     *
+     * @param e The error to log.
+     */
+    public static void logDebug(String message, Exception e) {
+        Log.e(tag(), message, e);
+        reportToCrashlytics(e);
     }
 
     /**
@@ -41,10 +64,15 @@ public class ErrorHandler {
 
         Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         Log.e(tag(), e.getMessage(), e);
+        reportToCrashlytics(e);
+    }
 
-        if (!BuildConfig.DEBUG) {
-            Crashlytics.logException(e);
-        }
+    /**
+     * A simple task continuation which logs the error and shows a toast.
+     */
+    public Void logAndToastTask(Task task) {
+        logAndToast(task.getError());
+        return null;
     }
 
     /**
@@ -62,6 +90,12 @@ public class ErrorHandler {
         int line = element.getLineNumber();
 
         return TAG_INIT + clazz + "::" + method + "@L" + line;
+    }
+
+    private static void reportToCrashlytics(Throwable throwable) {
+        if (!BuildConfig.DEBUG) {
+            Crashlytics.logException(throwable);
+        }
     }
 
 }

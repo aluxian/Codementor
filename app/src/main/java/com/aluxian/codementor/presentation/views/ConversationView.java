@@ -2,7 +2,16 @@ package com.aluxian.codementor.presentation.views;
 
 import android.support.annotation.Nullable;
 
+import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
+
 public interface ConversationView extends BaseView {
+
+    /**
+     * Set the adapter this view should use.
+     *
+     * @param adapter The adapter to set.
+     */
+    void setAdapter(ConversationAdapter adapter);
 
     /**
      * Change whether the SwipeRefreshLayout should be refreshing or not.

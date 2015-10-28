@@ -3,20 +3,20 @@ package com.aluxian.codementor.presentation.presenters;
 import android.text.TextUtils;
 
 import com.aluxian.codementor.R;
-import com.aluxian.codementor.data.tasks.CodementorTasks;
-import com.aluxian.codementor.data.tasks.FirebaseTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.tasks.CodementorTasks;
+import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.AuthData;
 
 import java.util.concurrent.CancellationException;
 
 import bolts.Continuation;
+import bolts.Task;
 
-import static bolts.Task.UI_THREAD_EXECUTOR;
+import static com.aluxian.codementor.utils.Constants.UI;
 
 public class LoginActivityPresenter extends Presenter<LoginActivityView> {
 
@@ -56,23 +56,21 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
         getView().showProgressDialog(R.string.auth_step_codementor);
 
         codementorTasks.extractAuthCode()
-                .onSuccess(updateUnlessCancelled(0), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> codementorTasks.signIn(username, password, task.getResult()))
-                .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase), UI)
                 .onSuccessTask(task -> codementorTasks.extractToken())
-                .onSuccess(updateUnlessCancelled(0), UI_THREAD_EXECUTOR)
+                .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), false))
-                .onSuccess(loggedIn(username), UI_THREAD_EXECUTOR)
-                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
-                .continueWith(dismissDialog(), UI_THREAD_EXECUTOR);
+                .onSuccess(loggedIn(username), UI)
+                .continueWith(taskContinuations::logAndToastError, UI)
+                .continueWith(this::onDismissDialog, UI);
 
     }
 
-    private <T, C> Continuation<T, C> dismissDialog() {
-        return task -> {
-            getView().dismissProgressDialog();
-            return null;
-        };
+    private Void onDismissDialog(Task task) {
+        getView().dismissProgressDialog();
+        return null;
     }
 
     private <T extends AuthData, C> Continuation<T, C> loggedIn(String username) {

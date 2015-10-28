@@ -1,47 +1,71 @@
 package com.aluxian.codementor.data.models;
 
+import com.google.common.base.Objects;
+
 import java.io.Serializable;
 
 public class ChatroomData implements Serializable {
 
-    public final String type;
-    public final float created_at;
-    public final float read_at;
-    public final String id;
-    public final String content;
-    public final User sender;
-    public final User receiver;
-    public final String chatroom_id;
-    public final String chatroom_firebase_id;
-    public final Request request;
+    private String type;
+    private float created_at;
 
-    public ChatroomData(String type, float created_at, float read_at, String id, String content, User sender,
-                        User receiver, String chatroom_id, String chatroom_firebase_id, Request request) {
-        this.type = type;
-        this.created_at = created_at;
-        this.read_at = read_at;
-        this.id = id;
-        this.content = content;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.chatroom_id = chatroom_id;
-        this.chatroom_firebase_id = chatroom_firebase_id;
-        this.request = request;
+    private String id;
+    private String content;
+    private Request request;
+
+    private User sender;
+    private User receiver;
+
+    private String chatroom_id;
+    private String chatroom_firebase_id;
+
+    public String getType() {
+        return type;
+    }
+
+    public float getCreatedAt() {
+        return created_at;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public Request getRequest() {
+        return request;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
+    public String getChatroomId() {
+        return chatroom_id;
+    }
+
+    public String getChatroomFirebaseId() {
+        return chatroom_firebase_id;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ChatroomData)) return false;
-
-        ChatroomData data = (ChatroomData) o;
-        return !(id != null ? !id.equals(data.id) : data.id != null);
-
+        ChatroomData that = (ChatroomData) o;
+        return Objects.equal(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return Objects.hashCode(id);
     }
 
 }

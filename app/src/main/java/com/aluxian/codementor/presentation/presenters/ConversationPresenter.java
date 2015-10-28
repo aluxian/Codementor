@@ -1,23 +1,26 @@
 package com.aluxian.codementor.presentation.presenters;
 
 import android.support.annotation.Nullable;
+import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 
 import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.models.Chatroom;
+import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
-import com.aluxian.codementor.data.tasks.CodementorTasks;
-import com.aluxian.codementor.data.tasks.FirebaseTasks;
-import com.aluxian.codementor.data.tasks.ServerApiTasks;
-import com.aluxian.codementor.data.tasks.TaskContinuations;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.views.ConversationView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
+import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.tasks.CodementorTasks;
+import com.aluxian.codementor.tasks.FirebaseTasks;
+import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.Constants;
+import com.aluxian.codementor.utils.SortedListCallback;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -29,50 +32,55 @@ import java.util.List;
 
 import bolts.Task;
 
-import static bolts.Task.UI_THREAD_EXECUTOR;
+import static com.aluxian.codementor.utils.Constants.UI;
 
 public class ConversationPresenter extends Presenter<ConversationView> {
 
-    private static final String ORDER_BY_CREATED_AT = "created_at";
-    private static final int ITEMS_BATCH_SIZE = 100;
-
-    private @Nullable Task firebaseReAuthTask;
+    private static final String CREATED_AT = "created_at";
+    private static final int BATCH_SIZE = 100;
 
     private Bus bus;
     private ErrorHandler errorHandler;
-    private Firebase firebaseRef;
+    private UserManager userManager;
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
     private ServerApiTasks serverApiTasks;
     private TaskContinuations taskContinuations;
 
-    private Chatroom chatroom;
-    private ConversationAdapter conversationAdapter;
-
     private Firebase presenceRef;
     private Query messagesRef;
 
-    public ConversationPresenter(ConversationView baseView, CoreServices coreServices,
-                                 Chatroom chatroom, ConversationAdapter conversationAdapter) {
+    private @Nullable Task firebaseReAuthTask;
+    private SortedList<ConversationItem> items;
+    private Chatroom chatroom;
+
+    public ConversationPresenter(ConversationView baseView, CoreServices coreServices, Chatroom chatroom) {
         super(baseView);
+        this.chatroom = chatroom;
 
         bus = coreServices.getBus();
         errorHandler = coreServices.getErrorHandler();
-        firebaseRef = coreServices.getFirebaseRef();
+        userManager = coreServices.getUserManager();
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
         serverApiTasks = coreServices.getServerApiTasks();
         taskContinuations = coreServices.getTaskContinuations();
 
-        presenceRef = firebaseRef.child(Constants.getPresencePath(chatroom.getOtherUser().getUsername()));
-        messagesRef = firebaseRef.child(chatroom.getFirebasePath())
-                .orderByChild(ORDER_BY_CREATED_AT)
-                .limitToLast(ITEMS_BATCH_SIZE);
+        Firebase firebaseRef = coreServices.getFirebaseRef();
+        presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
+        messagesRef = firebaseRef.child(chatroom.getFirebasePath()).orderByChild(CREATED_AT).limitToLast(BATCH_SIZE);
 
-        this.chatroom = chatroom;
-        this.conversationAdapter = conversationAdapter;
+        initAdapter();
+    }
+
+    private void initAdapter() {
+        ConversationAdapter adapter = new ConversationAdapter();
+        getView().setAdapter(adapter);
+        items = new SortedList<>(ConversationItem.class, new SortedListCallback<>(adapter));
+        adapter.setHasStableIds(true);
+        adapter.setList(items);
     }
 
     @Override
@@ -89,15 +97,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         removeFirebaseListeners();
     }
 
-    public void loadMore() {
-        getView().setRefreshing(true);
-        firebaseRef.child(chatroom.getFirebasePath())
-                .orderByChild(ORDER_BY_CREATED_AT)
-                .limitToLast(ITEMS_BATCH_SIZE)
-                .endAt(conversationAdapter.getOldestMessage().getCreatedAt() - 1)
-                .addListenerForSingleValueEvent(olderMessagesEventListener);
-    }
-
     private void addFirebaseListeners() {
         presenceRef.addValueEventListener(presenceEventListener);
         messagesRef.addValueEventListener(messagesEventListener);
@@ -106,6 +105,16 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private void removeFirebaseListeners() {
         presenceRef.removeEventListener(presenceEventListener);
         messagesRef.removeEventListener(messagesEventListener);
+    }
+
+    public void loadMore() {
+        if (items.size() == 0) {
+            return;
+        }
+
+        getView().setRefreshing(true);
+        messagesRef.endAt(items.get(0).getTimestamp() - 1)
+                .addListenerForSingleValueEvent(oldMessagesEventListener);
     }
 
     public void sendMessage(String messageBody) {
@@ -122,9 +131,10 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 chatroom.getOtherUser()
         );
 
+        items.add(new Message(firebaseMessage, userManager.getUsername()));
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> serverApiTasks.sendMessage(firebaseMessage, task.getResult()))
-                .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
+                .continueWith(taskContinuations::logAndToastError, UI);
     }
 
     private void updateStatus(@Nullable String status) {
@@ -133,43 +143,85 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             return;
         }
 
-        PresenceType presenceType;
-        try {
-            presenceType = PresenceType.valueOf(status.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            presenceType = PresenceType.OFFLINE;
-        }
-
-        int resId = presenceType.statusResId;
-        getView().setSubtitle(resId);
+        getView().setSubtitle(PresenceType.parse(status).statusResId);
     }
 
     private void handleFirebaseError(FirebaseError firebaseError) {
-        if (firebaseError.getCode() == FirebaseError.PERMISSION_DENIED) {
-            if (firebaseReAuthTask != null && !firebaseReAuthTask.isCompleted()) {
-                return;
+        if (firebaseError.getCode() != FirebaseError.PERMISSION_DENIED) {
+            errorHandler.logAndToast(firebaseError.toException());
+            return;
+        }
+
+        // Skip if already running
+        if (firebaseReAuthTask != null && !firebaseReAuthTask.isCompleted()) {
+            return;
+        }
+
+        firebaseReAuthTask = codementorTasks.extractToken()
+                .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), true))
+                .onSuccess(this::onFirebaseReAuthSuccessful, UI)
+                .continueWith(this::onFirebaseReAuthCompleted, UI);
+    }
+
+    private Void onFirebaseReAuthSuccessful(Task task) {
+        removeFirebaseListeners();
+        addFirebaseListeners();
+        return null;
+    }
+
+    private Void onFirebaseReAuthCompleted(Task task) {
+        if (task.isFaulted()) {
+            errorHandler.logAndToast(task.getError());
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<ConversationItem> castList(List<? extends ConversationItem> items) {
+        return (List<ConversationItem>) items;
+    }
+
+    private Void onMessagesLoaded(Task<List<Message>> task) {
+        List<Message> messages = task.getResult();
+
+        if (messages.size() > 0) {
+            if (items.size() > 0) {
+                bus.post(new NewMessageEvent(chatroom, messages.get(messages.size() - 1)));
             }
 
-            firebaseReAuthTask = codementorTasks.extractToken()
-                    .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), true))
-                    .onSuccess(task -> {
-                        removeFirebaseListeners();
-                        addFirebaseListeners();
-                        return null;
-                    }, UI_THREAD_EXECUTOR)
-                    .continueWith(task -> {
-                        if (task.isFaulted()) {
-                            errorHandler.logAndToast(firebaseError.toException());
-                        }
-
-                        return null;
-                    }, UI_THREAD_EXECUTOR);
-        } else {
-            errorHandler.logAndToast(firebaseError.toException());
+            serverApiTasks.markConversationRead(chatroom)
+                    .continueWith(taskContinuations::logAndToastError, UI);
         }
+
+        if (messages.size() < BATCH_SIZE) {
+            getView().setAllMessagesLoaded(true);
+        }
+
+        items.addAll(castList(messages));
+        getView().showEmptyState(items.size() == 0);
+
+        return null;
+    }
+
+    private Void onOldMessagesLoaded(Task<List<Message>> task) {
+        List<Message> messages = task.getResult();
+        items.addAll(castList(messages));
+
+        if (messages.size() < BATCH_SIZE) {
+            getView().setAllMessagesLoaded(true);
+        }
+
+        return null;
+    }
+
+    private Void onLoadingFinished(Task task) {
+        getView().setRefreshing(false);
+        return null;
     }
 
     private ValueEventListener presenceEventListener = new ValueEventListener() {
+
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             updateStatus(dataSnapshot.getValue(String.class));
@@ -180,76 +232,40 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             updateStatus(null);
             handleFirebaseError(firebaseError);
         }
+
     };
 
-    private ValueEventListener messagesEventListener = new ValueEventListener() {
+    private ManagedValueEventListener messagesEventListener = new ManagedValueEventListener() {
+
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             firebaseTasks.parseMessagesSnapshot(dataSnapshot)
-                    .onSuccess(task -> {
-                        List<Message> newMessages = task.getResult();
-
-                        if (newMessages.size() > 0) {
-                            Message lastMessage = newMessages.get(newMessages.size() - 1);
-
-                            if (conversationAdapter.getItemCount() > 0) {
-                                bus.post(new NewMessageEvent(chatroom, lastMessage));
-                            }
-
-                            serverApiTasks.markConversationRead(chatroom)
-                                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR);
-                        }
-
-                        if (newMessages.size() < ITEMS_BATCH_SIZE) {
-                            getView().setAllMessagesLoaded(true);
-                        }
-
-                        conversationAdapter.addMessages(newMessages);
-                        getView().showEmptyState(conversationAdapter.getItemCount() == 0);
-
-                        return null;
-                    }, UI_THREAD_EXECUTOR)
-                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
-                    .continueWith(task -> {
-                        getView().setRefreshing(false);
-                        return null;
-                    }, UI_THREAD_EXECUTOR);
+                    .onSuccess(ConversationPresenter.this::onMessagesLoaded, UI)
+                    .continueWith(taskContinuations::logAndToastError, UI)
+                    .continueWith(ConversationPresenter.this::onLoadingFinished, UI);
         }
+
+    };
+
+    private ManagedValueEventListener oldMessagesEventListener = new ManagedValueEventListener() {
+
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+                    .onSuccess(ConversationPresenter.this::onOldMessagesLoaded, UI)
+                    .continueWith(taskContinuations::logAndToastError, UI)
+                    .continueWith(ConversationPresenter.this::onLoadingFinished, UI);
+        }
+
+    };
+
+    private abstract class ManagedValueEventListener implements ValueEventListener {
 
         @Override
         public void onCancelled(FirebaseError firebaseError) {
             handleFirebaseError(firebaseError);
         }
-    };
 
-    private ValueEventListener olderMessagesEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
-                    .onSuccess(task -> {
-                        List<Message> newMessages = task.getResult();
-
-                        if (newMessages.size() > 0) {
-                            conversationAdapter.addMessages(newMessages);
-                        }
-
-                        if (newMessages.size() < ITEMS_BATCH_SIZE) {
-                            getView().setAllMessagesLoaded(true);
-                        }
-
-                        return null;
-                    }, UI_THREAD_EXECUTOR)
-                    .continueWith(taskContinuations.logAndToastError(), UI_THREAD_EXECUTOR)
-                    .continueWith(task -> {
-                        getView().setRefreshing(false);
-                        return null;
-                    }, UI_THREAD_EXECUTOR);
-        }
-
-        @Override
-        public void onCancelled(FirebaseError firebaseError) {
-            handleFirebaseError(firebaseError);
-        }
-    };
+    }
 
 }

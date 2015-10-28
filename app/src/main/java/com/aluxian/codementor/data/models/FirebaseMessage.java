@@ -3,6 +3,7 @@ package com.aluxian.codementor.data.models;
 import com.aluxian.codementor.data.types.MessageType;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Objects;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +13,15 @@ import java.util.UUID;
 public class FirebaseMessage {
 
     private @JsonProperty("chatroom_id") String chatroomId;
-    private @JsonProperty("created_at") @SuppressWarnings("unused") Map<String, String> createdAt;
+    private @JsonProperty("created_at") Map<String, String> createdAt;
     private @JsonProperty("read_at") String readAt = null;
 
     private String id;
     private String type;
-    private User sender;
-    private User receiver;
     private String content;
     private Request request;
+    private User sender;
+    private User receiver;
 
     public FirebaseMessage(String chatroomId, MessageType type, String content,
                            Request request, User sender, User receiver) {
@@ -52,14 +53,6 @@ public class FirebaseMessage {
         return type;
     }
 
-    public User getSender() {
-        return sender;
-    }
-
-    public User getReceiver() {
-        return receiver;
-    }
-
     public String getContent() {
         return content;
     }
@@ -68,22 +61,26 @@ public class FirebaseMessage {
         return request;
     }
 
+    public User getSender() {
+        return sender;
+    }
+
+    public User getReceiver() {
+        return receiver;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FirebaseMessage)) return false;
-
         FirebaseMessage that = (FirebaseMessage) o;
-        return !(chatroomId != null ? !chatroomId.equals(that.chatroomId) : that.chatroomId != null) && !(id != null
-                ? !id.equals(that.id) : that.id != null);
-
+        return Objects.equal(chatroomId, that.chatroomId) &&
+                Objects.equal(id, that.id);
     }
 
     @Override
     public int hashCode() {
-        int result = chatroomId != null ? chatroomId.hashCode() : 0;
-        result = 31 * result + (id != null ? id.hashCode() : 0);
-        return result;
+        return Objects.hashCode(chatroomId, id);
     }
 
 }

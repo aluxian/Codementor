@@ -1,81 +1,99 @@
 package com.aluxian.codementor.data.models;
 
-import java.util.UUID;
+import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-public class ConversationItem {
+import com.aluxian.codementor.utils.ContentComparable;
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 
-    public static final int TYPE_ALIGN_RIGHT = 0x10000000;
-    public static final int TYPE_TIME_MARKER = 0x00000001;
-    public static final int TYPE_MESSAGE = 0x00000010;
-    public static final int TYPE_CONNECT = 0x00000100;
-    public static final int TYPE_FILE = 0x00001000;
-    public static final int TYPE_REQUEST = 0x00010000;
-    public static final int TYPE_SIGNATURE = 0x00100000;
-    public static final int TYPE_OTHER = 0x01000000;
+public abstract class ConversationItem implements ContentComparable<ConversationItem> {
 
-    private Message message;
-    private TimeMarker timeMarker;
+    /**
+     * @return The unique ID of this item.
+     */
+    public abstract long getId();
 
-    public ConversationItem(Message message) {
-        this.message = message;
+    /**
+     * @return The type of view this item should be bound to.
+     */
+    public abstract int getLayoutId();
+
+    /**
+     * @return A timestamp associated with this item.
+     */
+    public abstract long getTimestamp();
+
+    /**
+     * @return The main text displayed for this item.
+     */
+    public String getText() {
+        return null;
     }
 
-    public ConversationItem(TimeMarker timeMarker) {
-        this.timeMarker = timeMarker;
+    /**
+     * @param context  The context to be used for formatting.
+     * @param showSeen Whether 'SEEN' may appear in the subtext.
+     * @return An optional, additional text.
+     */
+    public String getSubtext(@Nullable Context context, boolean showSeen) {
+        return null;
     }
 
-    public Message getMessage() {
-        return message;
+    /**
+     * @return Whether the main text should be treated as HTML.
+     */
+    public boolean isHtmlText() {
+        return false;
     }
 
-    public TimeMarker getTimeMarker() {
-        return timeMarker;
+    /**
+     * @return Whether this item has been read by its receiver.
+     */
+    public boolean isRead() {
+        return false;
     }
 
-    public int getViewType() {
-        int viewType;
+    /**
+     * @return Whether this item has been sent by the currently logged in user.
+     */
+    public boolean sentByMe() {
+        return false;
+    }
 
-        if (isMessage()) {
-            viewType = getMessage().getType().typeFlag;
+    /**
+     * @return The getSize of the file if this item represents one, 0 otherwise.
+     */
+    public long getSize() {
+        return 0;
+    }
 
-            if (getMessage().sentByCurrentUser()) {
-                viewType = viewType | TYPE_ALIGN_RIGHT;
+    @Override
+    public int compareTo(@NonNull ConversationItem another) {
+        int result = ComparisonChain.start()
+                .compare(getTimestamp(), another.getTimestamp())
+                .result();
+
+        if (result == 0) {
+            if (this instanceof Message && another instanceof TimeMarker) {
+                return 1;
             }
-        } else {
-            viewType = TYPE_TIME_MARKER;
+
+            if (this instanceof TimeMarker && another instanceof Message) {
+                return -1;
+            }
         }
 
-        return viewType;
-    }
-
-    public long getId() {
-        if (isMessage()) {
-            return UUID.fromString(getMessage().getId()).getMostSignificantBits();
-        } else {
-            return getTimeMarker().getTimestamp();
-        }
-    }
-
-    public boolean isMessage() {
-        return message != null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ConversationItem)) return false;
-
-        ConversationItem that = (ConversationItem) o;
-        return !(message != null ? !message.equals(that.message) : that.message != null) && !(timeMarker != null ?
-                !timeMarker.equals(that.timeMarker) : that.timeMarker != null);
-
-    }
-
-    @Override
-    public int hashCode() {
-        int result = message != null ? message.hashCode() : 0;
-        result = 31 * result + (timeMarker != null ? timeMarker.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public boolean compareContentTo(ConversationItem another) {
+        return Objects.equal(getSubtext(null, true), another.getSubtext(null, true))
+                && Objects.equal(getText(), another.getText())
+                && sentByMe() == another.sentByMe()
+                && isRead() == another.isRead();
     }
 
 }
