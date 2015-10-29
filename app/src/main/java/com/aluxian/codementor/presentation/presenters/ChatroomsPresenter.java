@@ -50,6 +50,11 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
     }
 
     @Override
+    public void viewReady() {
+        onRefresh();
+    }
+
+    @Override
     public void resume() {
         super.resume();
         bus.register(this);
