@@ -57,7 +57,7 @@ public class CoreServices {
 
         // Tasks
         codementorTasks = new CodementorTasks(okHttpClient);
-        firebaseTasks = new FirebaseTasks(firebaseRef, userManager);
+        firebaseTasks = new FirebaseTasks(firebaseRef, codementorTasks, userManager);
         serverApiTasks = new ServerApiTasks(okHttpClient, userManager);
     }
 
