@@ -31,7 +31,6 @@ import com.firebase.client.ValueEventListener;
 import com.squareup.otto.Bus;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import bolts.Task;
@@ -155,11 +154,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         for (ConversationItem item2 : itemsToAdd) {
             if (item1 == null) {
                 long firstTimestamp = item2.getTimestamp();
-                Date firstDate = new Date(firstTimestamp);
-
-                if (!Helpers.isSameDay(firstDate, new Date())) {
-                    newItems.add(new TimeMarker(firstTimestamp - 1));
-                }
+                newItems.add(new TimeMarker(firstTimestamp - 1));
 
                 item1 = item2;
                 newItems.add(item2);
