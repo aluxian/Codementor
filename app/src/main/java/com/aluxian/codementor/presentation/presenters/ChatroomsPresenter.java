@@ -47,7 +47,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
     private void initAdapter() {
         ChatroomsAdapter adapter = new ChatroomsAdapter(this);
         getView().setAdapter(adapter);
-        chatrooms = new SortedList<>(Chatroom.class, new SortedListCallback<>(adapter));
+        chatrooms = new SortedList<>(Chatroom.class, new SortedListCallback<>(adapter, true));
         adapter.setHasStableIds(true);
         adapter.setList(chatrooms);
     }

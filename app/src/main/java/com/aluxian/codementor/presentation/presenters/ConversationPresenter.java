@@ -9,7 +9,6 @@ import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
-import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.types.PresenceType;
@@ -78,7 +77,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private void initAdapter() {
         ConversationAdapter adapter = new ConversationAdapter();
         getView().setAdapter(adapter);
-        items = new SortedList<>(ConversationItem.class, new SortedListCallback<>(adapter));
+        items = new SortedList<>(ConversationItem.class, new SortedListCallback<>(adapter, true));
         adapter.setHasStableIds(true);
         adapter.setList(items);
     }
@@ -149,6 +148,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private void addItemsToList(List<? extends ConversationItem> itemsList) {
         //noinspection unchecked
         List<ConversationItem> itemsToAdd = (List<ConversationItem>) itemsList;
+        List<ConversationItem> newItems = new ArrayList<>();
         ConversationItem item1 = null;
 
         for (ConversationItem item2 : itemsToAdd) {
@@ -157,11 +157,11 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 Date firstDate = new Date(firstTimestamp);
 
                 if (!Helpers.isSameDay(firstDate, new Date())) {
-                    items.add(new TimeMarker(firstTimestamp - 1));
+                    newItems.add(new TimeMarker(firstTimestamp - 1));
                 }
 
                 item1 = item2;
-                items.add(item2);
+                newItems.add(item2);
 
                 continue;
             }
@@ -169,27 +169,15 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             long timestamp1 = item1.getTimestamp();
             long timestamp2 = item2.getTimestamp();
 
-            Date date1 = new Date(timestamp1);
-            Date date2 = new Date(timestamp2);
-
-            if (!Helpers.isSameDay(date1, date2)) {
-                items.add(new TimeMarker(timestamp1 - 1));
+            if (!Helpers.isSameDay(timestamp1, timestamp2)) {
+                newItems.add(new TimeMarker(timestamp1 - 1));
             }
 
-            items.add(item2);
+            newItems.add(item2);
             item1 = item2;
         }
-    }
 
-    private List<Message> parseMessagesSnapshot(DataSnapshot snapshot) {
-        List<Message> messages = new ArrayList<>();
-
-        for (DataSnapshot child : snapshot.getChildren()) {
-            MessageData messageData = child.getValue(MessageData.class);
-            messages.add(new Message(messageData, userManager.getUsername()));
-        }
-
-        return messages;
+        items.addAll(newItems);
     }
 
     private ValueEventListener presenceEventListener = new ManagedValueEventListener() {
@@ -211,24 +199,29 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            List<Message> messages = parseMessagesSnapshot(dataSnapshot);
+            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+                    .continueWith(task -> {
+                        List<Message> messages = task.getResult();
 
-            if (messages.size() > 0) {
-                if (items.size() > 0) {
-                    bus.post(new NewMessageEvent(chatroom, messages.get(messages.size() - 1)));
-                }
+                        if (messages.size() > 0) {
+                            if (items.size() > 0) {
+                                bus.post(new NewMessageEvent(chatroom, messages.get(messages.size() - 1)));
+                            }
 
-                codementorTasks.markConversationRead(chatroom)
-                        .continueWith(errorHandler::logAndToastTask, UI);
-            }
+                            codementorTasks.markConversationRead(chatroom)
+                                    .continueWith(errorHandler::logAndToastTask, UI);
+                        }
 
-            if (messages.size() < BATCH_SIZE) {
-                getView().setAllMessagesLoaded(true);
-            }
+                        if (messages.size() < BATCH_SIZE) {
+                            getView().setAllMessagesLoaded(true);
+                        }
 
-            addItemsToList(messages);
-            getView().showEmptyState(items.size() == 0);
-            getView().setRefreshing(false);
+                        addItemsToList(messages);
+                        getView().showEmptyState(items.size() == 0);
+                        getView().setRefreshing(false);
+
+                        return null;
+                    }, UI);
         }
 
     };
@@ -237,14 +230,18 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            List<Message> messages = parseMessagesSnapshot(dataSnapshot);
-            addItemsToList(messages);
+            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+                    .continueWith(task -> {
+                        List<Message> messages = task.getResult();
+                        addItemsToList(messages);
 
-            if (messages.size() < BATCH_SIZE) {
-                getView().setAllMessagesLoaded(true);
-            }
+                        if (messages.size() < BATCH_SIZE) {
+                            getView().setAllMessagesLoaded(true);
+                        }
 
-            getView().setRefreshing(false);
+                        getView().setRefreshing(false);
+                        return null;
+                    }, UI);
         }
 
     };

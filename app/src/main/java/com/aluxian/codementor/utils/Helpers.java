@@ -12,6 +12,10 @@ public class Helpers {
     public static final SimpleDateFormat CODEMENTOR_DATE_FORMAT =
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH);
 
+    public static boolean isSameDay(long timestamp1, long timestamp2) {
+        return isSameDay(new Date(timestamp1), new Date(timestamp2));
+    }
+
     public static boolean isSameDay(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();

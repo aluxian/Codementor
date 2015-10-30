@@ -71,7 +71,9 @@ public abstract class ConversationItem implements ContentComparable<Conversation
 
     @Override
     public int compareTo(@NonNull ConversationItem another) {
-        int result = ComparisonChain.start().compare(getTimestamp(), another.getTimestamp()).result();
+        int result = ComparisonChain.start()
+                .compare(getTimestamp(), another.getTimestamp())
+                .result();
 
         if (result == 0) {
             if (this instanceof Message && another instanceof TimeMarker) {
@@ -83,7 +85,7 @@ public abstract class ConversationItem implements ContentComparable<Conversation
             }
         }
 
-        return -result;
+        return result;
     }
 
     @Override

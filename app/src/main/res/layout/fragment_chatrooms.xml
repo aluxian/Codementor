@@ -3,7 +3,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <com.aluxian.codementor.DrawerSwipeRefreshLayout
+    <com.aluxian.codementor.ui.views.DrawerSwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,7 +14,7 @@
             android:layout_height="match_parent"
             android:scrollbars="vertical" />
 
-    </com.aluxian.codementor.DrawerSwipeRefreshLayout>
+    </com.aluxian.codementor.ui.views.DrawerSwipeRefreshLayout>
 
     <TextView
         android:id="@+id/tv_empty_state"

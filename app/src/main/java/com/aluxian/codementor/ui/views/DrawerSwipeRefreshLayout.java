@@ -1,4 +1,4 @@
-package com.aluxian.codementor;
+package com.aluxian.codementor.ui.views;
 
 import android.content.Context;
 import android.support.v4.widget.SwipeRefreshLayout;

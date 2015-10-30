@@ -2,6 +2,8 @@ package com.aluxian.codementor.tasks;
 
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
+import com.aluxian.codementor.data.models.Message;
+import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.utils.Constants;
@@ -12,6 +14,8 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.FirebaseException;
 import com.firebase.client.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CancellationException;
 
 import bolts.Continuation;
@@ -54,6 +58,23 @@ public class FirebaseTasks {
         });
 
         return taskSource.getTask();
+    }
+
+    /**
+     * @param snapshot The {@link DataSnapshot} to get data from.
+     * @return A simple list of {@link Message} objects.
+     */
+    public Task<List<Message>> parseMessagesSnapshot(DataSnapshot snapshot) {
+        return Task.callInBackground(() -> {
+            List<Message> messages = new ArrayList<>();
+
+            for (DataSnapshot child : snapshot.getChildren()) {
+                MessageData messageData = child.getValue(MessageData.class);
+                messages.add(new Message(messageData, userManager.getUsername()));
+            }
+
+            return messages;
+        });
     }
 
     /**

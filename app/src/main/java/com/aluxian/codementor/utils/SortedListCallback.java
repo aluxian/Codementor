@@ -5,13 +5,17 @@ import android.support.v7.widget.util.SortedListAdapterCallback;
 
 public class SortedListCallback<T extends ContentComparable<T>> extends SortedListAdapterCallback<T> {
 
-    public SortedListCallback(RecyclerView.Adapter adapter) {
+    private boolean reverseOrder;
+
+    public SortedListCallback(RecyclerView.Adapter adapter, boolean reverseOrder) {
         super(adapter);
+        this.reverseOrder = reverseOrder;
     }
 
     @Override
     public int compare(T o1, T o2) {
-        return o1.compareTo(o2);
+        int result = o1.compareTo(o2);
+        return reverseOrder ? -result : result;
     }
 
     @Override
