@@ -10,7 +10,7 @@ public interface LoginActivityView extends BaseView {
     /**
      * Display a progress dialog.
      *
-     * @param messageResId The resource id of the initial message to display in the dialog.
+     * @param messageResId
      */
     void showProgressDialog(int messageResId);
 

@@ -1,6 +1,5 @@
 package com.aluxian.codementor.ui.activities;
 
-import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
@@ -13,6 +12,7 @@ import android.widget.TextView;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.presentation.presenters.LoginActivityPresenter;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
+import com.aluxian.codementor.ui.fragments.LoadingDialogFragment;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
 import butterknife.Bind;
@@ -21,11 +21,13 @@ import butterknife.ButterKnife;
 public class LoginActivity extends BaseActivity<LoginActivityPresenter>
         implements LoginActivityView, OnCancelListener {
 
+    private static final String LOADING_DIALOG_TAG = "loading_dialog";
+
     @Bind(R.id.input_login) MaterialEditText usernameField;
     @Bind(R.id.input_password) MaterialEditText passwordField;
     @Bind(R.id.btn_login) AppCompatButton loginButton;
 
-    private AlertDialog progressDialog;
+    private LoadingDialogFragment loadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,20 +49,19 @@ public class LoginActivity extends BaseActivity<LoginActivityPresenter>
 
     @Override
     public void showProgressDialog(int messageResId) {
-        progressDialog = new AlertDialog.Builder(this, R.style.AppTheme_Login_Dialog)
-                .setMessage(messageResId)
-                .setOnCancelListener(this)
-                .show();
+        loadingDialog = LoadingDialogFragment.newInstance(messageResId);
+        loadingDialog.show(getSupportFragmentManager(), LOADING_DIALOG_TAG);
+        loadingDialog.setOnCancelListener(this);
     }
 
     @Override
     public void updateProgressDialogMessage(int messageResId) {
-        progressDialog.setMessage(getString(messageResId));
+        loadingDialog.setMessage(messageResId);
     }
 
     @Override
     public void dismissProgressDialog() {
-        progressDialog.dismiss();
+        loadingDialog.dismiss();
     }
 
     @Override
