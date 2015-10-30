@@ -1,6 +1,5 @@
 package com.aluxian.codementor.presentation.presenters;
 
-import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.util.SortedList;
 
@@ -30,7 +29,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
     private ErrorHandler errorHandler;
     private UserManager userManager;
 
-    private @Nullable Task chatroomsListTask;
+    private Task chatroomsListTask;
     private SortedList<Chatroom> chatrooms;
 
     public ChatroomsPresenter(ChatroomsView baseView, CoreServices coreServices) {
@@ -107,6 +106,11 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
 
     private Void onLoadingFinished(Task task) {
         getView().setRefreshing(false);
+
+        if (chatroomsListTask != null) {
+            getView().scrollToTop();
+        }
+
         return null;
     }
 

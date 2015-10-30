@@ -48,4 +48,9 @@ public interface ChatroomsView extends BaseView {
      */
     void showEmptyState(boolean show);
 
+    /**
+     * Scroll the list to the top.
+     */
+    void scrollToTop();
+
 }

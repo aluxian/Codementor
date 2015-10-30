@@ -40,7 +40,8 @@ import static com.aluxian.codementor.utils.Constants.UI;
 public class ConversationPresenter extends Presenter<ConversationView> {
 
     private static final String CREATED_AT = "created_at";
-    private static final int BATCH_SIZE = 50;
+    private static final int BATCH_SIZE_INITIAL = 25;
+    private static final int BATCH_SIZE = 100;
 
     private Bus bus;
     private ErrorHandler errorHandler;
@@ -48,11 +49,12 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
+    private Firebase firebaseRef;
 
-    private Firebase presenceRef;
+    private Query presenceRef;
     private Query messagesRef;
 
-    private @Nullable Task firebaseReAuthTask;
+    private Task firebaseReAuthTask;
     private SortedList<ConversationItem> items;
     private Chatroom chatroom;
 
@@ -66,10 +68,11 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
+        firebaseRef = coreServices.getFirebaseRef();
 
-        Firebase firebaseRef = coreServices.getFirebaseRef();
         presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
-        messagesRef = firebaseRef.child(chatroom.getFirebasePath()).orderByChild(CREATED_AT).limitToLast(BATCH_SIZE);
+        messagesRef = firebaseRef.child(chatroom.getFirebasePath())
+                .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE_INITIAL);
 
         initAdapter();
     }
@@ -112,7 +115,10 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         }
 
         getView().setRefreshing(true);
-        messagesRef.endAt(items.get(0).getTimestamp() - 1)
+        firebaseRef.child(chatroom.getFirebasePath())
+                .orderByChild(CREATED_AT)
+                .limitToLast(BATCH_SIZE)
+                .endAt(items.get(items.size() - 1).getTimestamp())
                 .addListenerForSingleValueEvent(oldMessagesEventListener);
     }
 
@@ -219,7 +225,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                                     .continueWith(errorHandler::logAndToastTask, UI);
                         }
 
-                        if (messages.size() < BATCH_SIZE) {
+                        if (messages.size() < BATCH_SIZE_INITIAL) {
                             getView().setAllMessagesLoaded(true);
                         }
 

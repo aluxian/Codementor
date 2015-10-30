@@ -147,6 +147,11 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
         emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
+    @Override
+    public void scrollToTop() {
+        recyclerView.getLayoutManager().smoothScrollToPosition(recyclerView, null, 0);
+    }
+
     /**
      * @return Whether the drawer is currently open.
      */
