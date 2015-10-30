@@ -40,7 +40,7 @@ import static com.aluxian.codementor.utils.Constants.UI;
 public class ConversationPresenter extends Presenter<ConversationView> {
 
     private static final String CREATED_AT = "created_at";
-    private static final int BATCH_SIZE = 100;
+    private static final int BATCH_SIZE = 50;
 
     private Bus bus;
     private ErrorHandler errorHandler;
