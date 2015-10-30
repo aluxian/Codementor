@@ -34,7 +34,7 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
     @Override
     public void destroy() {
         super.destroy();
-        setStatus(PresenceType.OFFLINE, PresenceType.AVAILABLE, PresenceType.ONLINE, PresenceType.AWAY);
+        setStatus(PresenceType.OFFLINE, PresenceType.ONLINE);
     }
 
     private void setStatus(PresenceType newPresenceType, PresenceType... requiredPresenceType) {

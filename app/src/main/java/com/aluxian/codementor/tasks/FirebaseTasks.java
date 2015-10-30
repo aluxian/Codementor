@@ -169,7 +169,8 @@ public class FirebaseTasks {
                 return null;
             }
 
-            return task.getResult();
+            taskSource.setResult(task.getResult());
+            return null;
         };
     }
 
