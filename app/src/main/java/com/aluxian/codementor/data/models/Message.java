@@ -176,7 +176,7 @@ public class Message extends ConversationItem {
     }
 
     private String generateDisplayText() {
-        switch (type) {
+        switch (getType()) {
             case MESSAGE:
                 return getRawContent();
 
