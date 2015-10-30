@@ -2,7 +2,7 @@
     <string name="app_name">Codementor</string>
     <string name="app_name_full">Codementor Chat</string>
 
-    <string name="title_activity_main">Codementor Chat</string>
+    <string name="title_activity_main">Codementor</string>
     <string name="title_activity_login">Log in</string>
 
     <string name="drawer_open">Open navigation drawer</string>
