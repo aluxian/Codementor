@@ -10,7 +10,7 @@ import java.util.UUID;
 public class Helpers {
 
     public static final SimpleDateFormat CODEMENTOR_DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH);
+            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isSameDay(long timestamp1, long timestamp2) {
         return isSameDay(new Date(timestamp1), new Date(timestamp2));

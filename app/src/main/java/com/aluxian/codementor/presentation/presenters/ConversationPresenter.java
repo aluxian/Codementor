@@ -9,6 +9,7 @@ import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
+import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.types.PresenceType;
@@ -170,7 +171,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             long timestamp2 = item2.getTimestamp();
 
             if (!Helpers.isSameDay(timestamp1, timestamp2)) {
-                newItems.add(new TimeMarker(timestamp1 - 1));
+                newItems.add(new TimeMarker(timestamp2 - 1));
             }
 
             newItems.add(item2);
@@ -178,6 +179,17 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         }
 
         items.addAll(newItems);
+    }
+
+    private List<Message> parseMessagesSnapshot(DataSnapshot snapshot) {
+        List<Message> messages = new ArrayList<>();
+
+        for (DataSnapshot child : snapshot.getChildren()) {
+            MessageData messageData = child.getValue(MessageData.class);
+            messages.add(new Message(messageData, userManager.getUsername()));
+        }
+
+        return messages;
     }
 
     private ValueEventListener presenceEventListener = new ManagedValueEventListener() {
@@ -199,7 +211,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+            Task.callInBackground(() -> parseMessagesSnapshot(dataSnapshot))
                     .continueWith(task -> {
                         List<Message> messages = task.getResult();
 
@@ -230,7 +242,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            firebaseTasks.parseMessagesSnapshot(dataSnapshot)
+            Task.callInBackground(() -> parseMessagesSnapshot(dataSnapshot))
                     .continueWith(task -> {
                         List<Message> messages = task.getResult();
                         addItemsToList(messages);

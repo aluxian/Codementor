@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.aluxian.codementor.utils.ContentComparable;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.google.common.collect.ComparisonChain;
 
@@ -75,15 +76,15 @@ public abstract class ConversationItem implements ContentComparable<Conversation
                 .compare(getTimestamp(), another.getTimestamp())
                 .result();
 
-        if (result == 0) {
-            if (this instanceof Message && another instanceof TimeMarker) {
-                return 1;
-            }
-
-            if (this instanceof TimeMarker && another instanceof Message) {
-                return -1;
-            }
-        }
+//        if (result == 0) {
+//            if (this instanceof Message && another instanceof TimeMarker) {
+//                return 1;
+//            }
+//
+//            if (this instanceof TimeMarker && another instanceof Message) {
+//                return -1;
+//            }
+//        }
 
         return result;
     }
@@ -94,6 +95,16 @@ public abstract class ConversationItem implements ContentComparable<Conversation
                 && Objects.equal(getText(), another.getText())
                 && sentByMe() == another.sentByMe()
                 && isRead() == another.isRead();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", getId())
+                .add("text", getText())
+                .add("subtext", getSubtext(null, true))
+                .add("timestamp", getTimestamp())
+                .toString();
     }
 
 }
