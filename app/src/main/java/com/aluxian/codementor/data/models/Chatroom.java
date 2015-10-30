@@ -190,9 +190,7 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
 
     @Override
     public int compareTo(@NonNull Chatroom another) {
-        return ComparisonChain.start()
-                .compare(another.getTimestamp(), getTimestamp())
-                .result();
+        return -ComparisonChain.start().compare(getTimestamp(), another.getTimestamp()).result();
     }
 
     @Override

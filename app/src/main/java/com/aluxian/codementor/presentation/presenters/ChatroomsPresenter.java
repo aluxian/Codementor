@@ -12,7 +12,8 @@ import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
-import com.aluxian.codementor.tasks.ServerApiTasks;
+import com.aluxian.codementor.services.UserManager;
+import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.utils.SortedListCallback;
 import com.squareup.otto.Bus;
 import com.squareup.otto.Subscribe;
@@ -25,8 +26,9 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
         implements OnRefreshListener, ChatroomSelectedListener {
 
     private Bus bus;
-    private ServerApiTasks serverApiTasks;
+    private CodementorTasks codementorTasks;
     private ErrorHandler errorHandler;
+    private UserManager userManager;
 
     private @Nullable Task chatroomsListTask;
     private SortedList<Chatroom> chatrooms;
@@ -35,8 +37,9 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
         super(baseView);
 
         bus = coreServices.getBus();
-        serverApiTasks = coreServices.getServerApiTasks();
+        codementorTasks = coreServices.getCodementorTasks();
         errorHandler = coreServices.getErrorHandler();
+        userManager = coreServices.getUserManager();
 
         initAdapter();
     }
@@ -81,13 +84,13 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
 
     @Override
     public void onRefresh() {
-        if (isAlreadyLoading()) {
+        if (isAlreadyLoading() || !userManager.isLoggedIn()) {
             return;
         }
 
         getView().setRefreshing(true);
-        chatroomsListTask = serverApiTasks.getChatroomsList()
-                .onSuccess(this::onGotChatroomsList, UI)
+        chatroomsListTask = codementorTasks.getChatroomsList()
+                .onSuccess(this::onChatroomsList, UI)
                 .continueWith(errorHandler::logAndToastTask, UI)
                 .continueWith(this::onLoadingFinished, UI);
     }
@@ -96,7 +99,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView>
         return chatroomsListTask != null && !chatroomsListTask.isCompleted();
     }
 
-    private Void onGotChatroomsList(Task<ChatroomsList> task) {
+    private Void onChatroomsList(Task<ChatroomsList> task) {
         chatrooms.addAll(task.getResult().getRecentChats());
         getView().showEmptyState(chatrooms.size() == 0);
         return null;

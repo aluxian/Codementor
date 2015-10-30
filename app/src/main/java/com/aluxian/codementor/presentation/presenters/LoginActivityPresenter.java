@@ -65,9 +65,17 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
                 .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), false))
                 .onSuccess(loggedIn(username), UI)
-                .continueWith(errorHandler::logAndToastTask, UI)
+                .continueWith(this::onErrorHandler, UI)
                 .continueWith(this::onDismissDialog, UI);
 
+    }
+
+    private Void onErrorHandler(Task task) {
+        if (task.isFaulted()) {
+            dialogCancelled();
+        }
+
+        return errorHandler.logAndToastTask(task);
     }
 
     private Void onDismissDialog(Task task) {

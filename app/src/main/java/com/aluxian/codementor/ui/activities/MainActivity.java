@@ -30,8 +30,8 @@ public class MainActivity extends BaseActivity<MainActivityPresenter>
     private static final String STATE_HAS_CHATROOM_SELECTED = "has_chatroom_selected";
 
     @Bind(R.id.tv_empty_state) TextView emptyStateView;
-    @Bind(R.id.navigation_drawer) View fragmentContainerView;
     @Bind(R.id.drawer_layout) DrawerLayout drawerLayout;
+    @Bind(R.id.drawer_view) View drawerView;
 
     private UserManager userManager;
     private PersistentCookieStore cookieStore;
@@ -53,9 +53,9 @@ public class MainActivity extends BaseActivity<MainActivityPresenter>
             return;
         }
 
-        Fragment navDrawerFragment = getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        Fragment navDrawerFragment = getSupportFragmentManager().findFragmentById(R.id.drawer_view);
         chatroomsFragment = (ChatroomsFragment) navDrawerFragment;
-        chatroomsFragment.init(fragmentContainerView, drawerLayout);
+        chatroomsFragment.init(drawerLayout, drawerView);
         chatroomsFragment.setChatroomSelectedListener(this);
 
         if (savedInstanceState != null) {

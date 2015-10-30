@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
-import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.Firebase;
@@ -35,7 +34,6 @@ public class CoreServices {
     // Tasks
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
-    private ServerApiTasks serverApiTasks;
 
     public CoreServices(Context context) {
         this.context = context;
@@ -56,9 +54,8 @@ public class CoreServices {
         okHttpClient.setFollowRedirects(false);
 
         // Tasks
-        codementorTasks = new CodementorTasks(okHttpClient);
+        codementorTasks = new CodementorTasks(okHttpClient, userManager);
         firebaseTasks = new FirebaseTasks(firebaseRef, codementorTasks, userManager);
-        serverApiTasks = new ServerApiTasks(okHttpClient, userManager);
     }
 
     public Context getContext() {
@@ -79,10 +76,6 @@ public class CoreServices {
 
     public FirebaseTasks getFirebaseTasks() {
         return firebaseTasks;
-    }
-
-    public ServerApiTasks getServerApiTasks() {
-        return serverApiTasks;
     }
 
     public UserManager getUserManager() {

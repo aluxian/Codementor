@@ -20,7 +20,6 @@ import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
-import com.aluxian.codementor.tasks.ServerApiTasks;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.Helpers;
 import com.aluxian.codementor.utils.SortedListCallback;
@@ -50,7 +49,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
-    private ServerApiTasks serverApiTasks;
 
     private Firebase presenceRef;
     private Query messagesRef;
@@ -69,7 +67,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
-        serverApiTasks = coreServices.getServerApiTasks();
 
         Firebase firebaseRef = coreServices.getFirebaseRef();
         presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
@@ -136,7 +133,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         items.add(new Message(firebaseMessage, userManager.getUsername()));
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
-                .onSuccessTask(task -> serverApiTasks.sendMessage(firebaseMessage, task.getResult()))
+                .onSuccessTask(task -> codementorTasks.sendMessage(firebaseMessage, task.getResult()))
                 .continueWith(errorHandler::logAndToastTask, UI);
     }
 
@@ -221,7 +218,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                     bus.post(new NewMessageEvent(chatroom, messages.get(messages.size() - 1)));
                 }
 
-                serverApiTasks.markConversationRead(chatroom)
+                codementorTasks.markConversationRead(chatroom)
                         .continueWith(errorHandler::logAndToastTask, UI);
             }
 

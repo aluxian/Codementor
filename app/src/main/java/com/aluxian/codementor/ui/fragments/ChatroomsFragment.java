@@ -41,7 +41,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private View fragmentContainerView;
+    private View drawerView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -108,25 +108,25 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     @Override
     public void openDrawer() {
-        if (drawerLayout != null && fragmentContainerView != null) {
-            drawerLayout.openDrawer(fragmentContainerView);
+        if (drawerLayout != null && drawerView != null) {
+            drawerLayout.openDrawer(drawerView);
         }
     }
 
     @Override
     public void closeDrawer() {
-        if (drawerLayout != null && fragmentContainerView != null) {
-            drawerLayout.closeDrawer(fragmentContainerView);
+        if (drawerLayout != null && drawerView != null) {
+            drawerLayout.closeDrawer(drawerView);
         }
     }
 
     @Override
     public void toggleDrawer() {
-        if (drawerLayout != null && fragmentContainerView != null) {
-            if (drawerLayout.isDrawerOpen(fragmentContainerView)) {
-                drawerLayout.closeDrawer(fragmentContainerView);
+        if (drawerLayout != null && drawerView != null) {
+            if (drawerLayout.isDrawerOpen(drawerView)) {
+                drawerLayout.closeDrawer(drawerView);
             } else {
-                drawerLayout.openDrawer(fragmentContainerView);
+                drawerLayout.openDrawer(drawerView);
             }
         }
     }
@@ -152,19 +152,19 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
      */
     public boolean isDrawerOpen() {
         return drawerLayout != null
-                && fragmentContainerView != null
-                && drawerLayout.isDrawerOpen(fragmentContainerView);
+                && drawerView != null
+                && drawerLayout.isDrawerOpen(drawerView);
     }
 
     /**
      * Users of this fragment must call this method to set up the navigation drawer interactions.
      *
-     * @param fragmentContainerView The container view of the drawer fragment.
-     * @param drawerLayout          The DrawerLayout containing this fragment's UI.
+     * @param drawerLayout The DrawerLayout containing this fragment's UI.
+     * @param drawerView   The container view of the drawer fragment.
      */
-    public void init(View fragmentContainerView, DrawerLayout drawerLayout) {
-        this.fragmentContainerView = fragmentContainerView;
+    public void init(DrawerLayout drawerLayout, View drawerView) {
         this.drawerLayout = drawerLayout;
+        this.drawerView = drawerView;
 
         drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         drawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout,

@@ -15,7 +15,7 @@
     </FrameLayout>
 
     <fragment
-        android:id="@+id/navigation_drawer"
+        android:id="@+id/drawer_view"
         android:name="com.aluxian.codementor.ui.fragments.ChatroomsFragment"
         android:layout_width="@dimen/drawer_width"
         android:layout_height="match_parent"
