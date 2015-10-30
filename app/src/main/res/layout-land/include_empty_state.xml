@@ -7,7 +7,7 @@
     android:layout_marginLeft="64dp"
     android:layout_marginRight="64dp"
     android:drawablePadding="32dp"
-    android:drawableTop="@drawable/img_message"
+    android:drawableTop="@drawable/codementor_logo"
     android:gravity="center_horizontal"
     android:text="@string/empty_no_conversations"
     android:textColor="@color/neutral_gray"
