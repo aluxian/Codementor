@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity<MainActivityPresenter>
 
         if (actionBar != null) {
             actionBar.setTitle(chatroom.getOtherUser().getName());
-            actionBar.setSubtitle(null);
+            actionBar.setSubtitle(chatroom.getOtherUser().getPresenceType().statusResId);
         }
 
         getSupportFragmentManager().beginTransaction()

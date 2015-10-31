@@ -3,6 +3,7 @@ package com.aluxian.codementor.ui.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.view.View;
 
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.presentation.presenters.Presenter;
@@ -21,6 +22,14 @@ public abstract class BaseFragment<P extends Presenter> extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (presenter != null) {
+            view.post(presenter::viewReady);
+        }
     }
 
     @Override

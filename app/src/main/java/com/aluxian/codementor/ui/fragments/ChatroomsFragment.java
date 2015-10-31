@@ -74,16 +74,6 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        swipeRefreshLayout.post(() -> {
-            if (swipeRefreshLayout != null) {
-                getPresenter().viewReady();
-            }
-        });
-    }
-
-    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
