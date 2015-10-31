@@ -18,14 +18,14 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Fresco.initialize(this);
+        Firebase.setAndroidContext(this);
+        Fabric.with(this, new Crashlytics());
+
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }
-
-        Fresco.initialize(this);
-        Firebase.setAndroidContext(this);
-        Fabric.with(this, new Crashlytics());
 
         coreServices = new CoreServices(this);
     }

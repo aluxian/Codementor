@@ -58,8 +58,14 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
     @Subscribe
     public void newMessageReceived(NewMessageEvent event) {
         Chatroom chatroom = event.getChatroom();
-        chatroom.updateContentDescription(event.getMessage());
-        chatroomsAdapter.updateChatroom(chatroom);
+        if (chatroomsAdapter.isNewestChatroom(chatroom)) {
+            chatroom.updateTimestamp(event.getMessage().getTimestamp());
+            chatroom.updateContentDescription(event.getMessage());
+            chatroomsAdapter.updateChatroom(chatroom);
+            getView().scrollToTop();
+        } else {
+            onRefresh();
+        }
     }
 
     @Override
@@ -84,11 +90,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
 
     private Void onLoadingFinished(Task task) {
         getView().setRefreshing(false);
-
-        if (chatroomsListTask != null) {
-            getView().scrollToTop();
-        }
-
+        getView().scrollToTop();
         return null;
     }
 

@@ -74,6 +74,10 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
         }
     }
 
+    public void updateTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public void updateContentDescription(Message message) {
         contentDescription = generateContentDescription(message);
     }

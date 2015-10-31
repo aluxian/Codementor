@@ -45,18 +45,14 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<ChatroomItemViewHolde
         return chatrooms.size();
     }
 
-    public void updateChatroom(Chatroom chatroom) {
-        int updateIndex = chatrooms.indexOf(chatroom);
-        if (updateIndex > 0) {
-            chatrooms.remove(updateIndex);
-            notifyItemRemoved(updateIndex);
+    public boolean isNewestChatroom(Chatroom chatroom) {
+        return chatrooms.indexOf(chatroom) == 0;
+    }
 
-            int addIndex = 0;
-            chatrooms.add(addIndex, chatroom);
-            notifyItemInserted(addIndex);
-        } else {
-            notifyItemChanged(0);
-        }
+    public void updateChatroom(Chatroom chatroom) {
+        int index = chatrooms.indexOf(chatroom);
+        chatrooms.set(index, chatroom);
+        notifyItemChanged(index);
     }
 
     public void addAll(List<Chatroom> newChatrooms) {
