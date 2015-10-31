@@ -1,13 +1,15 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.aluxian.codementor.utils.ContentComparable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 
-public abstract class ConversationItem implements ContentComparable<ConversationItem> {
+public abstract class ConversationItem implements Comparable<ConversationItem>, ContentComparable<ConversationItem> {
 
     /**
      * @return The unique ID of this item.
@@ -66,6 +68,15 @@ public abstract class ConversationItem implements ContentComparable<Conversation
      */
     public long getSize() {
         return 0;
+    }
+
+    @Override
+    public int compareTo(@NonNull ConversationItem another) {
+        if (equals(another)) {
+            return 0;
+        }
+
+        return ComparisonChain.start().compare(getTimestamp(), another.getTimestamp()).result();
     }
 
     @Override

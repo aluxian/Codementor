@@ -16,10 +16,11 @@ import com.aluxian.codementor.utils.Helpers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemViewHolder> {
 
-    private List<Message> messages = new ArrayList<>();
+    private TreeSet<Message> messages = new TreeSet<>();
     private List<ConversationItem> items = new ArrayList<>();
 
     @Override
@@ -54,16 +55,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
     }
 
     public Message getOldestMessage() {
-        return messages.get(0);
+        return messages.first();
     }
 
-    public void addNewMessages(List<Message> newMessages) {
-        messages.addAll(newMessages);
-        generateItems();
-    }
-
-    public void addOldMessages(List<Message> oldMessages) {
-        messages.addAll(0, oldMessages);
+    public void addMessages(TreeSet<Message> newMessages) {
+        TreeSet<Message> temp = new TreeSet<>(newMessages);
+        temp.addAll(messages);
+        messages = temp;
         generateItems();
     }
 

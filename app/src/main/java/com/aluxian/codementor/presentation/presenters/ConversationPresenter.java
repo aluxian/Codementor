@@ -25,8 +25,7 @@ import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 import com.squareup.otto.Bus;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.TreeSet;
 
 import bolts.Task;
 
@@ -155,13 +154,13 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private ValueEventListener newMessagesEventListener = new MessageValueEventListener() {
 
         @Override
-        protected void onMessages(List<Message> messages) {
+        protected void onMessages(TreeSet<Message> messages) {
             if (messages.size() > 0) {
                 if (conversationAdapter.getItemCount() > 0) {
-                    bus.post(new NewMessageEvent(new Chatroom(chatroom), messages.get(messages.size() - 1)));
+                    bus.post(new NewMessageEvent(new Chatroom(chatroom), messages.last()));
                 }
 
-                conversationAdapter.addNewMessages(messages);
+                conversationAdapter.addMessages(messages);
                 codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
             }
 
@@ -177,8 +176,8 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private ValueEventListener oldMessagesEventListener = new MessageValueEventListener() {
 
         @Override
-        protected void onMessages(List<Message> messages) {
-            conversationAdapter.addOldMessages(messages);
+        protected void onMessages(TreeSet<Message> messages) {
+            conversationAdapter.addMessages(messages);
             if (messages.size() < BATCH_SIZE) {
                 getView().setAllMessagesLoaded(true);
             }
@@ -191,15 +190,16 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             Task.callInBackground(() -> parse(dataSnapshot))
-                    .continueWith(task -> {
+                    .onSuccess(task -> {
                         onMessages(task.getResult());
                         getView().setRefreshing(false);
                         return null;
-                    }, UI);
+                    }, UI)
+                    .continueWith(errorHandler::logAndToastTask, UI);
         }
 
-        private List<Message> parse(DataSnapshot snapshot) {
-            List<Message> messages = new ArrayList<>();
+        private TreeSet<Message> parse(DataSnapshot snapshot) {
+            TreeSet<Message> messages = new TreeSet<>();
 
             for (DataSnapshot child : snapshot.getChildren()) {
                 MessageData messageData = child.getValue(MessageData.class);
@@ -209,7 +209,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             return messages;
         }
 
-        protected abstract void onMessages(List<Message> messages);
+        protected abstract void onMessages(TreeSet<Message> messages);
 
     }
 
