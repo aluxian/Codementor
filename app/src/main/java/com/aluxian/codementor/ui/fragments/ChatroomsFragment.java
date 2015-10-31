@@ -50,7 +50,10 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
             drawerShouldBeOpen = true;
         }
 
-        setPresenter(new ChatroomsPresenter(this, getCoreServices()));
+        chatroomsAdapter = new ChatroomsAdapter(this);
+        chatroomsAdapter.setHasStableIds(true);
+
+        setPresenter(new ChatroomsPresenter(this, chatroomsAdapter, getCoreServices()));
     }
 
     @Override
@@ -95,12 +98,9 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     }
 
     @Override
-    public void setAdapter(ChatroomsAdapter adapter) {
-        chatroomsAdapter = adapter;
-    }
-
-    @Override
     public void onChatroomSelected(Chatroom chatroom) {
+        closeDrawer();
+
         if (chatroomSelectedListener != null) {
             chatroomSelectedListener.onChatroomSelected(chatroom);
         }
