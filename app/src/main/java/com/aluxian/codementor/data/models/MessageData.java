@@ -21,18 +21,6 @@ public class MessageData {
 
     public MessageData() {}
 
-    public MessageData(String id, String content, Request request, User sender, User receiver, String createdAt,
-                       String readAt, String type) {
-        this.id = id;
-        this.content = content;
-        this.request = request;
-        this.sender = sender;
-        this.receiver = receiver;
-        this.created_at = createdAt;
-        this.read_at = readAt;
-        this.type = type;
-    }
-
     public String getId() {
         return id;
     }

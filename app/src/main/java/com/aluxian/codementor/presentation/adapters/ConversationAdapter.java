@@ -57,11 +57,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
         return messages.get(0);
     }
 
-    public void optimisticallyAddMessage(Message message) {
-        messages.add(message);
-        generateItems();
-    }
-
     public void addNewMessages(List<Message> newMessages) {
         messages.addAll(newMessages);
         generateItems();

@@ -123,9 +123,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 chatroom.getOtherUser()
         );
 
-        Message message = new Message(firebaseMessage, userManager.getUsername());
-        conversationAdapter.optimisticallyAddMessage(message);
-
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> codementorTasks.sendMessage(firebaseMessage, task.getResult()))
                 .continueWith(errorHandler::logAndToastTask, UI);

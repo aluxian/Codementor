@@ -12,8 +12,6 @@ import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.Helpers;
 import com.google.common.base.Objects;
 
-import java.util.Date;
-
 public class Message extends ConversationItem {
 
     private MessageData messageData;
@@ -27,20 +25,6 @@ public class Message extends ConversationItem {
     public Message(MessageData messageData, String loggedInUsername) {
         this.messageData = messageData;
         this.loggedInUsername = loggedInUsername;
-    }
-
-    public Message(FirebaseMessage firebaseMessage, String loggedInUsername) {
-        this.loggedInUsername = loggedInUsername;
-        this.messageData = new MessageData(
-                firebaseMessage.getId(),
-                firebaseMessage.getContent(),
-                firebaseMessage.getRequest(),
-                firebaseMessage.getSender(),
-                firebaseMessage.getReceiver(),
-                Helpers.CODEMENTOR_DATE_FORMAT.format(new Date()),
-                firebaseMessage.getReadAt(),
-                firebaseMessage.getType()
-        );
     }
 
     @Override

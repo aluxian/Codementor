@@ -41,30 +41,6 @@ public class FirebaseMessage {
         this.id = UUID.randomUUID().toString();
     }
 
-    public String getReadAt() {
-        return readAt;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public Request getRequest() {
-        return request;
-    }
-
-    public User getSender() {
-        return sender;
-    }
-
     public User getReceiver() {
         return receiver;
     }
