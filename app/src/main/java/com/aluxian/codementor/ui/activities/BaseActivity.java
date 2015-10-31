@@ -17,6 +17,14 @@ public abstract class BaseActivity<P extends Presenter> extends AppCompatActivit
     private @Nullable P presenter;
 
     @Override
+    public void onStart() {
+        super.onStart();
+        if (presenter != null) {
+            presenter.start();
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         if (presenter != null) {

@@ -19,16 +19,12 @@ public class ErrorHandler {
     }
 
     /**
-     * Log the given exception.
+     * Log the given debug exception.
      *
      * @param e The error to log.
      */
-    public static void log(Exception e) {
-        if (e == null) {
-            return;
-        }
-
-        Log.e(tag(), e.getMessage(), e);
+    public static void logDebug(String message, Exception e) {
+        Log.e(tag(), message, e);
         reportToCrashlytics(e);
     }
 
@@ -43,12 +39,16 @@ public class ErrorHandler {
     }
 
     /**
-     * Log the given debug exception.
+     * Log the given exception.
      *
      * @param e The error to log.
      */
-    public static void logDebug(String message, Exception e) {
-        Log.e(tag(), message, e);
+    public static void logError(Exception e) {
+        if (e == null) {
+            return;
+        }
+
+        Log.e(tag(), e.getMessage(), e);
         reportToCrashlytics(e);
     }
 

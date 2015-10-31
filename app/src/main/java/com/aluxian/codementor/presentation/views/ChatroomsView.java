@@ -1,15 +1,6 @@
 package com.aluxian.codementor.presentation.views;
 
-import com.aluxian.codementor.data.models.Chatroom;
-
 public interface ChatroomsView extends BaseView {
-
-    /**
-     * Called when a Chatroom entry is selected by the user.
-     *
-     * @param chatroom The Chatroom object.
-     */
-    void onChatroomSelected(Chatroom chatroom);
 
     /**
      * Open the drawer.

@@ -31,6 +31,11 @@ public abstract class Presenter<T extends BaseView> {
     public void viewReady() {}
 
     /**
+     * Method that controls the lifecycle of the view. It should be called in the view's onStart() method.
+     */
+    public void start() {}
+
+    /**
      * Method that controls the lifecycle of the view. It should be called in the view's onResume() method.
      */
     public void resume() {}

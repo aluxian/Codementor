@@ -44,14 +44,14 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
     }
 
     @Override
-    public void resume() {
-        super.resume();
+    public void start() {
+        super.start();
         bus.register(this);
     }
 
     @Override
-    public void pause() {
-        super.pause();
+    public void stop() {
+        super.stop();
         bus.unregister(this);
     }
 
@@ -59,9 +59,8 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
     public void newMessageReceived(NewMessageEvent event) {
         Chatroom chatroom = event.getChatroom();
         if (chatroomsAdapter.isNewestChatroom(chatroom)) {
-            chatroom.updateTimestamp(event.getMessage().getTimestamp());
             chatroom.updateContentDescription(event.getMessage());
-            chatroomsAdapter.updateChatroom(chatroom);
+            chatroomsAdapter.replaceFirstChatroom(chatroom);
             getView().scrollToTop();
         } else {
             onRefresh();

@@ -1,13 +1,10 @@
 package com.aluxian.codementor.data.models;
 
-import android.support.annotation.NonNull;
-
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.ContentComparable;
 import com.aluxian.codementor.utils.Helpers;
 import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 
 import java.io.Serializable;
 
@@ -21,11 +18,15 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
     private long id;
     private MessageType lastMessageType;
     private String contentDescription;
-    private long timestamp;
 
     public Chatroom(ChatroomData chatroomData, String loggedInUsername) {
         this.chatroomData = chatroomData;
         this.loggedInUsername = loggedInUsername;
+    }
+
+    public Chatroom(Chatroom chatroom) {
+        this.chatroomData = chatroom.chatroomData;
+        this.loggedInUsername = chatroom.loggedInUsername;
     }
 
     public long getId() {
@@ -74,24 +75,12 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
         }
     }
 
-    public void updateTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public void updateContentDescription(Message message) {
         contentDescription = generateContentDescription(message);
     }
 
     private boolean sentByMe() {
         return chatroomData.getSender().equals(getCurrentUser());
-    }
-
-    private long getTimestamp() {
-        if (timestamp == 0) {
-            timestamp = Helpers.parseDate(chatroomData.getCreatedAt());
-        }
-
-        return timestamp;
     }
 
     private MessageType getLastMessageType() {
@@ -193,16 +182,9 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
     }
 
     @Override
-    public int compareTo(@NonNull Chatroom another) {
-        return ComparisonChain.start()
-                .compare(getTimestamp(), another.getTimestamp())
-                .result();
-    }
-
-    @Override
-    public boolean compareContentTo(Chatroom another) {
+    public boolean contentEquals(Chatroom another) {
         return Objects.equal(getContentDescription(), another.getContentDescription())
-                && getOtherUser().compareContentTo(another.getOtherUser());
+                && getOtherUser().contentEquals(another.getOtherUser());
     }
 
 }

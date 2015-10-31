@@ -1,15 +1,13 @@
 package com.aluxian.codementor.data.models;
 
-import android.support.annotation.NonNull;
-
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.ContentComparable;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 
 import java.io.Serializable;
 
@@ -73,13 +71,15 @@ public class User implements Serializable, ContentComparable<User> {
     }
 
     @Override
-    public int compareTo(@NonNull User another) {
-        return ComparisonChain.start().compare(getName(), another.getName()).result();
+    public boolean contentEquals(User another) {
+        return getPresenceType() == another.getPresenceType();
     }
 
     @Override
-    public boolean compareContentTo(User another) {
-        return getPresenceType() == another.getPresenceType();
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("username", getUsername())
+                .toString();
     }
 
 }

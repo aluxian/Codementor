@@ -1,16 +1,13 @@
 package com.aluxian.codementor.presentation.presenters;
 
 import android.support.annotation.Nullable;
-import android.support.v7.util.SortedList;
 import android.text.TextUtils;
 
 import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.models.Chatroom;
-import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.MessageData;
-import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
@@ -21,8 +18,6 @@ import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.aluxian.codementor.utils.Constants;
-import com.aluxian.codementor.utils.Helpers;
-import com.aluxian.codementor.utils.SortedListCallback;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -55,11 +50,13 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private Query messagesRef;
 
     private Task firebaseReAuthTask;
-    private SortedList<ConversationItem> items;
+    private ConversationAdapter conversationAdapter;
     private Chatroom chatroom;
 
-    public ConversationPresenter(ConversationView baseView, CoreServices coreServices, Chatroom chatroom) {
+    public ConversationPresenter(ConversationView baseView, ConversationAdapter conversationAdapter,
+                                 Chatroom chatroom, CoreServices coreServices) {
         super(baseView);
+        this.conversationAdapter = conversationAdapter;
         this.chatroom = chatroom;
 
         bus = coreServices.getBus();
@@ -73,44 +70,34 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
         messagesRef = firebaseRef.child(chatroom.getFirebasePath())
                 .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE_INITIAL);
-
-        initAdapter();
-    }
-
-    private void initAdapter() {
-        ConversationAdapter adapter = new ConversationAdapter();
-        getView().setAdapter(adapter);
-        items = new SortedList<>(ConversationItem.class, new SortedListCallback<>(adapter, true));
-        adapter.setHasStableIds(true);
-        adapter.setList(items);
     }
 
     @Override
-    public void resume() {
-        super.resume();
+    public void start() {
+        super.start();
         getView().setRefreshing(true);
         addFirebaseListeners();
     }
 
     @Override
-    public void pause() {
-        super.pause();
+    public void stop() {
+        super.stop();
         getView().setRefreshing(false);
         removeFirebaseListeners();
     }
 
     private void addFirebaseListeners() {
         presenceRef.addValueEventListener(presenceEventListener);
-        messagesRef.addValueEventListener(messagesEventListener);
+        messagesRef.addValueEventListener(newMessagesEventListener);
     }
 
     private void removeFirebaseListeners() {
         presenceRef.removeEventListener(presenceEventListener);
-        messagesRef.removeEventListener(messagesEventListener);
+        messagesRef.removeEventListener(newMessagesEventListener);
     }
 
     public void loadMore() {
-        if (items.size() == 0) {
+        if (conversationAdapter.getItemCount() == 0) {
             return;
         }
 
@@ -118,7 +105,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         firebaseRef.child(chatroom.getFirebasePath())
                 .orderByChild(CREATED_AT)
                 .limitToLast(BATCH_SIZE)
-                .endAt(items.get(items.size() - 1).getTimestamp())
+                .endAt(conversationAdapter.getOldestMessage().getTimestamp() - 1)
                 .addListenerForSingleValueEvent(oldMessagesEventListener);
     }
 
@@ -136,61 +123,12 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 chatroom.getOtherUser()
         );
 
-        items.add(new Message(firebaseMessage, userManager.getUsername()));
+        Message message = new Message(firebaseMessage, userManager.getUsername());
+        conversationAdapter.optimisticallyAddMessage(message);
+
         firebaseTasks.sendMessage(firebaseMessage, chatroom)
                 .onSuccessTask(task -> codementorTasks.sendMessage(firebaseMessage, task.getResult()))
                 .continueWith(errorHandler::logAndToastTask, UI);
-    }
-
-    private void updateStatus(@Nullable String status) {
-        if (status == null) {
-            getView().setSubtitle(null);
-            return;
-        }
-
-        getView().setSubtitle(PresenceType.parse(status).statusResId);
-    }
-
-    private void addItemsToList(List<? extends ConversationItem> itemsList) {
-        //noinspection unchecked
-        List<ConversationItem> itemsToAdd = (List<ConversationItem>) itemsList;
-        List<ConversationItem> newItems = new ArrayList<>();
-        ConversationItem item1 = null;
-
-        for (ConversationItem item2 : itemsToAdd) {
-            if (item1 == null) {
-                long firstTimestamp = item2.getTimestamp();
-                newItems.add(new TimeMarker(firstTimestamp - 1));
-
-                item1 = item2;
-                newItems.add(item2);
-
-                continue;
-            }
-
-            long timestamp1 = item1.getTimestamp();
-            long timestamp2 = item2.getTimestamp();
-
-            if (!Helpers.isSameDay(timestamp1, timestamp2)) {
-                newItems.add(new TimeMarker(timestamp2 - 1));
-            }
-
-            newItems.add(item2);
-            item1 = item2;
-        }
-
-        items.addAll(newItems);
-    }
-
-    private List<Message> parseMessagesSnapshot(DataSnapshot snapshot) {
-        List<Message> messages = new ArrayList<>();
-
-        for (DataSnapshot child : snapshot.getChildren()) {
-            MessageData messageData = child.getValue(MessageData.class);
-            messages.add(new Message(messageData, userManager.getUsername()));
-        }
-
-        return messages;
     }
 
     private ValueEventListener presenceEventListener = new ManagedValueEventListener() {
@@ -206,58 +144,77 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             updateStatus(null);
         }
 
-    };
+        private void updateStatus(@Nullable String status) {
+            if (status == null) {
+                getView().setSubtitle(null);
+                return;
+            }
 
-    private ValueEventListener messagesEventListener = new ManagedValueEventListener() {
-
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            Task.callInBackground(() -> parseMessagesSnapshot(dataSnapshot))
-                    .continueWith(task -> {
-                        List<Message> messages = task.getResult();
-
-                        if (messages.size() > 0) {
-                            if (items.size() > 0) {
-                                bus.post(new NewMessageEvent(chatroom, messages.get(messages.size() - 1)));
-                            }
-
-                            codementorTasks.markConversationRead(chatroom)
-                                    .continueWith(errorHandler::logAndToastTask, UI);
-                        }
-
-                        if (messages.size() < BATCH_SIZE_INITIAL) {
-                            getView().setAllMessagesLoaded(true);
-                        }
-
-                        addItemsToList(messages);
-                        getView().showEmptyState(items.size() == 0);
-                        getView().setRefreshing(false);
-
-                        return null;
-                    }, UI);
+            getView().setSubtitle(PresenceType.parse(status).statusResId);
         }
 
     };
 
-    private ValueEventListener oldMessagesEventListener = new ManagedValueEventListener() {
+    private ValueEventListener newMessagesEventListener = new MessageValueEventListener() {
+
+        @Override
+        protected void onMessages(List<Message> messages) {
+            if (messages.size() > 0) {
+                if (conversationAdapter.getItemCount() > 0) {
+                    bus.post(new NewMessageEvent(new Chatroom(chatroom), messages.get(messages.size() - 1)));
+                }
+
+                conversationAdapter.addNewMessages(messages);
+                codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
+            }
+
+            if (messages.size() < BATCH_SIZE_INITIAL) {
+                getView().setAllMessagesLoaded(true);
+            }
+
+            getView().showEmptyState(conversationAdapter.getItemCount() == 0);
+        }
+
+    };
+
+    private ValueEventListener oldMessagesEventListener = new MessageValueEventListener() {
+
+        @Override
+        protected void onMessages(List<Message> messages) {
+            conversationAdapter.addOldMessages(messages);
+            if (messages.size() < BATCH_SIZE) {
+                getView().setAllMessagesLoaded(true);
+            }
+        }
+
+    };
+
+    private abstract class MessageValueEventListener extends ManagedValueEventListener {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            Task.callInBackground(() -> parseMessagesSnapshot(dataSnapshot))
+            Task.callInBackground(() -> parse(dataSnapshot))
                     .continueWith(task -> {
-                        List<Message> messages = task.getResult();
-                        addItemsToList(messages);
-
-                        if (messages.size() < BATCH_SIZE) {
-                            getView().setAllMessagesLoaded(true);
-                        }
-
+                        onMessages(task.getResult());
                         getView().setRefreshing(false);
                         return null;
                     }, UI);
         }
 
-    };
+        private List<Message> parse(DataSnapshot snapshot) {
+            List<Message> messages = new ArrayList<>();
+
+            for (DataSnapshot child : snapshot.getChildren()) {
+                MessageData messageData = child.getValue(MessageData.class);
+                messages.add(new Message(messageData, userManager.getUsername()));
+            }
+
+            return messages;
+        }
+
+        protected abstract void onMessages(List<Message> messages);
+
+    }
 
     private abstract class ManagedValueEventListener implements ValueEventListener {
 

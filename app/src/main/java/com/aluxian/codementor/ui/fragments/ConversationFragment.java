@@ -38,6 +38,7 @@ import static android.support.v7.widget.LinearLayoutManager.VERTICAL;
 public class ConversationFragment extends BaseFragment<ConversationPresenter> implements ConversationView {
 
     private static final String ARG_CHATROOM_JSON = "chatroom_json";
+
     private ConversationAdapter conversationAdapter;
     private boolean allMessagesLoaded;
 
@@ -61,8 +62,11 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        conversationAdapter = new ConversationAdapter();
+        conversationAdapter.setHasStableIds(true);
+
         Chatroom chatroom = (Chatroom) getArguments().getSerializable(ARG_CHATROOM_JSON);
-        setPresenter(new ConversationPresenter(this, getCoreServices(), chatroom));
+        setPresenter(new ConversationPresenter(this, conversationAdapter, chatroom, getCoreServices()));
     }
 
     @Override
@@ -99,11 +103,6 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this);
-    }
-
-    @Override
-    public void setAdapter(ConversationAdapter adapter) {
-        conversationAdapter = adapter;
     }
 
     @Override

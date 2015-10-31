@@ -1,13 +1,11 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.aluxian.codementor.utils.ContentComparable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 
 public abstract class ConversationItem implements ContentComparable<ConversationItem> {
 
@@ -71,26 +69,7 @@ public abstract class ConversationItem implements ContentComparable<Conversation
     }
 
     @Override
-    public int compareTo(@NonNull ConversationItem another) {
-        int result = ComparisonChain.start()
-                .compare(getTimestamp(), another.getTimestamp())
-                .result();
-
-//        if (result == 0) {
-//            if (this instanceof Message && another instanceof TimeMarker) {
-//                return 1;
-//            }
-//
-//            if (this instanceof TimeMarker && another instanceof Message) {
-//                return -1;
-//            }
-//        }
-
-        return result;
-    }
-
-    @Override
-    public boolean compareContentTo(ConversationItem another) {
+    public boolean contentEquals(ConversationItem another) {
         return Objects.equal(getSubtext(null, true), another.getSubtext(null, true))
                 && Objects.equal(getText(), another.getText())
                 && sentByMe() == another.sentByMe()

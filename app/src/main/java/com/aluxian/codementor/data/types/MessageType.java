@@ -34,7 +34,7 @@ public enum MessageType {
         try {
             return valueOf(rawType);
         } catch (IllegalArgumentException e) {
-            ErrorHandler.log(e);
+            ErrorHandler.logError(e);
             return OTHER;
         }
     }

@@ -13,15 +13,11 @@ public class Helpers {
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isSameDay(long timestamp1, long timestamp2) {
-        return isSameDay(new Date(timestamp1), new Date(timestamp2));
-    }
-
-    public static boolean isSameDay(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
 
-        cal1.setTime(date1);
-        cal2.setTime(date2);
+        cal1.setTime(new Date(timestamp1));
+        cal2.setTime(new Date(timestamp2));
 
         boolean sameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
         boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);

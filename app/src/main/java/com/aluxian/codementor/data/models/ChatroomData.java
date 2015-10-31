@@ -6,10 +6,8 @@ import java.io.Serializable;
 
 public class ChatroomData implements Serializable {
 
-    private String type;
-    private float created_at;
-
     private String id;
+    private String type;
     private String content;
     private Request request;
 
@@ -19,16 +17,12 @@ public class ChatroomData implements Serializable {
     private String chatroom_id;
     private String chatroom_firebase_id;
 
-    public String getType() {
-        return type;
-    }
-
-    public float getCreatedAt() {
-        return created_at;
-    }
-
     public String getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public String getContent() {
