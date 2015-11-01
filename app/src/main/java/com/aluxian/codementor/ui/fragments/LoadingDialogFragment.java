@@ -26,7 +26,7 @@ public class LoadingDialogFragment extends DialogFragment {
         args.putInt(ARG_INITIAL_MESSAGE_ID, initialMessageId);
 
         LoadingDialogFragment fragment = new LoadingDialogFragment();
-        fragment.setStyle(STYLE_NO_TITLE, 0);
+        fragment.setStyle(STYLE_NO_TITLE, R.style.LoadingTheme);
         fragment.setArguments(args);
 
         return fragment;

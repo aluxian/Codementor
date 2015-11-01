@@ -11,10 +11,8 @@
         <item name="colorButtonNormal">@color/brand</item>
     </style>
 
-    <style name="AppTheme.Login.Dialog" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorAccent">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:background">@color/brand</item>
+    <style name="LoadingTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorControlActivated">@color/brand_accent</item>
     </style>
 
     <style name="AppWidget" />
