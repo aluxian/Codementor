@@ -15,7 +15,6 @@
     <string name="hint_password">Password</string>
 
     <string name="error_field_required">This field is required</string>
-    <string name="error_unexpected">An unexpected error occurred</string>
 
     <string name="empty_chatrooms">No chatrooms.\nSwipe down to refresh.</string>
     <string name="empty_conversation">No messages.\nSend one yourself!</string>
