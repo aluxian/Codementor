@@ -1,7 +1,6 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.aluxian.codementor.R;
@@ -34,18 +33,19 @@ public class TimeMarker extends ConversationItem {
     }
 
     @Override
-    public String getSubtext(@Nullable Context context, boolean showSeen) {
-        if (context != null) {
-            return DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_DATE);
-        } else {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(new Date(timestamp));
+    protected String generateSubtext(Context context, boolean showSeen) {
+        return DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_DATE);
+    }
 
-            String day = calendar.getDisplayName(Calendar.DAY_OF_MONTH, Calendar.SHORT, Locale.US);
-            String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US);
+    @Override
+    protected String generateSubtext(boolean showSeen) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date(timestamp));
 
-            return day + " " + month;
-        }
+        String day = calendar.getDisplayName(Calendar.DAY_OF_MONTH, Calendar.SHORT, Locale.US);
+        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US);
+
+        return day + " " + month;
     }
 
 }

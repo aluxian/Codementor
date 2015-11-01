@@ -39,6 +39,18 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
      * @return An optional, additional text.
      */
     public String getSubtext(@Nullable Context context, boolean showSeen) {
+        if (context != null) {
+            return generateSubtext(context, showSeen);
+        } else {
+            return generateSubtext(showSeen);
+        }
+    }
+
+    protected String generateSubtext(boolean showSeen) {
+        return null;
+    }
+
+    protected String generateSubtext(Context context, boolean showSeen) {
         return null;
     }
 
