@@ -1,6 +1,7 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -20,6 +21,7 @@ public class Message extends ConversationItem implements Serializable {
     private long id;
     private MessageType type;
     private String displayText;
+    private String subtext;
     private long createdAt;
 
     public Message(MessageData messageData, String loggedInUsername) {
@@ -61,6 +63,15 @@ public class Message extends ConversationItem implements Serializable {
         }
 
         return displayText;
+    }
+
+    @Override
+    public String getSubtext(@Nullable Context context, boolean showSeen) {
+        if (subtext == null) {
+            subtext = super.getSubtext(context, showSeen);
+        }
+
+        return subtext;
     }
 
     @Override
