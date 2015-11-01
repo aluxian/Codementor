@@ -115,7 +115,7 @@ public class Message extends ConversationItem {
         Request request = getRequest();
 
         if (request != null) {
-            request.getSize();
+            return request.getSize();
         }
 
         return 0;
