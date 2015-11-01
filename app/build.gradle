@@ -4,7 +4,6 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.moallemi.advanced-build-version'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'view-inspector'
 apply plugin: 'io.fabric'
 
 advancedVersioning {
@@ -42,8 +41,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
+
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
