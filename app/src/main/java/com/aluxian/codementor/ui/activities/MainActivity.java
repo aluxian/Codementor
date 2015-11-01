@@ -97,7 +97,6 @@ public class MainActivity extends BaseActivity<MainActivityPresenter>
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setTitle(R.string.app_name_full);
         }
 
         return true;

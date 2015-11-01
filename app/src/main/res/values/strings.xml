@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Codementor</string>
-    <string name="app_name_full">Codementor Chat</string>
 
     <string name="title_activity_main">Codementor</string>
     <string name="title_activity_login">Log in</string>
