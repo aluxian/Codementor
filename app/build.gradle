@@ -1,7 +1,27 @@
+import org.moallemi.gradle.internal.VersionCodeType
+
 apply plugin: 'com.android.application'
+apply plugin: 'org.moallemi.advanced-build-version'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'view-inspector'
 apply plugin: 'io.fabric'
+
+advancedVersioning {
+    nameOptions {
+        versionMajor 1
+        versionMinor 0
+        versionPatch 0
+    }
+
+    codeOptions {
+        versionCodeType VersionCodeType.AUTO_INCREMENT_ONE_STEP
+    }
+
+    outputOptions {
+        renameOutput true
+    }
+}
 
 android {
     packagingOptions {
@@ -17,8 +37,8 @@ android {
         applicationId "com.aluxian.codementor"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 1
-        versionName '1.0.0'
+        versionCode advancedVersioning.versionCode
+        versionName advancedVersioning.versionName
     }
 
     buildTypes {
