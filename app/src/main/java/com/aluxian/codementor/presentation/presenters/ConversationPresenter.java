@@ -17,12 +17,11 @@ import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
-import com.aluxian.codementor.utils.Constants;
+import com.aluxian.codementor.utils.QueryEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 import com.squareup.otto.Bus;
 
 import java.util.TreeSet;
@@ -43,18 +42,19 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
-    private Firebase firebaseRef;
+    private CoreServices coreServices;
 
-    private Query presenceRef;
-    private Query messagesRef;
+    private QueryEventListener presenceListener;
+    private QueryEventListener messagesListener;
 
-    private Task firebaseReAuthTask;
     private ConversationAdapter conversationAdapter;
     private Chatroom chatroom;
 
     public ConversationPresenter(ConversationView baseView, ConversationAdapter conversationAdapter,
                                  Chatroom chatroom, CoreServices coreServices) {
         super(baseView);
+
+        this.coreServices = coreServices;
         this.conversationAdapter = conversationAdapter;
         this.chatroom = chatroom;
 
@@ -64,35 +64,25 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         codementorTasks = coreServices.getCodementorTasks();
         firebaseTasks = coreServices.getFirebaseTasks();
-        firebaseRef = coreServices.getFirebaseRef();
 
-        presenceRef = firebaseRef.child(Constants.presencePath(chatroom.getOtherUser().getUsername()));
-        messagesRef = firebaseRef.child(chatroom.getFirebasePath())
-                .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE_INITIAL);
+        presenceListener = new PresenceEventListener(coreServices);
+        messagesListener = new NewMessagesEventListener(coreServices);
     }
 
     @Override
     public void start() {
         super.start();
         getView().setRefreshing(true);
-        addFirebaseListeners();
+        presenceListener.start();
+        messagesListener.start();
     }
 
     @Override
     public void stop() {
         super.stop();
         getView().setRefreshing(false);
-        removeFirebaseListeners();
-    }
-
-    private void addFirebaseListeners() {
-        presenceRef.addValueEventListener(presenceEventListener);
-        messagesRef.addValueEventListener(newMessagesEventListener);
-    }
-
-    private void removeFirebaseListeners() {
-        presenceRef.removeEventListener(presenceEventListener);
-        messagesRef.removeEventListener(newMessagesEventListener);
+        presenceListener.stop();
+        messagesListener.stop();
     }
 
     public void loadMore() {
@@ -101,11 +91,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         }
 
         getView().setRefreshing(true);
-        firebaseRef.child(chatroom.getFirebasePath())
-                .orderByChild(CREATED_AT)
-                .limitToLast(BATCH_SIZE)
-                .endAt(conversationAdapter.getOldestMessage().getTimestamp() - 1)
-                .addListenerForSingleValueEvent(oldMessagesEventListener);
+        new OldMessagesEventListener(coreServices).start();
     }
 
     public void sendMessage(String messageBody) {
@@ -127,7 +113,21 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 .continueWith(errorHandler::logAndToastTask, UI);
     }
 
-    private ValueEventListener presenceEventListener = new ManagedValueEventListener() {
+    private class PresenceEventListener extends QueryEventListener {
+
+        public PresenceEventListener(CoreServices coreServices) {
+            super(coreServices);
+        }
+
+        @Override
+        protected Query createQuery(Firebase firebase) {
+            return firebase.child(chatroom.getOtherUser().getPresencePath());
+        }
+
+        @Override
+        protected void set(Query query) {
+            query.addValueEventListener(this);
+        }
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -149,9 +149,24 @@ public class ConversationPresenter extends Presenter<ConversationView> {
             getView().setSubtitle(PresenceType.parse(status).statusResId);
         }
 
-    };
+    }
 
-    private ValueEventListener newMessagesEventListener = new MessageValueEventListener() {
+    private class NewMessagesEventListener extends MessageEventListener {
+
+        public NewMessagesEventListener(CoreServices coreServices) {
+            super(coreServices);
+        }
+
+        @Override
+        protected Query createQuery(Firebase firebase) {
+            return firebase.child(chatroom.getFirebasePath())
+                    .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE_INITIAL);
+        }
+
+        @Override
+        protected void set(Query query) {
+            query.addValueEventListener(this);
+        }
 
         @Override
         protected void onMessages(TreeSet<Message> messages) {
@@ -170,10 +185,25 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
             getView().showEmptyState(conversationAdapter.getItemCount() == 0);
         }
+    }
 
-    };
+    private class OldMessagesEventListener extends MessageEventListener {
 
-    private ValueEventListener oldMessagesEventListener = new MessageValueEventListener() {
+        public OldMessagesEventListener(CoreServices coreServices) {
+            super(coreServices);
+        }
+
+        @Override
+        protected Query createQuery(Firebase firebase) {
+            return firebase.child(chatroom.getFirebasePath())
+                    .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE)
+                    .endAt(conversationAdapter.getOldestMessage().getTimestamp() - 1);
+        }
+
+        @Override
+        protected void set(Query query) {
+            query.addListenerForSingleValueEvent(this);
+        }
 
         @Override
         protected void onMessages(TreeSet<Message> messages) {
@@ -182,10 +212,13 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 getView().setAllMessagesLoaded(true);
             }
         }
+    }
 
-    };
+    private abstract class MessageEventListener extends QueryEventListener {
 
-    private abstract class MessageValueEventListener extends ManagedValueEventListener {
+        public MessageEventListener(CoreServices coreServices) {
+            super(coreServices);
+        }
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -210,42 +243,6 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         }
 
         protected abstract void onMessages(TreeSet<Message> messages);
-
-    }
-
-    private abstract class ManagedValueEventListener implements ValueEventListener {
-
-        @Override
-        public void onCancelled(FirebaseError firebaseError) {
-            if (firebaseError.getCode() != FirebaseError.PERMISSION_DENIED) {
-                errorHandler.logAndToast(firebaseError.toException());
-                return;
-            }
-
-            // Skip if already running
-            if (firebaseReAuthTask != null && !firebaseReAuthTask.isCompleted()) {
-                return;
-            }
-
-            firebaseReAuthTask = codementorTasks.extractToken()
-                    .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), true))
-                    .onSuccess(this::onReAuthSuccessful, UI)
-                    .continueWith(this::onReAuthCompleted, UI);
-        }
-
-        private Void onReAuthSuccessful(Task task) {
-            removeFirebaseListeners();
-            addFirebaseListeners();
-            return null;
-        }
-
-        private Void onReAuthCompleted(Task task) {
-            if (task.isFaulted()) {
-                errorHandler.logAndToast(task.getError());
-            }
-
-            return null;
-        }
 
     }
 

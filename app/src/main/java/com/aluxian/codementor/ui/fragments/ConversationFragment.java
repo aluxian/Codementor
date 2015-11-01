@@ -118,7 +118,9 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
     @Override
     public void showEmptyState(boolean show) {
-        emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (emptyState != null) {
+            emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override

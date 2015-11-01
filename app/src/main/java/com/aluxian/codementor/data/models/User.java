@@ -49,6 +49,10 @@ public class User implements Serializable, ContentComparable<User> {
         return Constants.chatroomReadUrl(getUsername());
     }
 
+    public String getPresencePath() {
+        return Constants.presencePath(getUsername());
+    }
+
     public PresenceType getPresenceType() {
         return presenceType;
     }

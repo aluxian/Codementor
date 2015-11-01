@@ -50,7 +50,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
             drawerShouldBeOpen = true;
         }
 
-        chatroomsAdapter = new ChatroomsAdapter(this);
+        chatroomsAdapter = new ChatroomsAdapter(this, getCoreServices());
         chatroomsAdapter.setHasStableIds(true);
 
         setPresenter(new ChatroomsPresenter(this, chatroomsAdapter, getCoreServices()));
@@ -134,7 +134,9 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
 
     @Override
     public void showEmptyState(boolean show) {
-        emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (emptyState != null) {
+            emptyState.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
     }
 
     @Override

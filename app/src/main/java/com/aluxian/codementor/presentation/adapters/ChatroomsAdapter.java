@@ -9,6 +9,7 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.holders.ChatroomItemViewHolder;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
+import com.aluxian.codementor.services.CoreServices;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +18,17 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<ChatroomItemViewHolde
 
     private List<Chatroom> chatrooms = new ArrayList<>();
     private ChatroomSelectedListener chatroomSelectedListener;
+    private CoreServices coreServices;
 
-    public ChatroomsAdapter(ChatroomSelectedListener chatroomSelectedListener) {
+    public ChatroomsAdapter(ChatroomSelectedListener chatroomSelectedListener, CoreServices coreServices) {
         this.chatroomSelectedListener = chatroomSelectedListener;
+        this.coreServices = coreServices;
     }
 
     @Override
     public ChatroomItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View rootView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_chatroom, parent, false);
-        return new ChatroomItemViewHolder(rootView);
+        return new ChatroomItemViewHolder(rootView, coreServices);
     }
 
     @Override
