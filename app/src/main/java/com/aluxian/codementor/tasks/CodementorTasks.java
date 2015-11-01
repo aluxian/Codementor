@@ -113,6 +113,8 @@ public class CodementorTasks {
                     .build();
 
             Response response = okHttpClient.newCall(request).execute();
+            response.body().close();
+
             List<String> headers = response.headers("Location");
 
             if (response.code() != 302) {
@@ -158,6 +160,8 @@ public class CodementorTasks {
                     .build();
 
             Response response = okHttpClient.newCall(request).execute();
+            response.body().close();
+
             if (!response.isSuccessful()) {
                 throw new Exception("Request unsuccessful, returned code " + response.code());
             }
@@ -184,6 +188,8 @@ public class CodementorTasks {
                     .build();
 
             Response response = okHttpClient.newCall(request).execute();
+            response.body().close();
+
             if (!response.isSuccessful()) {
                 throw new Exception("Send message to Codementor server failed with code " + response.code());
             }
