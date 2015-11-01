@@ -27,7 +27,7 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.tv_title) TextView titleTextView;
     @Bind(R.id.view_presence) View presenceView;
 
-    private User previousUser;
+    private Chatroom currentChatroom;
     private PresenceListener presenceListener;
     private CoreServices coreServices;
 
@@ -38,16 +38,22 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindChatroom(Chatroom chatroom) {
+        if (currentChatroom != null && currentChatroom.contentEquals(chatroom)) {
+            return;
+        }
+
         setText(chatroom);
         setAvatar(chatroom);
         setPresenceListener(chatroom);
-        this.previousUser = chatroom.getOtherUser();
+
+        currentChatroom = chatroom;
     }
 
     public void recycle() {
-        previousUser = null;
+        currentChatroom = null;
         if (presenceListener != null) {
             presenceListener.stop();
+            presenceListener = null;
         }
     }
 
@@ -64,7 +70,7 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void setPresenceListener(Chatroom chatroom) {
-        if (previousUser != null && previousUser.equals(chatroom.getOtherUser())) {
+        if (currentChatroom != null && currentChatroom.getOtherUser().equals(chatroom.getOtherUser())) {
             return;
         }
 

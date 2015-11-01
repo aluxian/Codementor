@@ -7,6 +7,8 @@ import com.aluxian.codementor.data.models.ConversationItem;
 
 public abstract class ConversationItemViewHolder extends RecyclerView.ViewHolder {
 
+    private ConversationItem currentItem;
+
     public ConversationItemViewHolder(View itemView) {
         super(itemView);
     }
@@ -17,6 +19,14 @@ public abstract class ConversationItemViewHolder extends RecyclerView.ViewHolder
      * @param item   The message to bind.
      * @param newest Whether it's the newest item in the conversation.
      */
-    public abstract void bindItem(ConversationItem item, boolean newest);
+    public void bindItem(ConversationItem item, boolean newest) {
+        if (currentItem == null || !currentItem.contentEquals(item)) {
+            onBind(item, newest);
+        }
+
+        currentItem = item;
+    }
+
+    protected abstract void onBind(ConversationItem item, boolean newest);
 
 }

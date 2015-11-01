@@ -22,7 +22,7 @@ public class MessageViewHolder extends ConversationItemViewHolder {
     }
 
     @Override
-    public void bindItem(ConversationItem item, boolean newest) {
+    public void onBind(ConversationItem item, boolean newest) {
         if (item.isHtmlText()) {
             messageTextView.setMovementMethod(LinkMovementMethod.getInstance());
             messageTextView.setText(Html.fromHtml(item.getText()));
