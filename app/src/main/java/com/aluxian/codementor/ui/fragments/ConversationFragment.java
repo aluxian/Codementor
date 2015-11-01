@@ -29,6 +29,7 @@ import com.aluxian.codementor.presentation.adapters.ConversationAdapter;
 import com.aluxian.codementor.presentation.listeners.EndlessRecyclerScrollListener;
 import com.aluxian.codementor.presentation.presenters.ConversationPresenter;
 import com.aluxian.codementor.presentation.views.ConversationView;
+import com.aluxian.codementor.ui.activities.BaseActivity;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -41,6 +42,7 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
 
     private ConversationAdapter conversationAdapter;
     private boolean allMessagesLoaded;
+    private Chatroom chatroom;
 
     @Bind(R.id.btn_send) ImageButton sendButton;
     @Bind(R.id.tv_message) EditText messageField;
@@ -59,13 +61,27 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (chatroom != null) {
+            ActionBar actionBar = ((BaseActivity) getActivity()).getSupportActionBar();
+
+            if (actionBar != null) {
+                actionBar.setTitle(chatroom.getOtherUser().getName());
+                actionBar.setSubtitle(chatroom.getOtherUser().getPresenceType().statusResId);
+            }
+        }
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         conversationAdapter = new ConversationAdapter();
         conversationAdapter.setHasStableIds(true);
 
-        Chatroom chatroom = (Chatroom) getArguments().getSerializable(ARG_CHATROOM_JSON);
+        chatroom = (Chatroom) getArguments().getSerializable(ARG_CHATROOM_JSON);
         setPresenter(new ConversationPresenter(this, conversationAdapter, chatroom, getCoreServices()));
     }
 
