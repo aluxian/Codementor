@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.aluxian.codementor.R;
-import com.google.common.base.Objects;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -47,19 +46,6 @@ public class TimeMarker extends ConversationItem {
 
             return day + " " + month;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TimeMarker)) return false;
-        TimeMarker that = (TimeMarker) o;
-        return Objects.equal(timestamp, that.timestamp);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(timestamp);
     }
 
 }

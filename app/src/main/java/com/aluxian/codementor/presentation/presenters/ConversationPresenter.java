@@ -1,9 +1,10 @@
 package com.aluxian.codementor.presentation.presenters;
 
+import android.content.Intent;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 
-import com.aluxian.codementor.data.events.NewMessageEvent;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.Message;
@@ -22,7 +23,6 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.squareup.otto.Bus;
 
 import java.util.TreeSet;
 
@@ -36,7 +36,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
     private static final int BATCH_SIZE_INITIAL = 25;
     private static final int BATCH_SIZE = 100;
 
-    private Bus bus;
+    private LocalBroadcastManager localBroadcastManager;
     private ErrorHandler errorHandler;
     private UserManager userManager;
 
@@ -58,7 +58,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         this.conversationAdapter = conversationAdapter;
         this.chatroom = chatroom;
 
-        bus = coreServices.getBus();
+        localBroadcastManager = coreServices.getLocalBroadcastManager();
         errorHandler = coreServices.getErrorHandler();
         userManager = coreServices.getUserManager();
 
@@ -172,7 +172,10 @@ public class ConversationPresenter extends Presenter<ConversationView> {
         protected void onMessages(TreeSet<Message> messages) {
             if (messages.size() > 0) {
                 if (conversationAdapter.getItemCount() > 0) {
-                    bus.post(new NewMessageEvent(new Chatroom(chatroom), messages.last()));
+                    Intent intent = new Intent(ChatroomsPresenter.ACTION_NEW_MESSAGE);
+                    intent.putExtra(ChatroomsPresenter.EXTRA_CHATROOM, new Chatroom(chatroom));
+                    intent.putExtra(ChatroomsPresenter.EXTRA_MESSAGE, messages.last());
+                    localBroadcastManager.sendBroadcast(intent);
                 }
 
                 conversationAdapter.addMessages(messages);

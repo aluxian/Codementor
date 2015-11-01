@@ -15,6 +15,7 @@ import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
 import com.aluxian.codementor.utils.Helpers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -59,9 +60,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
     }
 
     public void addMessages(TreeSet<Message> newMessages) {
-        TreeSet<Message> temp = new TreeSet<>(newMessages);
-        temp.addAll(messages);
-        messages = temp;
+        TreeSet<Message> existingMessages = new TreeSet<>(messages);
+        messages.clear();
+        messages.addAll(existingMessages);
+        messages.addAll(newMessages);
         generateItems();
     }
 
@@ -72,9 +74,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
         for (Message message2 : messages) {
             if (message1 == null) {
                 long firstTimestamp = message2.getTimestamp();
-                items.add(0, new TimeMarker(firstTimestamp));
+                items.add(new TimeMarker(firstTimestamp));
 
-                items.add(0, message2);
+                items.add(message2);
                 message1 = message2;
 
                 continue;
@@ -84,13 +86,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
             long timestamp2 = message2.getTimestamp();
 
             if (!Helpers.isSameDay(timestamp1, timestamp2)) {
-                items.add(0, new TimeMarker(timestamp2));
+                items.add(new TimeMarker(timestamp2));
             }
 
-            items.add(0, message2);
+            items.add(message2);
             message1 = message2;
         }
 
+        Collections.reverse(items);
         notifyDataSetChanged();
     }
 

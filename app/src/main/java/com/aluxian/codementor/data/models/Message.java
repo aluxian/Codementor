@@ -10,9 +10,10 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.Helpers;
-import com.google.common.base.Objects;
 
-public class Message extends ConversationItem {
+import java.io.Serializable;
+
+public class Message extends ConversationItem implements Serializable {
 
     private MessageData messageData;
     private String loggedInUsername;
@@ -199,19 +200,6 @@ public class Message extends ConversationItem {
             default:
                 return "Message type not yet supported by this app.";
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Message)) return false;
-        Message message = (Message) o;
-        return Objects.equal(messageData, message.messageData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(messageData);
     }
 
 }

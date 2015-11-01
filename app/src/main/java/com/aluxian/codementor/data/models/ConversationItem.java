@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import com.aluxian.codementor.utils.ContentComparable;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
+import com.google.common.primitives.Longs;
 
 public abstract class ConversationItem implements Comparable<ConversationItem>, ContentComparable<ConversationItem> {
 
@@ -72,19 +72,32 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
 
     @Override
     public int compareTo(@NonNull ConversationItem another) {
-        if (equals(another)) {
+        if (getId() == another.getId()) {
             return 0;
         }
 
-        return ComparisonChain.start().compare(getTimestamp(), another.getTimestamp()).result();
+        return Longs.compare(getTimestamp(), another.getTimestamp());
     }
 
     @Override
     public boolean contentEquals(ConversationItem another) {
         return Objects.equal(getSubtext(null, true), another.getSubtext(null, true))
-                && Objects.equal(getText(), another.getText())
-                && sentByMe() == another.sentByMe()
-                && isRead() == another.isRead();
+                && Objects.equal(getText(), another.getText());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TimeMarker)) return false;
+        TimeMarker that = (TimeMarker) o;
+        return Objects.equal(getId(), that.getId()) &&
+                Objects.equal(getTimestamp(), that.getTimestamp()) &&
+                Objects.equal(isRead(), that.isRead());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId(), getTimestamp(), isRead());
     }
 
     @Override

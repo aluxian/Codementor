@@ -39,6 +39,12 @@ public class ChatroomsAdapter extends RecyclerView.Adapter<ChatroomItemViewHolde
     }
 
     @Override
+    public void onViewRecycled(ChatroomItemViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.recycle();
+    }
+
+    @Override
     public long getItemId(int position) {
         return chatrooms.get(position).getId();
     }

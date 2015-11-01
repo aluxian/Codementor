@@ -3,6 +3,7 @@ package com.aluxian.codementor.services;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
@@ -10,7 +11,6 @@ import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.Firebase;
 import com.squareup.okhttp.OkHttpClient;
-import com.squareup.otto.Bus;
 
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -25,7 +25,7 @@ public class CoreServices {
     private Context context;
     private UserManager userManager;
     private ErrorHandler errorHandler;
-    private Bus bus;
+    private LocalBroadcastManager localBroadcastManager;
 
     // Network
     private Firebase firebaseRef;
@@ -45,7 +45,7 @@ public class CoreServices {
         // General
         userManager = new UserManager(sharedPrefs);
         errorHandler = new ErrorHandler(context);
-        bus = new Bus();
+        localBroadcastManager = LocalBroadcastManager.getInstance(context);
 
         // Network
         firebaseRef = new Firebase(Constants.FIREBASE_URL);
@@ -86,8 +86,8 @@ public class CoreServices {
         return errorHandler;
     }
 
-    public Bus getBus() {
-        return bus;
+    public LocalBroadcastManager getLocalBroadcastManager() {
+        return localBroadcastManager;
     }
 
 }

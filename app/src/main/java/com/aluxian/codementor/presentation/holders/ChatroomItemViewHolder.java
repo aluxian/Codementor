@@ -44,6 +44,13 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         this.previousUser = chatroom.getOtherUser();
     }
 
+    public void recycle() {
+        previousUser = null;
+        if (presenceListener != null) {
+            presenceListener.stop();
+        }
+    }
+
     private void setText(Chatroom chatroom) {
         User otherUser = chatroom.getOtherUser();
         titleTextView.setText(otherUser.getName());
