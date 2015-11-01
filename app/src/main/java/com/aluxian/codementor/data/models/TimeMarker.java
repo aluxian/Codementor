@@ -1,7 +1,6 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 
 import com.aluxian.codementor.R;
@@ -13,7 +12,6 @@ import java.util.Locale;
 public class TimeMarker extends ConversationItem {
 
     private final long timestamp;
-    private String subtext;
 
     public TimeMarker(long timestamp) {
         this.timestamp = timestamp;
@@ -32,15 +30,6 @@ public class TimeMarker extends ConversationItem {
     @Override
     public long getTimestamp() {
         return timestamp;
-    }
-
-    @Override
-    public String getSubtext(@Nullable Context context, boolean showSeen) {
-        if (subtext == null) {
-            subtext = super.getSubtext(context, showSeen);
-        }
-
-        return subtext;
     }
 
     @Override

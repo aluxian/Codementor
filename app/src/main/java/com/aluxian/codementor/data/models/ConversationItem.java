@@ -11,6 +11,9 @@ import com.google.common.primitives.Longs;
 
 public abstract class ConversationItem implements Comparable<ConversationItem>, ContentComparable<ConversationItem> {
 
+    private String richSubtext;
+    private String simpleSubtext;
+
     /**
      * @return The unique ID of this item.
      */
@@ -40,9 +43,17 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
      */
     public String getSubtext(@Nullable Context context, boolean showSeen) {
         if (context != null) {
-            return generateSubtext(context, showSeen);
+            if (richSubtext == null) {
+                richSubtext = generateSubtext(context, showSeen);
+            }
+
+            return richSubtext;
         } else {
-            return generateSubtext(showSeen);
+            if (simpleSubtext == null) {
+                simpleSubtext = generateSubtext(showSeen);
+            }
+
+            return simpleSubtext;
         }
     }
 
