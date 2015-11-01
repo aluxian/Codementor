@@ -26,14 +26,14 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
     }
 
     @Override
-    public void resume() {
-        super.resume();
+    public void start() {
+        super.start();
         setStatus(PresenceType.ONLINE, PresenceType.OFFLINE, PresenceType.AWAY);
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
+    public void stop() {
+        super.stop();
         setStatus(PresenceType.OFFLINE, PresenceType.ONLINE);
     }
 
