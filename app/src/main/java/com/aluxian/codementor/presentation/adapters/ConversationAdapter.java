@@ -59,11 +59,20 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
         return messages.first();
     }
 
-    public void addMessages(TreeSet<Message> newMessages) {
+    public void addNewMessages(TreeSet<Message> newMessages) {
+        if (messages.size() > 0 && newMessages.size() > 0 && messages.last().equals(newMessages.last())) {
+            return;
+        }
+
         TreeSet<Message> existingMessages = new TreeSet<>(messages);
         messages.clear();
-        messages.addAll(existingMessages);
         messages.addAll(newMessages);
+        messages.addAll(existingMessages);
+        generateItems();
+    }
+
+    public void addOldMessages(TreeSet<Message> oldMessages) {
+        messages.addAll(oldMessages);
         generateItems();
     }
 

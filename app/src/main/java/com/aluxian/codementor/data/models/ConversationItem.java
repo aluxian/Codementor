@@ -88,16 +88,15 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TimeMarker)) return false;
-        TimeMarker that = (TimeMarker) o;
+        if (!(o instanceof ConversationItem)) return false;
+        ConversationItem that = (ConversationItem) o;
         return Objects.equal(getId(), that.getId()) &&
-                Objects.equal(getTimestamp(), that.getTimestamp()) &&
                 Objects.equal(isRead(), that.isRead());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId(), getTimestamp(), isRead());
+        return Objects.hashCode(getId(), isRead());
     }
 
     @Override

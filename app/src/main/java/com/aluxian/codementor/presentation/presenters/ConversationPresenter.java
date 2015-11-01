@@ -178,7 +178,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                     localBroadcastManager.sendBroadcast(intent);
                 }
 
-                conversationAdapter.addMessages(messages);
+                conversationAdapter.addNewMessages(messages);
                 codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
             }
 
@@ -210,7 +210,7 @@ public class ConversationPresenter extends Presenter<ConversationView> {
 
         @Override
         protected void onMessages(TreeSet<Message> messages) {
-            conversationAdapter.addMessages(messages);
+            conversationAdapter.addOldMessages(messages);
             if (messages.size() < BATCH_SIZE) {
                 getView().setAllMessagesLoaded(true);
             }
