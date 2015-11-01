@@ -26,11 +26,13 @@ public class App extends Application {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }
-
-        coreServices = new CoreServices(this);
     }
 
     public CoreServices getCoreServices() {
+        if (coreServices == null) {
+            coreServices = new CoreServices(this);
+        }
+
         return coreServices;
     }
 
