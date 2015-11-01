@@ -26,6 +26,33 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/tv_message" />
 
+            <ImageView
+                android:id="@+id/img_check_1"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_below="@id/tv_message"
+                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="4dp"
+                android:layout_toEndOf="@id/tv_subtext"
+                android:layout_toRightOf="@id/tv_subtext"
+                android:contentDescription="@null"
+                android:src="@drawable/msg_check"
+                android:tint="@color/sender_text_faded" />
+
+            <ImageView
+                android:id="@+id/img_check_2"
+                android:layout_width="wrap_content"
+                android:layout_height="10dp"
+                android:layout_alignBottom="@id/img_check_1"
+                android:layout_marginLeft="-8dp"
+                android:layout_marginStart="-8dp"
+                android:layout_toEndOf="@id/img_check_1"
+                android:layout_toRightOf="@id/img_check_1"
+                android:contentDescription="@null"
+                android:src="@drawable/msg_halfcheck"
+                android:tint="@color/sender_text_faded" />
+
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

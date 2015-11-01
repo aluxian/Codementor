@@ -1,8 +1,10 @@
 package com.aluxian.codementor.presentation.holders;
 
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.aluxian.codementor.R;
@@ -15,6 +17,7 @@ public class MessageViewHolder extends ConversationItemViewHolder {
 
     @Bind(R.id.tv_message) TextView messageTextView;
     @Bind(R.id.tv_subtext) TextView subtextView;
+    @Nullable @Bind(R.id.img_check_2) ImageView checkMark2;
 
     public MessageViewHolder(View itemView) {
         super(itemView);
@@ -31,7 +34,11 @@ public class MessageViewHolder extends ConversationItemViewHolder {
             messageTextView.setText(item.getText());
         }
 
-        subtextView.setText(item.getSubtext(itemView.getContext(), newest));
+        if (checkMark2 != null) {
+            checkMark2.setVisibility(item.showSeen() ? View.VISIBLE : View.INVISIBLE);
+        }
+
+        subtextView.setText(item.getSubtext(itemView.getContext()));
         itemView.requestLayout();
     }
 

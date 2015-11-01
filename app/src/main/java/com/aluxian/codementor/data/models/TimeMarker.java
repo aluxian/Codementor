@@ -33,12 +33,7 @@ public class TimeMarker extends ConversationItem {
     }
 
     @Override
-    protected String generateSubtext(Context context, boolean showSeen) {
-        return DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_DATE);
-    }
-
-    @Override
-    protected String generateSubtext(boolean showSeen) {
+    protected String generateSubtext() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(timestamp));
 
@@ -46,6 +41,11 @@ public class TimeMarker extends ConversationItem {
         String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US);
 
         return day + " " + month;
+    }
+
+    @Override
+    protected String generateSubtext(Context context) {
+        return DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_DATE);
     }
 
 }

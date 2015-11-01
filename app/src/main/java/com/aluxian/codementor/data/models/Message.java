@@ -75,7 +75,7 @@ public class Message extends ConversationItem implements Serializable {
     }
 
     @Override
-    protected String generateSubtext(boolean showSeen) {
+    protected String generateSubtext() {
         String subtext = "";
         long size = getSize();
 
@@ -87,16 +87,11 @@ public class Message extends ConversationItem implements Serializable {
             subtext += size;
         }
 
-        // Seen
-        if (showSeen && sentByMe() && isRead()) {
-            subtext += "  SEEN";
-        }
-
         return subtext;
     }
 
     @Override
-    protected String generateSubtext(Context context, boolean showSeen) {
+    protected String generateSubtext(Context context) {
         String subtext = "";
         long size = getSize();
 
@@ -109,11 +104,6 @@ public class Message extends ConversationItem implements Serializable {
             subtext += " " + Formatter.formatShortFileSize(context, size);
         }
 
-        // Seen
-        if (showSeen && sentByMe() && isRead()) {
-            subtext += "  SEEN";
-        }
-
         return subtext;
     }
 
@@ -123,8 +113,9 @@ public class Message extends ConversationItem implements Serializable {
     }
 
     @Override
-    public boolean isRead() {
-        return !TextUtils.isEmpty(messageData.getReadAt());
+    public boolean showSeen() {
+        return sentByMe() && !TextUtils.isEmpty(messageData.getReadAt());
+
     }
 
     @Override

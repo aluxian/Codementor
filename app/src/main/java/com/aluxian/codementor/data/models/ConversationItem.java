@@ -37,31 +37,30 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     }
 
     /**
-     * @param context  The context to be used for formatting.
-     * @param showSeen Whether 'SEEN' may appear in the subtext.
+     * @param context The context to be used for formatting.
      * @return An optional, additional text.
      */
-    public String getSubtext(@Nullable Context context, boolean showSeen) {
+    public String getSubtext(@Nullable Context context) {
         if (context != null) {
             if (richSubtext == null) {
-                richSubtext = generateSubtext(context, showSeen);
+                richSubtext = generateSubtext(context);
             }
 
             return richSubtext;
         } else {
             if (simpleSubtext == null) {
-                simpleSubtext = generateSubtext(showSeen);
+                simpleSubtext = generateSubtext();
             }
 
             return simpleSubtext;
         }
     }
 
-    protected String generateSubtext(boolean showSeen) {
+    protected String generateSubtext() {
         return null;
     }
 
-    protected String generateSubtext(Context context, boolean showSeen) {
+    protected String generateSubtext(Context context) {
         return null;
     }
 
@@ -75,7 +74,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     /**
      * @return Whether this item has been read by its receiver.
      */
-    public boolean isRead() {
+    public boolean showSeen() {
         return false;
     }
 
@@ -100,8 +99,9 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
 
     @Override
     public boolean contentEquals(ConversationItem another) {
-        return Objects.equal(getSubtext(null, true), another.getSubtext(null, true))
-                && Objects.equal(getText(), another.getText());
+        return Objects.equal(getSubtext(null), another.getSubtext(null))
+                && Objects.equal(getText(), another.getText())
+                && Objects.equal(showSeen(), another.showSeen());
     }
 
     @Override
@@ -110,12 +110,12 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         if (!(o instanceof ConversationItem)) return false;
         ConversationItem that = (ConversationItem) o;
         return Objects.equal(getId(), that.getId()) &&
-                Objects.equal(isRead(), that.isRead());
+                Objects.equal(showSeen(), that.showSeen());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId(), isRead());
+        return Objects.hashCode(getId(), showSeen());
     }
 
     @Override
@@ -123,7 +123,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         return MoreObjects.toStringHelper(this)
                 .add("id", getId())
                 .add("text", getText())
-                .add("subtext", getSubtext(null, true))
+                .add("subtext", getSubtext(null))
                 .add("timestamp", getTimestamp())
                 .toString();
     }
