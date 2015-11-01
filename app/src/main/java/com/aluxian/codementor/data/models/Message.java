@@ -11,8 +11,12 @@ import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.Helpers;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Message extends ConversationItem implements Serializable {
+
+    private static final Map<Long, Long> TIMESTAMPS_MAP = new HashMap<>();
 
     private MessageData messageData;
     private String loggedInUsername;
@@ -48,7 +52,14 @@ public class Message extends ConversationItem implements Serializable {
     @Override
     public long getTimestamp() {
         if (createdAt == 0) {
-            createdAt = Helpers.parseDate(messageData.getCreatedAt());
+            Long timestamp = TIMESTAMPS_MAP.get(getId());
+
+            if (timestamp != null) {
+                createdAt = timestamp;
+            } else {
+                createdAt = Helpers.parseDate(messageData.getCreatedAt());
+                TIMESTAMPS_MAP.put(getId(), createdAt);
+            }
         }
 
         return createdAt;

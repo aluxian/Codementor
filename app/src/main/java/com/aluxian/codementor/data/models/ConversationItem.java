@@ -95,10 +95,6 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
 
     @Override
     public int compareTo(@NonNull ConversationItem another) {
-        if (getId() == another.getId()) {
-            return 0;
-        }
-
         return Longs.compare(getTimestamp(), another.getTimestamp());
     }
 
