@@ -17,6 +17,8 @@ public class MessageViewHolder extends ConversationItemViewHolder {
 
     @Bind(R.id.tv_message) TextView messageTextView;
     @Bind(R.id.tv_subtext) TextView subtextView;
+
+    @Nullable @Bind(R.id.img_check_1) ImageView checkMark1;
     @Nullable @Bind(R.id.img_check_2) ImageView checkMark2;
 
     public MessageViewHolder(View itemView) {
@@ -34,8 +36,14 @@ public class MessageViewHolder extends ConversationItemViewHolder {
             messageTextView.setText(item.getText());
         }
 
-        if (checkMark2 != null) {
-            checkMark2.setVisibility(item.showSeen() ? View.VISIBLE : View.INVISIBLE);
+        if (checkMark1 != null && checkMark2 != null) {
+            if (item.showSeen()) {
+                checkMark1.setVisibility(View.VISIBLE);
+                checkMark2.setImageResource(R.drawable.msg_halfcheck);
+            } else {
+                checkMark1.setVisibility(View.INVISIBLE);
+                checkMark2.setImageResource(R.drawable.msg_check);
+            }
         }
 
         subtextView.setText(item.getSubtext(itemView.getContext()));
