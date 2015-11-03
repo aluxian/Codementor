@@ -1,15 +1,17 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
-import android.text.format.DateUtils;
+import android.support.annotation.Nullable;
 
 import com.aluxian.codementor.R;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class TimeMarker extends ConversationItem {
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMM", Locale.US);
 
     private final long timestamp;
 
@@ -33,19 +35,8 @@ public class TimeMarker extends ConversationItem {
     }
 
     @Override
-    protected String generateSubtext() {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date(timestamp));
-
-        String day = calendar.getDisplayName(Calendar.DAY_OF_MONTH, Calendar.SHORT, Locale.US);
-        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.US);
-
-        return day + " " + month;
-    }
-
-    @Override
-    protected String generateSubtext(Context context) {
-        return DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_DATE);
+    protected String generateSubtext(@Nullable Context context) {
+        return DATE_FORMAT.format(new Date(timestamp));
     }
 
 }

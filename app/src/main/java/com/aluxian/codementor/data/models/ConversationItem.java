@@ -11,8 +11,7 @@ import com.google.common.primitives.Longs;
 
 public abstract class ConversationItem implements Comparable<ConversationItem>, ContentComparable<ConversationItem> {
 
-    private String richSubtext;
-    private String simpleSubtext;
+    private String cachedSubtext;
 
     /**
      * @return The unique ID of this item.
@@ -41,26 +40,14 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
      * @return An optional, additional text.
      */
     public String getSubtext(@Nullable Context context) {
-        if (context != null) {
-            if (richSubtext == null) {
-                richSubtext = generateSubtext(context);
-            }
-
-            return richSubtext;
-        } else {
-            if (simpleSubtext == null) {
-                simpleSubtext = generateSubtext();
-            }
-
-            return simpleSubtext;
+        if (cachedSubtext == null) {
+            cachedSubtext = generateSubtext(context);
         }
+
+        return cachedSubtext;
     }
 
-    protected String generateSubtext() {
-        return null;
-    }
-
-    protected String generateSubtext(Context context) {
+    protected String generateSubtext(@Nullable Context context) {
         return null;
     }
 
@@ -74,7 +61,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     /**
      * @return Whether this item has been read by its receiver.
      */
-    public boolean showSeen() {
+    public boolean isRead() {
         return false;
     }
 
@@ -101,7 +88,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     public boolean contentEquals(ConversationItem another) {
         return Objects.equal(getSubtext(null), another.getSubtext(null))
                 && Objects.equal(getText(), another.getText())
-                && Objects.equal(showSeen(), another.showSeen());
+                && Objects.equal(isRead(), another.isRead());
     }
 
     @Override
@@ -110,12 +97,12 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         if (!(o instanceof ConversationItem)) return false;
         ConversationItem that = (ConversationItem) o;
         return Objects.equal(getId(), that.getId()) &&
-                Objects.equal(showSeen(), that.showSeen());
+                Objects.equal(isRead(), that.isRead());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId(), showSeen());
+        return Objects.hashCode(getId(), isRead());
     }
 
     @Override

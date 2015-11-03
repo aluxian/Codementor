@@ -6,12 +6,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.aluxian.codementor.R;
+import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ConversationItem;
 import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.TimeMarker;
 import com.aluxian.codementor.presentation.holders.ConversationItemViewHolder;
 import com.aluxian.codementor.presentation.holders.MessageViewHolder;
 import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
+import com.aluxian.codementor.services.CoreServices;
+import com.aluxian.codementor.services.ErrorHandler;
+import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.utils.Helpers;
 
 import java.util.ArrayList;
@@ -19,10 +23,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
+import static com.aluxian.codementor.utils.Constants.UI;
+
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemViewHolder> {
 
     private TreeSet<Message> messages = new TreeSet<>();
     private List<ConversationItem> items = new ArrayList<>();
+
+    private Chatroom chatroom;
+    private CodementorTasks codementorTasks;
+    private ErrorHandler errorHandler;
+
+    public ConversationAdapter(Chatroom chatroom, CoreServices coreServices) {
+        this.chatroom = chatroom;
+        this.codementorTasks = coreServices.getCodementorTasks();
+        this.errorHandler = coreServices.getErrorHandler();
+    }
 
     @Override
     public ConversationItemViewHolder onCreateViewHolder(ViewGroup parent, int layoutId) {
@@ -37,7 +53,14 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
 
     @Override
     public void onBindViewHolder(ConversationItemViewHolder holder, int position) {
-        holder.bindItem(items.get(position), position == 0);
+        ConversationItem item = items.get(position);
+        boolean isNewest = position == 0;
+
+        if (isNewest && !item.sentByMe() && !item.isRead()) {
+            codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
+        }
+
+        holder.bindItem(item, isNewest);
     }
 
     @Override

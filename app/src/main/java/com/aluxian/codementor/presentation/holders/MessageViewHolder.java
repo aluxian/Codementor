@@ -37,7 +37,7 @@ public class MessageViewHolder extends ConversationItemViewHolder {
         }
 
         if (checkMark1 != null && checkMark2 != null) {
-            if (item.showSeen()) {
+            if (item.isRead()) {
                 checkMark1.setVisibility(View.VISIBLE);
                 checkMark2.setImageResource(R.drawable.msg_halfcheck);
             } else {

@@ -1,6 +1,7 @@
 package com.aluxian.codementor.data.models;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
@@ -75,33 +76,27 @@ public class Message extends ConversationItem implements Serializable {
     }
 
     @Override
-    protected String generateSubtext() {
+    protected String generateSubtext(@Nullable Context context) {
         String subtext = "";
         long size = getSize();
 
-        // Time
-        subtext += getTimestamp();
+        if (context != null) {
+            // Time
+            String time = DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_TIME);
+            subtext += time;
 
-        // Size
-        if (size > 0) {
-            subtext += size;
-        }
+            // Size
+            if (size > 0) {
+                subtext += " " + Formatter.formatShortFileSize(context, size);
+            }
+        } else {
+            // Time
+            subtext += getTimestamp();
 
-        return subtext;
-    }
-
-    @Override
-    protected String generateSubtext(Context context) {
-        String subtext = "";
-        long size = getSize();
-
-        // Time
-        String time = DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_TIME);
-        subtext += time;
-
-        // Size
-        if (size > 0) {
-            subtext += " " + Formatter.formatShortFileSize(context, size);
+            // Size
+            if (size > 0) {
+                subtext += size;
+            }
         }
 
         return subtext;
@@ -113,8 +108,8 @@ public class Message extends ConversationItem implements Serializable {
     }
 
     @Override
-    public boolean showSeen() {
-        return sentByMe() && !TextUtils.isEmpty(messageData.getReadAt());
+    public boolean isRead() {
+        return !TextUtils.isEmpty(messageData.getReadAt());
 
     }
 

@@ -78,10 +78,10 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        conversationAdapter = new ConversationAdapter();
+        chatroom = (Chatroom) getArguments().getSerializable(ARG_CHATROOM_JSON);
+        conversationAdapter = new ConversationAdapter(chatroom, getCoreServices());
         conversationAdapter.setHasStableIds(true);
 
-        chatroom = (Chatroom) getArguments().getSerializable(ARG_CHATROOM_JSON);
         setPresenter(new ConversationPresenter(this, conversationAdapter, chatroom, getCoreServices()));
     }
 

@@ -118,7 +118,7 @@ public class CodementorTasks {
             List<String> headers = response.headers("Location");
 
             if (response.code() != 302) {
-                throw new Exception("Request unsuccessful, returned code " + response.code());
+                throw new Exception("Couldn't sign in, server returned code " + response.code());
             }
 
             if (headers.size() < 1) {
@@ -163,7 +163,7 @@ public class CodementorTasks {
             response.body().close();
 
             if (!response.isSuccessful()) {
-                throw new Exception("Request unsuccessful, returned code " + response.code());
+                throw new Exception("Couldn't mark message as read, code " + response.code());
             }
 
             return null;
