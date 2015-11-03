@@ -1,5 +1,8 @@
 package com.aluxian.codementor.presentation.holders;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
+import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -28,12 +31,16 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.tv_title) TextView titleTextView;
     @Bind(R.id.view_presence) View presenceView;
 
+    private Context context;
     private Chatroom currentChatroom;
-    private PresenceEventListener presenceListener;
     private CoreServices coreServices;
+    private PresenceEventListener presenceListener;
+    private ValueAnimator presenceAnimator;
+    private int presenceColour;
 
     public ChatroomItemViewHolder(View itemView, CoreServices coreServices) {
         super(itemView);
+        this.context = itemView.getContext();
         this.coreServices = coreServices;
         ButterKnife.bind(this, itemView);
     }
@@ -46,15 +53,19 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         setText(chatroom);
         setAvatar(chatroom);
         setPresenceListener(chatroom);
-
-        currentChatroom = chatroom;
     }
 
     public void recycle() {
         currentChatroom = null;
+
         if (presenceListener != null) {
             presenceListener.stop();
             presenceListener = null;
+        }
+
+        if (presenceAnimator != null) {
+            presenceAnimator.cancel();
+            presenceAnimator = null;
         }
     }
 
@@ -75,24 +86,47 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
             return;
         }
 
-        if (presenceListener != null) {
-            presenceListener.stop();
+        recycle();
+        currentChatroom = chatroom;
+
+        presenceColour = PresenceType.OFFLINE.getColor(context);
+        presenceView.setBackgroundColor(presenceColour);
+
+        presenceListener = new PresenceEventListener(chatroom, this::onPresenceType, coreServices);
+        presenceListener.start();
+    }
+
+    private void onPresenceType(PresenceType presenceType) {
+        if (currentChatroom != null) {
+            currentChatroom.getOtherUser().setPresenceType(presenceType);
         }
 
-        presenceView.setBackgroundResource(PresenceType.OFFLINE.backgroundResId);
-        presenceListener = new PresenceEventListener(presenceView, chatroom, coreServices);
-        presenceListener.start();
+        if (presenceAnimator != null) {
+            presenceAnimator.cancel();
+        }
+
+        Integer colorFrom = presenceColour;
+        Integer colorTo = presenceType.getColor(context);
+
+        presenceAnimator = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+        presenceAnimator.addUpdateListener(this::onPresenceColor);
+        presenceAnimator.setDuration(250);
+        presenceAnimator.start();
+    }
+
+    private void onPresenceColor(ValueAnimator animator) {
+        presenceView.setBackgroundColor((Integer) animator.getAnimatedValue());
     }
 
     private static class PresenceEventListener extends QueryEventListener implements ValueEventListener {
 
-        private View presenceView;
         private Chatroom chatroom;
+        private PresenceListener callback;
 
-        private PresenceEventListener(View presenceView, Chatroom chatroom, CoreServices coreServices) {
+        private PresenceEventListener(Chatroom chatroom, PresenceListener callback, CoreServices coreServices) {
             super(coreServices);
-            this.presenceView = presenceView;
             this.chatroom = chatroom;
+            this.callback = callback;
         }
 
         @Override
@@ -112,9 +146,13 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
 
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
-            PresenceType presenceType = PresenceType.parse(dataSnapshot.getValue(String.class));
-            presenceView.setBackgroundResource(presenceType.backgroundResId);
-            chatroom.getOtherUser().setPresenceType(presenceType);
+            callback.update(PresenceType.parse(dataSnapshot.getValue(String.class)));
+        }
+
+        public interface PresenceListener {
+
+            void update(PresenceType presenceType);
+
         }
 
     }

@@ -7,7 +7,6 @@ import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
-import com.aluxian.codementor.tasks.CodementorTasks;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
@@ -20,14 +19,12 @@ import static com.aluxian.codementor.utils.Constants.UI;
 
 public abstract class MessagesEventListener extends QueryEventListener implements ValueEventListener {
 
-    protected CodementorTasks codementorTasks;
     protected LocalBroadcastManager localBroadcastManager;
     protected ErrorHandler errorHandler;
     protected UserManager userManager;
 
     public MessagesEventListener(CoreServices coreServices) {
         super(coreServices);
-        codementorTasks = coreServices.getCodementorTasks();
         localBroadcastManager = coreServices.getLocalBroadcastManager();
         errorHandler = coreServices.getErrorHandler();
         userManager = coreServices.getUserManager();

@@ -15,7 +15,6 @@ import java.util.TreeSet;
 
 import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.BATCH_SIZE_INITIAL;
 import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.CREATED_AT;
-import static com.aluxian.codementor.utils.Constants.UI;
 
 public class NewMessagesEventListener extends MessagesEventListener {
 
@@ -48,7 +47,6 @@ public class NewMessagesEventListener extends MessagesEventListener {
             }
 
             conversationAdapter.addNewMessages(messages);
-            codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
         }
 
         if (messages.size() < BATCH_SIZE_INITIAL) {
