@@ -34,7 +34,7 @@
             <ImageView
                 android:id="@+id/img_check_1"
                 android:layout_width="wrap_content"
-                android:layout_height="10dp"
+                android:layout_height="12sp"
                 android:layout_below="@id/tv_message"
                 android:layout_marginTop="4dp"
                 android:layout_toEndOf="@id/tv_subtext"
@@ -46,7 +46,7 @@
             <ImageView
                 android:id="@+id/img_check_2"
                 android:layout_width="wrap_content"
-                android:layout_height="10dp"
+                android:layout_height="12sp"
                 android:layout_alignBottom="@id/img_check_1"
                 android:layout_marginLeft="-8dp"
                 android:layout_marginStart="-8dp"
