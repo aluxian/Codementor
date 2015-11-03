@@ -1,4 +1,4 @@
-package com.aluxian.codementor.utils;
+package com.aluxian.codementor.presentation.listeners;
 
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
@@ -7,13 +7,12 @@ import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 
 import bolts.Task;
 
 import static com.aluxian.codementor.utils.Constants.UI;
 
-public abstract class QueryEventListener implements ValueEventListener {
+public abstract class QueryEventListener {
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
@@ -38,7 +37,6 @@ public abstract class QueryEventListener implements ValueEventListener {
         unset();
     }
 
-    @Override
     public void onCancelled(FirebaseError firebaseError) {
         if (firebaseError.getCode() != FirebaseError.PERMISSION_DENIED) {
             onError(firebaseError);
@@ -81,9 +79,7 @@ public abstract class QueryEventListener implements ValueEventListener {
 
     protected abstract void set(Query query);
 
-    protected void unset(Query query) {
-        query.removeEventListener(this);
-    }
+    protected abstract void unset(Query query);
 
     private void set() {
         if (query == null) {

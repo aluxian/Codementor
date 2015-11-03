@@ -10,12 +10,13 @@ import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.User;
 import com.aluxian.codementor.data.types.PresenceType;
+import com.aluxian.codementor.presentation.listeners.QueryEventListener;
 import com.aluxian.codementor.services.CoreServices;
-import com.aluxian.codementor.utils.QueryEventListener;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,7 +29,7 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     @Bind(R.id.view_presence) View presenceView;
 
     private Chatroom currentChatroom;
-    private PresenceListener presenceListener;
+    private PresenceEventListener presenceListener;
     private CoreServices coreServices;
 
     public ChatroomItemViewHolder(View itemView, CoreServices coreServices) {
@@ -79,16 +80,16 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         }
 
         presenceView.setBackgroundResource(PresenceType.OFFLINE.backgroundResId);
-        presenceListener = new PresenceListener(presenceView, chatroom, coreServices);
+        presenceListener = new PresenceEventListener(presenceView, chatroom, coreServices);
         presenceListener.start();
     }
 
-    private static class PresenceListener extends QueryEventListener {
+    private static class PresenceEventListener extends QueryEventListener implements ValueEventListener {
 
         private View presenceView;
         private Chatroom chatroom;
 
-        private PresenceListener(View presenceView, Chatroom chatroom, CoreServices coreServices) {
+        private PresenceEventListener(View presenceView, Chatroom chatroom, CoreServices coreServices) {
             super(coreServices);
             this.presenceView = presenceView;
             this.chatroom = chatroom;
@@ -102,6 +103,11 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         @Override
         protected void set(Query query) {
             query.addValueEventListener(this);
+        }
+
+        @Override
+        protected void unset(Query query) {
+            query.removeEventListener(this);
         }
 
         @Override

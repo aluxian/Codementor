@@ -70,12 +70,12 @@ public class ErrorHandler {
     /**
      * A simple task continuation which logs the error and shows a toast.
      */
-    public Void logAndToastTask(Task task) {
+    public <T> T logAndToastTask(Task<T> task) {
         if (task.isFaulted()) {
             logAndToast(task.getError());
         }
 
-        return null;
+        return task.getResult();
     }
 
     /**

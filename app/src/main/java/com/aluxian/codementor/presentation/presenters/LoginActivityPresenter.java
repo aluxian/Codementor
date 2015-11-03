@@ -70,7 +70,7 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
 
     }
 
-    private Void onErrorHandler(Task task) {
+    private <T> T onErrorHandler(Task<T> task) {
         if (task.isFaulted()) {
             dialogCancelled();
         }
