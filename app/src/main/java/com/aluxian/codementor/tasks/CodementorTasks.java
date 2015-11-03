@@ -99,6 +99,9 @@ public class CodementorTasks {
      */
     public Task<Void> signIn(String username, String password, String authCode) {
         return Task.callInBackground(() -> {
+            boolean initialFollowRedirects = okHttpClient.getFollowRedirects();
+            okHttpClient.setFollowRedirects(false);
+
             RequestBody requestBody = new FormEncodingBuilder()
                     .add("utf8", "✓")
                     .add("authenticity_token", authCode)
@@ -130,6 +133,7 @@ public class CodementorTasks {
                 throw new Exception("Wrong credentials");
             }
 
+            okHttpClient.setFollowRedirects(initialFollowRedirects);
             return null;
         });
     }

@@ -51,7 +51,6 @@ public class CoreServices {
         firebaseRef = new Firebase(Constants.FIREBASE_URL);
         okHttpClient = new OkHttpClient();
         okHttpClient.setCookieHandler(new CookieManager(cookieStore, CookiePolicy.ACCEPT_ALL));
-        okHttpClient.setFollowRedirects(false);
 
         // Tasks
         codementorTasks = new CodementorTasks(okHttpClient, userManager);
