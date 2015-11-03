@@ -25,6 +25,8 @@ public class Message extends ConversationItem implements Serializable {
     private long id;
     private MessageType type;
     private String displayText;
+    private String simpleSubtext;
+    private String richSubtext;
     private long createdAt;
 
     public Message(MessageData messageData, String loggedInUsername) {
@@ -76,30 +78,38 @@ public class Message extends ConversationItem implements Serializable {
     }
 
     @Override
-    protected String generateSubtext(@Nullable Context context) {
-        String subtext = "";
-        long size = getSize();
-
+    public String getSubtext(@Nullable Context context) {
         if (context != null) {
-            // Time
-            String time = DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_TIME);
-            subtext += time;
+            if (richSubtext == null) {
+                long size = getSize();
+                richSubtext = "";
 
-            // Size
-            if (size > 0) {
-                subtext += " " + Formatter.formatShortFileSize(context, size);
+                // Time
+                richSubtext += DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_TIME);
+
+                // Size
+                if (size > 0) {
+                    richSubtext += " " + Formatter.formatShortFileSize(context, size);
+                }
             }
+
+            return richSubtext;
         } else {
-            // Time
-            subtext += getTimestamp();
+            if (simpleSubtext == null) {
+                long size = getSize();
+                simpleSubtext = "";
 
-            // Size
-            if (size > 0) {
-                subtext += size;
+                // Time
+                simpleSubtext += getTimestamp();
+
+                // Size
+                if (size > 0) {
+                    simpleSubtext += size;
+                }
             }
-        }
 
-        return subtext;
+            return simpleSubtext;
+        }
     }
 
     @Override

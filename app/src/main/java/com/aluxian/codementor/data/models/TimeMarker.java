@@ -11,9 +11,10 @@ import java.util.Locale;
 
 public class TimeMarker extends ConversationItem {
 
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMM", Locale.US);
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("d MMMM", Locale.US);
 
     private final long timestamp;
+    private String subtext;
 
     public TimeMarker(long timestamp) {
         this.timestamp = timestamp;
@@ -35,8 +36,12 @@ public class TimeMarker extends ConversationItem {
     }
 
     @Override
-    protected String generateSubtext(@Nullable Context context) {
-        return DATE_FORMAT.format(new Date(timestamp));
+    public String getSubtext(@Nullable Context context) {
+        if (subtext == null) {
+            subtext = DATE_FORMAT.format(new Date(timestamp));
+        }
+
+        return subtext;
     }
 
 }
