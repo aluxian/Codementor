@@ -15,8 +15,10 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:paddingBottom="12dp"
-        android:paddingLeft="16dp"
+        android:paddingEnd="16dp"
+        android:paddingLeft="12dp"
         android:paddingRight="16dp"
+        android:paddingStart="12dp"
         android:paddingTop="12dp">
 
         <FrameLayout
