@@ -53,11 +53,20 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         setText(chatroom);
         setAvatar(chatroom);
         setPresenceListener(chatroom);
+
+        itemView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {}
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                itemView.removeOnAttachStateChangeListener(this);
+                recycle();
+            }
+        });
     }
 
     public void recycle() {
-        currentChatroom = null;
-
         if (presenceListener != null) {
             presenceListener.stop();
             presenceListener = null;
@@ -67,6 +76,8 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
             presenceAnimator.cancel();
             presenceAnimator = null;
         }
+
+        currentChatroom = null;
     }
 
     private void setText(Chatroom chatroom) {
@@ -121,9 +132,9 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
     private static class PresenceEventListener extends QueryEventListener implements ValueEventListener {
 
         private Chatroom chatroom;
-        private PresenceListener callback;
+        private PresenceCallback callback;
 
-        private PresenceEventListener(Chatroom chatroom, PresenceListener callback, CoreServices coreServices) {
+        private PresenceEventListener(Chatroom chatroom, PresenceCallback callback, CoreServices coreServices) {
             super(coreServices);
             this.chatroom = chatroom;
             this.callback = callback;
@@ -149,7 +160,7 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
             callback.update(PresenceType.parse(dataSnapshot.getValue(String.class)));
         }
 
-        public interface PresenceListener {
+        public interface PresenceCallback {
 
             void update(PresenceType presenceType);
 

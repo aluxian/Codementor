@@ -30,11 +30,11 @@ public abstract class QueryEventListener {
     }
 
     public void start() {
-        set();
+        set(getQuery());
     }
 
     public void stop() {
-        unset();
+        unset(getQuery());
     }
 
     public void onCancelled(FirebaseError firebaseError) {
@@ -62,8 +62,8 @@ public abstract class QueryEventListener {
     }
 
     private Void onReAuthSuccessful(Task task) {
-        unset();
-        set();
+        unset(getQuery());
+        set(getQuery());
         return null;
     }
 
@@ -81,20 +81,12 @@ public abstract class QueryEventListener {
 
     protected abstract void unset(Query query);
 
-    private void set() {
+    private Query getQuery() {
         if (query == null) {
             query = createQuery(firebaseRef);
         }
 
-        set(query);
-    }
-
-    private void unset() {
-        if (query == null) {
-            query = createQuery(firebaseRef);
-        }
-
-        unset(query);
+        return query;
     }
 
 }
