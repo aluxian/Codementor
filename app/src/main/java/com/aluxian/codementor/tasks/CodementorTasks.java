@@ -12,6 +12,7 @@ import com.aluxian.codementor.utils.CamelCaseNamingStrategy;
 import com.aluxian.codementor.utils.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
@@ -19,6 +20,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,50 +48,74 @@ public class CodementorTasks {
      * @return An auth code extracted from Codementor's sign in page.
      */
     public Task<String> extractAuthCode() {
-        return Task.callInBackground(() -> {
-            String code = null;
+        Task<String>.TaskCompletionSource taskSource = Task.<String>create();
 
-            Request request = new Request.Builder().url(Constants.CODEMENTOR_SIGN_IN_URL).build();
-            Response response = okHttpClient.newCall(request).execute();
+        Request request = new Request.Builder()
+                .url(Constants.CODEMENTOR_SIGN_IN_URL)
+                .build();
 
-            String responseBody = response.body().string();
-            Matcher matcher = AUTH_CODE_PATTERN.matcher(responseBody);
-
-            if (matcher.find()) {
-                code = matcher.group(1);
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
             }
 
-            if (TextUtils.isEmpty(code)) {
-                throw new Exception("Couldn't retrieve auth code");
-            }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String body = response.body().string();
+                String code = null;
 
-            return code;
+                Matcher matcher = AUTH_CODE_PATTERN.matcher(body);
+                if (matcher.find()) {
+                    code = matcher.group(1);
+                }
+
+                if (TextUtils.isEmpty(code)) {
+                    throw new IOException("Couldn't retrieve auth code");
+                }
+
+                taskSource.setResult(code);
+            }
         });
+
+        return taskSource.getTask();
     }
 
     /**
      * @return A Firebase token extracted from Codementor's website.
      */
     public Task<String> extractToken() {
-        return Task.callInBackground(() -> {
-            String token = null;
+        Task<String>.TaskCompletionSource taskSource = Task.<String>create();
 
-            Request request = new Request.Builder().url(Constants.CODEMENTOR_FIREBASE_TOKEN_URL).build();
-            Response response = okHttpClient.newCall(request).execute();
+        Request request = new Request.Builder()
+                .url(Constants.CODEMENTOR_FIREBASE_TOKEN_URL)
+                .build();
 
-            String responseBody = response.body().string();
-            Matcher matcher = FIREBASE_TOKEN_PATTERN.matcher(responseBody);
-
-            if (matcher.find()) {
-                token = matcher.group(1);
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
             }
 
-            if (TextUtils.isEmpty(token)) {
-                throw new Exception("Couldn't retrieve Firebase token");
-            }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String body = response.body().string();
+                String token = null;
 
-            return token;
+                Matcher matcher = FIREBASE_TOKEN_PATTERN.matcher(body);
+                if (matcher.find()) {
+                    token = matcher.group(1);
+                }
+
+                if (TextUtils.isEmpty(token)) {
+                    throw new IOException("Couldn't retrieve Firebase token");
+                }
+
+                taskSource.setResult(token);
+            }
         });
+
+        return taskSource.getTask();
     }
 
     /**
@@ -98,80 +124,113 @@ public class CodementorTasks {
      * @param authCode Authenticity code required for the sign in process.
      */
     public Task<Void> signIn(String username, String password, String authCode) {
-        return Task.callInBackground(() -> {
-            boolean initialFollowRedirects = okHttpClient.getFollowRedirects();
-            okHttpClient.setFollowRedirects(false);
+        Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
 
-            RequestBody requestBody = new FormEncodingBuilder()
-                    .add("utf8", "✓")
-                    .add("authenticity_token", authCode)
-                    .add("login", username)
-                    .add("password", password)
-                    .add("remember_me", "on")
-                    .build();
+        boolean initialFollowRedirects = okHttpClient.getFollowRedirects();
+        okHttpClient.setFollowRedirects(false);
 
-            Request request = new Request.Builder()
-                    .post(requestBody)
-                    .url(Constants.CODEMENTOR_SIGN_IN_URL)
-                    .build();
+        RequestBody requestBody = new FormEncodingBuilder()
+                .add("utf8", "✓")
+                .add("authenticity_token", authCode)
+                .add("login", username)
+                .add("password", password)
+                .add("remember_me", "on")
+                .build();
 
-            Response response = okHttpClient.newCall(request).execute();
-            response.body().close();
+        Request request = new Request.Builder()
+                .post(requestBody)
+                .url(Constants.CODEMENTOR_SIGN_IN_URL)
+                .build();
 
-            List<String> headers = response.headers("Location");
-
-            if (response.code() != 302) {
-                throw new Exception("Couldn't sign in, server returned code " + response.code());
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
             }
 
-            if (headers.size() < 1) {
-                throw new Exception("Location header not found");
-            }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                response.body().close();
 
-            // Redirected to the same page
-            if (headers.get(0).equals(Constants.CODEMENTOR_SIGN_IN_URL)) {
-                throw new Exception("Wrong credentials");
-            }
+                if (response.code() != 302) {
+                    throw new IOException("Couldn't sign in, server returned code " + response.code());
+                }
 
-            okHttpClient.setFollowRedirects(initialFollowRedirects);
-            return null;
+                List<String> headers = response.headers("Location");
+                if (headers.size() < 1) {
+                    throw new IOException("Location header not found");
+                }
+
+                // Redirected to the same page
+                if (headers.get(0).equals(Constants.CODEMENTOR_SIGN_IN_URL)) {
+                    throw new IOException("Wrong credentials");
+                }
+
+                taskSource.setResult(null);
+            }
         });
+
+        okHttpClient.setFollowRedirects(initialFollowRedirects);
+        return taskSource.getTask();
     }
 
     /**
      * @return A {@link ChatroomsList}.
      */
     public Task<ChatroomsList> getChatroomsList() {
-        return Task.callInBackground(() -> {
-            Request request = new Request.Builder().url(Constants.chatroomsListUrl()).build();
-            Response response = okHttpClient.newCall(request).execute();
+        Task<ChatroomsList>.TaskCompletionSource taskSource = Task.<ChatroomsList>create();
 
-            String responseBody = response.body().string();
-            ChatroomsListData data = new Gson().fromJson(responseBody, ChatroomsListData.class);
+        Request request = new Request.Builder()
+                .url(Constants.chatroomsListUrl())
+                .build();
 
-            return new ChatroomsList(data, userManager.getUsername());
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
+            }
+
+            @Override
+            public void onResponse(Response response) throws IOException {
+                String body = response.body().string();
+                ChatroomsListData data = new Gson().fromJson(body, ChatroomsListData.class);
+                taskSource.setResult(new ChatroomsList(data, userManager.getUsername()));
+            }
         });
+
+        return taskSource.getTask();
     }
 
     /**
      * @param chatroom The chatroom to be marked as read.
      */
     public Task<Void> markConversationRead(Chatroom chatroom) {
-        return Task.callInBackground(() -> {
-            Request request = new Request.Builder()
-                    .post(RequestBody.create(TEXT_PLAIN_MEDIA_TYPE, ""))
-                    .url(chatroom.getOtherUser().getReadPath())
-                    .build();
+        Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
 
-            Response response = okHttpClient.newCall(request).execute();
-            response.body().close();
+        Request request = new Request.Builder()
+                .post(RequestBody.create(TEXT_PLAIN_MEDIA_TYPE, ""))
+                .url(chatroom.getOtherUser().getReadPath())
+                .build();
 
-            if (!response.isSuccessful()) {
-                throw new Exception("Couldn't mark message as read, code " + response.code());
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
             }
 
-            return null;
+            @Override
+            public void onResponse(Response response) throws IOException {
+                response.body().close();
+
+                if (!response.isSuccessful()) {
+                    throw new IOException("Couldn't mark message as read, code " + response.code());
+                }
+
+                taskSource.setResult(null);
+            }
         });
+
+        return taskSource.getTask();
     }
 
     /**
@@ -179,27 +238,38 @@ public class CodementorTasks {
      * @param firebaseKey     The Firebase key of the message.
      */
     public Task<Void> sendMessage(FirebaseMessage firebaseMessage, String firebaseKey) {
-        return Task.callInBackground(() -> {
-            Gson gson = new GsonBuilder()
-                    .setFieldNamingStrategy(new CamelCaseNamingStrategy())
-                    .disableHtmlEscaping()
-                    .create();
+        Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
 
-            String requestBody = gson.toJson(new FirebaseServerMessage(firebaseKey, firebaseMessage));
-            Request request = new Request.Builder()
-                    .post(RequestBody.create(JSON_MEDIA_TYPE, requestBody))
-                    .url(firebaseMessage.getReceiver().getChatroomPath())
-                    .build();
+        Gson gson = new GsonBuilder()
+                .setFieldNamingStrategy(new CamelCaseNamingStrategy())
+                .disableHtmlEscaping()
+                .create();
 
-            Response response = okHttpClient.newCall(request).execute();
-            response.body().close();
+        String requestBody = gson.toJson(new FirebaseServerMessage(firebaseKey, firebaseMessage));
+        Request request = new Request.Builder()
+                .post(RequestBody.create(JSON_MEDIA_TYPE, requestBody))
+                .url(firebaseMessage.getReceiver().getChatroomPath())
+                .build();
 
-            if (!response.isSuccessful()) {
-                throw new Exception("Send message to Codementor server failed with code " + response.code());
+        okHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                taskSource.setError(e);
             }
 
-            return null;
+            @Override
+            public void onResponse(Response response) throws IOException {
+                response.body().close();
+
+                if (!response.isSuccessful()) {
+                    throw new IOException("Send message to Codementor server failed with code " + response.code());
+                }
+
+                taskSource.setResult(null);
+            }
         });
+
+        return taskSource.getTask();
     }
 
 }

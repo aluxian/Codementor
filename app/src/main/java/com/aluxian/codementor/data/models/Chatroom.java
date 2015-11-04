@@ -4,6 +4,7 @@ import com.aluxian.codementor.data.types.MessageType;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.ContentComparable;
 import com.aluxian.codementor.utils.Helpers;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
@@ -185,6 +186,15 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
     public boolean contentEquals(Chatroom another) {
         return Objects.equal(getContentDescription(), another.getContentDescription())
                 && getOtherUser().contentEquals(another.getOtherUser());
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", getId())
+                .add("chatroomId", getChatroomId())
+                .add("content", getContentDescription())
+                .toString();
     }
 
 }
