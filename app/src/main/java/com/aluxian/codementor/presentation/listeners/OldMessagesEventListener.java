@@ -11,7 +11,6 @@ import com.firebase.client.Query;
 import java.util.TreeSet;
 
 import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.BATCH_SIZE;
-import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.CREATED_AT;
 
 public class OldMessagesEventListener extends MessagesEventListener {
 
@@ -29,8 +28,7 @@ public class OldMessagesEventListener extends MessagesEventListener {
 
     @Override
     protected Query createQuery(Firebase firebase) {
-        return firebase.child(chatroom.getFirebasePath())
-                .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE)
+        return firebase.child(chatroom.getFirebasePath()).limitToLast(BATCH_SIZE)
                 .endAt(conversationAdapter.getOldestMessage().getTimestamp() - 1);
     }
 

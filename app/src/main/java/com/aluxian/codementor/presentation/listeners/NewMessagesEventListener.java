@@ -14,7 +14,6 @@ import com.firebase.client.Query;
 import java.util.TreeSet;
 
 import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.BATCH_SIZE_INITIAL;
-import static com.aluxian.codementor.presentation.presenters.ConversationPresenter.CREATED_AT;
 
 public class NewMessagesEventListener extends MessagesEventListener {
 
@@ -32,8 +31,7 @@ public class NewMessagesEventListener extends MessagesEventListener {
 
     @Override
     protected Query createQuery(Firebase firebase) {
-        return firebase.child(chatroom.getFirebasePath())
-                .orderByChild(CREATED_AT).limitToLast(BATCH_SIZE_INITIAL);
+        return firebase.child(chatroom.getFirebasePath()).limitToLast(BATCH_SIZE_INITIAL);
     }
 
     @Override
