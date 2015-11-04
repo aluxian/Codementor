@@ -76,6 +76,7 @@ public class ChatroomsFragment extends BaseFragment<ChatroomsPresenter>
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        recyclerView.setAdapter(null);
         ButterKnife.unbind(this);
     }
 

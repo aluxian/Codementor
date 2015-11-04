@@ -118,6 +118,7 @@ public class ConversationFragment extends BaseFragment<ConversationPresenter> im
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        recyclerView.setAdapter(null);
         ButterKnife.unbind(this);
     }
 
