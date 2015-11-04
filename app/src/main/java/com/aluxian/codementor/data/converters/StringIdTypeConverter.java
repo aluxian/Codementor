@@ -1,29 +1,19 @@
 package com.aluxian.codementor.data.converters;
 
-import com.bluelinelabs.logansquare.typeconverters.TypeConverter;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.util.StdConverter;
+import com.bluelinelabs.logansquare.typeconverters.StringBasedTypeConverter;
 
-import java.io.IOException;
 import java.util.UUID;
 
-public class StringIdTypeConverter extends StdConverter<String, Long> implements TypeConverter<Long> {
+public class StringIdTypeConverter extends StringBasedTypeConverter<Long> {
 
     @Override
-    public Long convert(String value) {
+    public Long getFromString(String value) {
         return UUID.fromString(value).getMostSignificantBits();
     }
 
     @Override
-    public Long parse(JsonParser jsonParser) throws IOException {
-        return convert(jsonParser.getValueAsString(null));
-    }
-
-    @Override
-    public void serialize(Long object, String fieldName,
-                          boolean writeFieldNameForObject, JsonGenerator jsonGenerator) throws IOException {
-        jsonGenerator.writeStringField(fieldName, Long.toString(object));
+    public String convertToString(Long value) {
+        return Long.toString(value);
     }
 
 }

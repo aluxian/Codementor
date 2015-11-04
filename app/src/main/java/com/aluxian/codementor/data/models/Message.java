@@ -3,9 +3,10 @@ package com.aluxian.codementor.data.models;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 
-import com.aluxian.codementor.data.converters.MessageTypeConverter;
-import com.aluxian.codementor.data.converters.StringIdTypeConverter;
-import com.aluxian.codementor.data.converters.TimestampConverter;
+import com.aluxian.codementor.data.converters.TimestampCounterConverter;
+import com.aluxian.codementor.data.deserializers.MessageTypeDeserializer;
+import com.aluxian.codementor.data.deserializers.StringIdDeserializer;
+import com.aluxian.codementor.data.deserializers.TimestampDeserializer;
 import com.aluxian.codementor.data.types.MessageType;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,9 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static com.aluxian.codementor.services.UserManager.LOGGED_IN_USERNAME;
 import static com.aluxian.codementor.utils.Helpers.escapeHtml;
@@ -25,14 +24,14 @@ import static com.aluxian.codementor.utils.Helpers.italic;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
+@JsonDeserialize(converter = TimestampCounterConverter.class)
 public class Message extends ConversationItem implements Serializable {
 
-    private static final Map<Long, Long> TIMESTAMPS_MAP = new HashMap<>();
     private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm", Locale.ENGLISH);
 
-    @JsonDeserialize(converter = StringIdTypeConverter.class) Long id;
-    @JsonDeserialize(converter = MessageTypeConverter.class) MessageType type;
-    @JsonDeserialize(converter = TimestampConverter.class) @JsonProperty("created_at") Long createdAt;
+    @JsonDeserialize(using = StringIdDeserializer.class) Long id;
+    @JsonDeserialize(using = MessageTypeDeserializer.class) MessageType type;
+    @JsonDeserialize(using = TimestampDeserializer.class) @JsonProperty("created_at") Long createdAt;
     @JsonProperty("read_at") String readAt;
 
     String content;
@@ -44,14 +43,6 @@ public class Message extends ConversationItem implements Serializable {
     private String text;
     private String subtext;
     private String contentDescription;
-
-    public Message() {
-        if (TIMESTAMPS_MAP.containsKey(id)) {
-            createdAt = TIMESTAMPS_MAP.get(id);
-        } else {
-            TIMESTAMPS_MAP.put(id, createdAt);
-        }
-    }
 
     @Override
     public long getId() {
@@ -106,6 +97,14 @@ public class Message extends ConversationItem implements Serializable {
     @Override
     public boolean sentByMe() {
         return sender.equals(getCurrentUser());
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public String getContentDescription() {

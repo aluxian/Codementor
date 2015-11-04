@@ -20,7 +20,7 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
 
     @JsonField(name = "chatroom_id") String chatroomId;
     @JsonField(name = "chatroom_firebase_id") String chatroomFirebaseId;
-    @JsonField(name = "id", typeConverter = StringIdTypeConverter.class) long id;
+    @JsonField(typeConverter = StringIdTypeConverter.class) long id;
     @JsonField(typeConverter = MessageTypeConverter.class) MessageType type;
 
     @JsonField String content;
