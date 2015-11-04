@@ -46,14 +46,10 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
     }
 
     @Override
-    public void viewReady() {
-        onRefresh();
-    }
-
-    @Override
     public void start() {
         super.start();
         localBroadcastManager.registerReceiver(newMessageReceiver, new IntentFilter(ACTION_NEW_MESSAGE));
+        onRefresh();
     }
 
     @Override
