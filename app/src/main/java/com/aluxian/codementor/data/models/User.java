@@ -46,12 +46,12 @@ public class User implements Serializable, ContentComparable<User> {
         return firstName != null ? firstName : name;
     }
 
-    public String getChatroomPath() {
+    public String getChatroomUrl() {
         return String.format("%s/chatrooms/%s", Constants.SERVER_API_URL, username);
     }
 
-    public String getReadPath() {
-        return String.format("chatrooms/%s/read", username);
+    public String getReadUrl() {
+        return String.format("%s/chatrooms/%s/read", Constants.SERVER_API_URL, username);
     }
 
     public String getPresencePath() {

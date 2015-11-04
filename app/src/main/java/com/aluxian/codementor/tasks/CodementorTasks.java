@@ -228,7 +228,7 @@ public class CodementorTasks {
 
         Request request = new Request.Builder()
                 .post(RequestBody.create(TEXT_PLAIN_MEDIA_TYPE, ""))
-                .url(chatroom.getOtherUser().getReadPath())
+                .url(chatroom.getOtherUser().getReadUrl())
                 .build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
@@ -271,7 +271,7 @@ public class CodementorTasks {
 
         Request request = new Request.Builder()
                 .post(RequestBody.create(JSON_MEDIA_TYPE, requestBody))
-                .url(firebaseMessage.getReceiver().getChatroomPath())
+                .url(firebaseMessage.getReceiver().getChatroomUrl())
                 .build();
 
         okHttpClient.newCall(request).enqueue(new Callback() {
