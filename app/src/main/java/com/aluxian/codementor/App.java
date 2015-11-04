@@ -8,18 +8,20 @@ import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Firebase;
 import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import io.fabric.sdk.android.Fabric;
 
 public class App extends Application {
 
     private CoreServices coreServices;
+    private RefWatcher refWatcher;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        getRefWatcher();
 
-        LeakCanary.install(this);
         Fresco.initialize(this);
         Firebase.setAndroidContext(this);
         Fabric.with(this, new Crashlytics());
@@ -36,6 +38,14 @@ public class App extends Application {
         }
 
         return coreServices;
+    }
+
+    public RefWatcher getRefWatcher() {
+        if (refWatcher == null) {
+            refWatcher = LeakCanary.install(this);
+        }
+
+        return refWatcher;
     }
 
 }

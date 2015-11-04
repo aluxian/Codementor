@@ -74,7 +74,7 @@ public abstract class BaseActivity<P extends Presenter> extends AppCompatActivit
     }
 
     /**
-     * @return A {@link CoreServices} instance from this fragments {@link App}.
+     * @return A {@link CoreServices} instance from this activity's {@link App}.
      */
     protected CoreServices getCoreServices() {
         return ((App) getApplication()).getCoreServices();

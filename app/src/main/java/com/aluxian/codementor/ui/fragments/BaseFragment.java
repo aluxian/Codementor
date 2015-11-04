@@ -8,6 +8,7 @@ import android.view.View;
 import com.aluxian.codementor.App;
 import com.aluxian.codementor.presentation.presenters.Presenter;
 import com.aluxian.codementor.services.CoreServices;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Base class for every fragment in this application.
@@ -70,6 +71,8 @@ public abstract class BaseFragment<P extends Presenter> extends Fragment {
         if (presenter != null) {
             presenter.destroy();
         }
+
+        getRefWatcher().watch(this);
     }
 
     /**
@@ -90,10 +93,17 @@ public abstract class BaseFragment<P extends Presenter> extends Fragment {
     }
 
     /**
-     * @return A {@link CoreServices} instance from this fragments {@link App}.
+     * @return A {@link CoreServices} instance from this fragment's {@link App}.
      */
     protected CoreServices getCoreServices() {
         return ((App) getActivity().getApplication()).getCoreServices();
+    }
+
+    /**
+     * @return A {@link com.squareup.leakcanary.RefWatcher} instance from this fragment's {@link App}.
+     */
+    protected RefWatcher getRefWatcher() {
+        return ((App) getActivity().getApplication()).getRefWatcher();
     }
 
 }
