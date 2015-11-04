@@ -59,6 +59,7 @@ public class CodementorTasks {
             public void onResponse(Response response) throws IOException {
                 String body = response.body().string();
                 String code = null;
+                response.body().close();
 
                 if (!response.isSuccessful()) {
                     taskSource.setError(new Exception("Couldn't retrieve auth code"));
@@ -102,6 +103,7 @@ public class CodementorTasks {
             public void onResponse(Response response) throws IOException {
                 String body = response.body().string();
                 String token = null;
+                response.body().close();
 
                 if (!response.isSuccessful()) {
                     taskSource.setError(new Exception("Couldn't retrieve Firebase token"));
