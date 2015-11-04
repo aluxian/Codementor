@@ -7,6 +7,7 @@ import com.aluxian.codementor.services.CoreServices;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.firebase.client.Firebase;
+import com.squareup.leakcanary.LeakCanary;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -18,6 +19,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
+        LeakCanary.install(this);
         Fresco.initialize(this);
         Firebase.setAndroidContext(this);
         Fabric.with(this, new Crashlytics());
