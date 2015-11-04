@@ -19,7 +19,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -129,7 +128,7 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         presenceView.setBackgroundColor((Integer) animator.getAnimatedValue());
     }
 
-    private static class PresenceEventListener extends QueryEventListener implements ValueEventListener {
+    private static class PresenceEventListener extends QueryEventListener {
 
         private Chatroom chatroom;
         private PresenceCallback callback;

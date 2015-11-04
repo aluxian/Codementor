@@ -10,9 +10,8 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 
-public class PresenceEventListener extends QueryEventListener implements ValueEventListener {
+public class PresenceEventListener extends QueryEventListener {
 
     private ConversationView conversationView;
     private Chatroom chatroom;

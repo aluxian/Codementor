@@ -35,6 +35,16 @@ public class OldMessagesEventListener extends MessagesEventListener {
     }
 
     @Override
+    protected void set(Query query) {
+        query.addListenerForSingleValueEvent(this);
+    }
+
+    @Override
+    protected void unset(Query query) {
+        query.removeEventListener(this);
+    }
+
+    @Override
     protected void onMessages(TreeSet<Message> messages) {
         conversationAdapter.addOldMessages(messages);
         conversationView.setRefreshing(false);

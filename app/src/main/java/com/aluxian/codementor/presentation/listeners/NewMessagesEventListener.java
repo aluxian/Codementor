@@ -37,6 +37,16 @@ public class NewMessagesEventListener extends MessagesEventListener {
     }
 
     @Override
+    protected void set(Query query) {
+        query.addValueEventListener(this);
+    }
+
+    @Override
+    protected void unset(Query query) {
+        query.removeEventListener(this);
+    }
+
+    @Override
     protected void onMessages(TreeSet<Message> messages) {
         if (messages.size() > 0) {
             if (conversationAdapter.getItemCount() > 0) {

@@ -6,8 +6,6 @@ import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 
 import java.util.TreeSet;
 
@@ -15,7 +13,7 @@ import bolts.Task;
 
 import static com.aluxian.codementor.utils.Constants.UI;
 
-public abstract class MessagesEventListener extends QueryEventListener implements ValueEventListener {
+public abstract class MessagesEventListener extends QueryEventListener {
 
     protected LocalBroadcastManager localBroadcastManager;
     protected ErrorHandler errorHandler;
@@ -24,16 +22,6 @@ public abstract class MessagesEventListener extends QueryEventListener implement
         super(coreServices);
         localBroadcastManager = coreServices.getLocalBroadcastManager();
         errorHandler = coreServices.getErrorHandler();
-    }
-
-    @Override
-    protected void set(Query query) {
-        query.addValueEventListener(this);
-    }
-
-    @Override
-    protected void unset(Query query) {
-        query.removeEventListener(this);
     }
 
     @Override

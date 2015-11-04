@@ -7,12 +7,13 @@ import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import bolts.Task;
 
 import static com.aluxian.codementor.utils.Constants.UI;
 
-public abstract class QueryEventListener {
+public abstract class QueryEventListener implements ValueEventListener {
 
     private CodementorTasks codementorTasks;
     private FirebaseTasks firebaseTasks;
@@ -37,6 +38,7 @@ public abstract class QueryEventListener {
         unset(getQuery());
     }
 
+    @Override
     public void onCancelled(FirebaseError firebaseError) {
         if (firebaseError.getCode() != FirebaseError.PERMISSION_DENIED) {
             onError(firebaseError);
