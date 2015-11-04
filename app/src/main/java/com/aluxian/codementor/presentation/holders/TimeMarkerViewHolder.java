@@ -20,7 +20,7 @@ public class TimeMarkerViewHolder extends ConversationItemViewHolder {
 
     @Override
     public void onBind(ConversationItem item, boolean newest) {
-        timestampTextView.setText(item.getSubtext(itemView.getContext()));
+        timestampTextView.setText(item.getSubtext());
     }
 
 }

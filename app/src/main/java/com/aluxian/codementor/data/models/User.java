@@ -3,26 +3,31 @@ package com.aluxian.codementor.data.models;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.ContentComparable;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonObject
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class User implements Serializable, ContentComparable<User> {
 
-    private @JsonIgnore PresenceType presenceType;
-    private String first_name;
-    private String avatar_url;
-    private String username;
-    private String name;
+    private PresenceType presenceType = PresenceType.OFFLINE;
+    @JsonField(name = "first_name") @JsonProperty("first_name") String firstName;
+    @JsonField(name = "avatar_url") @JsonProperty("avatar_url") String avatarUrl;
+    @JsonField String username;
+    @JsonField String name;
 
-    public User() {
-        presenceType = PresenceType.OFFLINE;
+    public User() {}
+
+    public User(String username) {
+        this.username = username;
     }
 
     public String getUsername() {
@@ -34,23 +39,23 @@ public class User implements Serializable, ContentComparable<User> {
     }
 
     public String getAvatarUrl() {
-        return avatar_url;
+        return avatarUrl;
     }
 
     public String getShortestName() {
-        return first_name != null ? first_name : name;
+        return firstName != null ? firstName : name;
     }
 
     public String getChatroomPath() {
-        return Constants.chatroomUrl(getUsername());
+        return String.format("%s/chatrooms/%s", Constants.SERVER_API_URL, username);
     }
 
     public String getReadPath() {
-        return Constants.chatroomReadUrl(getUsername());
+        return String.format("chatrooms/%s/read", username);
     }
 
     public String getPresencePath() {
-        return Constants.presencePath(getUsername());
+        return String.format("presence/%s/magic", username);
     }
 
     public PresenceType getPresenceType() {

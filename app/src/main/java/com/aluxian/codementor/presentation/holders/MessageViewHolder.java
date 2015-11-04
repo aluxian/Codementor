@@ -46,7 +46,7 @@ public class MessageViewHolder extends ConversationItemViewHolder {
             }
         }
 
-        subtextView.setText(item.getSubtext(itemView.getContext()));
+        subtextView.setText(item.getSubtext());
         itemView.requestLayout();
     }
 

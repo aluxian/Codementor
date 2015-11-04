@@ -1,5 +1,6 @@
 package com.aluxian.codementor.presentation.presenters;
 
+import com.aluxian.codementor.data.models.User;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.presentation.views.MainActivityView;
 import com.aluxian.codementor.services.CoreServices;
@@ -13,41 +14,36 @@ import static com.aluxian.codementor.utils.Constants.UI;
 
 public class MainActivityPresenter extends Presenter<MainActivityView> {
 
-    private UserManager userManager;
     private FirebaseTasks firebaseTasks;
-    private ErrorHandler errorHandler;
 
     public MainActivityPresenter(MainActivityView baseView, CoreServices coreServices) {
         super(baseView);
-
-        userManager = coreServices.getUserManager();
         firebaseTasks = coreServices.getFirebaseTasks();
-        errorHandler = coreServices.getErrorHandler();
     }
 
     @Override
     public void start() {
         super.start();
-        setStatus(PresenceType.ONLINE, PresenceType.OFFLINE, PresenceType.AWAY);
+        setPresence(PresenceType.ONLINE, PresenceType.OFFLINE, PresenceType.AWAY);
     }
 
     @Override
     public void stop() {
         super.stop();
-        setStatus(PresenceType.OFFLINE, PresenceType.ONLINE);
+        setPresence(PresenceType.OFFLINE, PresenceType.ONLINE);
     }
 
-    private void setStatus(PresenceType newPresenceType, PresenceType... requiredPresenceType) {
-        String username = userManager.getUsername();
-        firebaseTasks.getPresence(username)
+    private void setPresence(PresenceType newPresenceType, PresenceType... requiredPresenceType) {
+        User user = new User(UserManager.LOGGED_IN_USERNAME);
+        firebaseTasks.getPresence(user)
                 .onSuccessTask(task -> {
                     if (Arrays.asList(requiredPresenceType).contains(task.getResult())) {
-                        return firebaseTasks.setPresence(username, newPresenceType);
+                        return firebaseTasks.setPresence(user, newPresenceType);
                     }
 
                     return null;
                 }, UI)
-                .continueWith(errorHandler::logAndToastTask, UI);
+                .continueWith(ErrorHandler::logErrorTask, UI);
 
     }
 

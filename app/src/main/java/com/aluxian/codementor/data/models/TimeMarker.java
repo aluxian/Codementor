@@ -1,8 +1,5 @@
 package com.aluxian.codementor.data.models;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
-
 import com.aluxian.codementor.R;
 
 import java.text.SimpleDateFormat;
@@ -36,7 +33,7 @@ public class TimeMarker extends ConversationItem {
     }
 
     @Override
-    public String getSubtext(@Nullable Context context) {
+    public String getSubtext() {
         if (subtext == null) {
             subtext = DATE_FORMAT.format(new Date(timestamp));
         }

@@ -86,7 +86,7 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
     private <T extends AuthData, C> Continuation<T, C> loggedIn(String username) {
         return task -> {
             if (!task.isCancelled()) {
-                userManager.setLoggedIn(username, task.getResult().getToken());
+                userManager.setLoggedIn(username);
                 getView().navigateToMainActivity();
             }
 

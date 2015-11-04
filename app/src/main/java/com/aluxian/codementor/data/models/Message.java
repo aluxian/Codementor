@@ -1,186 +1,133 @@
 package com.aluxian.codementor.data.models;
 
-import android.content.Context;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.text.format.Formatter;
 
-import com.aluxian.codementor.R;
+import com.aluxian.codementor.data.converters.MessageTypeConverter;
+import com.aluxian.codementor.data.converters.StringIdTypeConverter;
+import com.aluxian.codementor.data.converters.TimestampConverter;
 import com.aluxian.codementor.data.types.MessageType;
-import com.aluxian.codementor.utils.Constants;
-import com.aluxian.codementor.utils.Helpers;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import static com.aluxian.codementor.services.UserManager.LOGGED_IN_USERNAME;
+import static com.aluxian.codementor.utils.Helpers.escapeHtml;
+import static com.aluxian.codementor.utils.Helpers.italic;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Message extends ConversationItem implements Serializable {
 
     private static final Map<Long, Long> TIMESTAMPS_MAP = new HashMap<>();
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm", Locale.ENGLISH);
 
-    private MessageData messageData;
-    private String loggedInUsername;
+    @JsonDeserialize(converter = StringIdTypeConverter.class) Long id;
+    @JsonDeserialize(converter = MessageTypeConverter.class) MessageType type;
+    @JsonDeserialize(converter = TimestampConverter.class) @JsonProperty("created_at") Long createdAt;
+    @JsonProperty("read_at") String readAt;
 
-    private long id;
-    private MessageType type;
-    private String displayText;
-    private String simpleSubtext;
-    private String richSubtext;
-    private long createdAt;
+    String content;
+    Request request;
 
-    public Message(MessageData messageData, String loggedInUsername) {
-        this.messageData = messageData;
-        this.loggedInUsername = loggedInUsername;
+    User sender;
+    User receiver;
+
+    private String text;
+    private String subtext;
+    private String contentDescription;
+
+    public Message() {
+        if (TIMESTAMPS_MAP.containsKey(id)) {
+            createdAt = TIMESTAMPS_MAP.get(id);
+        } else {
+            TIMESTAMPS_MAP.put(id, createdAt);
+        }
     }
 
     @Override
     public long getId() {
-        if (id == 0) {
-            id = Helpers.parseStringId(messageData.getId());
-        }
-
         return id;
     }
 
     @Override
     public int getLayoutId() {
         if (sentByMe()) {
-            return getType().rightLayoutId;
+            return type.rightLayoutId;
         } else {
-            return getType().leftLayoutId;
+            return type.leftLayoutId;
         }
     }
 
     @Override
     public long getTimestamp() {
-        if (createdAt == 0) {
-            Long timestamp = TIMESTAMPS_MAP.get(getId());
-
-            if (timestamp != null) {
-                createdAt = timestamp;
-            } else {
-                createdAt = Helpers.parseDate(messageData.getCreatedAt());
-                TIMESTAMPS_MAP.put(getId(), createdAt);
-            }
-        }
-
         return createdAt;
     }
 
     @Override
     public String getText() {
-        if (displayText == null) {
-            displayText = generateDisplayText();
+        if (text == null) {
+            text = generateText();
         }
 
-        return displayText;
+        return text;
     }
 
     @Override
-    public String getSubtext(@Nullable Context context) {
-        if (context != null) {
-            if (richSubtext == null) {
-                long size = getSize();
-                richSubtext = "";
-
-                // Time
-                richSubtext += DateUtils.formatDateTime(context, getTimestamp(), DateUtils.FORMAT_SHOW_TIME);
-
-                // Size
-                if (size > 0) {
-                    richSubtext += " " + Formatter.formatShortFileSize(context, size);
-                }
+    public String getSubtext() {
+        if (subtext == null) {
+            subtext = TIME_FORMAT.format(new Date(createdAt));
+            if (request != null) {
+                subtext += " " + Formatter.formatShortFileSize(null, request.getSize());
             }
-
-            return richSubtext;
-        } else {
-            if (simpleSubtext == null) {
-                long size = getSize();
-                simpleSubtext = "";
-
-                // Time
-                simpleSubtext += getTimestamp();
-
-                // Size
-                if (size > 0) {
-                    simpleSubtext += size;
-                }
-            }
-
-            return simpleSubtext;
         }
+
+        return subtext;
     }
 
     @Override
     public boolean isHtmlText() {
-        return getType().leftLayoutId == R.layout.item_msg_html_left;
+        return type.isHtml();
     }
 
     @Override
     public boolean isRead() {
-        return !TextUtils.isEmpty(messageData.getReadAt());
-
+        return !TextUtils.isEmpty(readAt);
     }
 
     @Override
     public boolean sentByMe() {
-        return messageData.getSender().equals(getCurrentUser());
+        return sender.equals(getCurrentUser());
     }
 
-    @Override
-    public long getSize() {
-        Request request = getRequest();
-
-        if (request != null) {
-            return request.getSize();
+    public String getContentDescription() {
+        if (contentDescription == null) {
+            contentDescription = generateContentDescription();
         }
 
-        return 0;
-    }
-
-    public MessageType getType() {
-        if (type == null) {
-            type = MessageType.parse(messageData.getType());
-        }
-
-        return type;
-    }
-
-    public String getRawContent() {
-        return messageData.getContent();
-    }
-
-    public Request getRequest() {
-        return messageData.getRequest();
+        return contentDescription;
     }
 
     public User getCurrentUser() {
-        User sender = messageData.getSender();
-        User receiver = messageData.getReceiver();
-
-        if (sender.getUsername().equals(loggedInUsername)) {
-            return sender;
-        } else {
-            return receiver;
-        }
+        return sender.getUsername().equals(LOGGED_IN_USERNAME) ? sender : receiver;
     }
 
     public User getOtherUser() {
-        User sender = messageData.getSender();
-        User receiver = messageData.getReceiver();
-
-        if (!sender.getUsername().equals(loggedInUsername)) {
-            return sender;
-        } else {
-            return receiver;
-        }
+        return sender.getUsername().equals(LOGGED_IN_USERNAME) ? receiver : sender;
     }
 
-    private String generateDisplayText() {
-        switch (getType()) {
+    private String generateText() {
+        switch (type) {
             case MESSAGE:
-                return getRawContent();
+                return content;
 
             case CONNECT:
                 if (sentByMe()) {
@@ -190,22 +137,21 @@ public class Message extends ConversationItem implements Serializable {
                 return getOtherUser().getShortestName() + " requested to start a session.";
 
             case FILE:
-                String fileUrl = Helpers.escapeHtml(getRequest().getUrl());
-                String fileText = Helpers.escapeHtml(getRequest().getFilename());
+                String fileUrl = escapeHtml(request.getUrl());
+                String fileText = escapeHtml(request.getFilename());
                 return "<a href=\"" + fileUrl + "\">" + fileText + "</a>";
 
             case REQUEST:
-                String attachedMessage = getOtherUser().getShortestName() + " attached a request: ";
+                String attached = getOtherUser().getShortestName() + " attached a request: ";
 
                 if (sentByMe()) {
-                    attachedMessage = "You attached a request: ";
+                    attached = "You attached a request: ";
                 }
 
-                String reqUrl = Helpers.escapeHtml(Constants.requestUrl(getRequest().getId()));
-                String reqText = Helpers.escapeHtml(getRequest().getTitle());
-                String attachedText = Helpers.escapeHtml(attachedMessage);
+                String reqUrl = escapeHtml(request.getQuestionPageUrl());
+                String reqText = escapeHtml(request.getTitle());
 
-                return "<i><b>" + attachedText + "</b></i><a href=\"" + reqUrl + "\">" + reqText + "</a>";
+                return italic("<b>" + attached + "</b><a href=\"" + reqUrl + "\">" + reqText + "</a>");
 
             case SIGNATURE:
                 if (sentByMe()) {
@@ -216,6 +162,44 @@ public class Message extends ConversationItem implements Serializable {
 
             default:
                 return "Message type not yet supported by this app.";
+        }
+    }
+
+    private String generateContentDescription() {
+        switch (type) {
+            case MESSAGE:
+                if (sentByMe()) {
+                    return italic("You: ") + content;
+                }
+
+                return content;
+
+            case CONNECT:
+                if (sentByMe()) {
+                    return italic("You requested a session.");
+                }
+
+                return italic(getOtherUser().getShortestName() + " requested a session.");
+
+            case FILE:
+                return italic(escapeHtml(request.getFilename()));
+
+            case REQUEST:
+                if (sentByMe()) {
+                    return italic("You attached a request.");
+                }
+
+                return italic(getOtherUser().getShortestName() + " attached a request.");
+
+            case SIGNATURE:
+                if (sentByMe()) {
+                    return italic("You initiated a NDA request.");
+                }
+
+                return italic(getOtherUser().getShortestName() + " initiated a NDA request.");
+
+            default:
+                return italic("Unsupported message type.");
         }
     }
 

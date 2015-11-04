@@ -1,16 +1,9 @@
 package com.aluxian.codementor.utils;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
 
 public class Helpers {
-
-    public static final SimpleDateFormat CODEMENTOR_DATE_FORMAT =
-            new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 
     public static boolean isSameDay(long timestamp1, long timestamp2) {
         Calendar cal1 = Calendar.getInstance();
@@ -23,24 +16,6 @@ public class Helpers {
         boolean sameDay = cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
 
         return sameYear && sameDay;
-    }
-
-    public static long parseDate(Object createdAt) {
-        String stringCreatedAt = String.valueOf(createdAt);
-
-        try {
-            return Double.valueOf(stringCreatedAt).longValue();
-        } catch (NumberFormatException e1) {
-            try {
-                return CODEMENTOR_DATE_FORMAT.parse(stringCreatedAt).getTime();
-            } catch (ParseException e2) {
-                return 0;
-            }
-        }
-    }
-
-    public static long parseStringId(String uid) {
-        return UUID.fromString(uid).getMostSignificantBits();
     }
 
     public static String italic(String text) {

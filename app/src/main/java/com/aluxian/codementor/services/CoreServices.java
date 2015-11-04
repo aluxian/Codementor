@@ -53,7 +53,7 @@ public class CoreServices {
         okHttpClient.setCookieHandler(new CookieManager(cookieStore, CookiePolicy.ACCEPT_ALL));
 
         // Tasks
-        codementorTasks = new CodementorTasks(okHttpClient, userManager);
+        codementorTasks = new CodementorTasks(okHttpClient);
         firebaseTasks = new FirebaseTasks(firebaseRef, codementorTasks, userManager);
     }
 

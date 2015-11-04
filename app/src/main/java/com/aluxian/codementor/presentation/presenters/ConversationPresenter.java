@@ -86,7 +86,8 @@ public class ConversationPresenter extends Presenter<ConversationView> {
                 chatroom.getChatroomId(),
                 MessageType.MESSAGE,
                 messageBody,
-                null, chatroom.getCurrentUser(),
+                null,
+                chatroom.getCurrentUser(),
                 chatroom.getOtherUser()
         );
 

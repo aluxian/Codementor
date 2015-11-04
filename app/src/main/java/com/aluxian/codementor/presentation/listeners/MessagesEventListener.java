@@ -3,10 +3,8 @@ package com.aluxian.codementor.presentation.listeners;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.aluxian.codementor.data.models.Message;
-import com.aluxian.codementor.data.models.MessageData;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
-import com.aluxian.codementor.services.UserManager;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
@@ -21,13 +19,11 @@ public abstract class MessagesEventListener extends QueryEventListener implement
 
     protected LocalBroadcastManager localBroadcastManager;
     protected ErrorHandler errorHandler;
-    protected UserManager userManager;
 
     public MessagesEventListener(CoreServices coreServices) {
         super(coreServices);
         localBroadcastManager = coreServices.getLocalBroadcastManager();
         errorHandler = coreServices.getErrorHandler();
-        userManager = coreServices.getUserManager();
     }
 
     @Override
@@ -45,7 +41,6 @@ public abstract class MessagesEventListener extends QueryEventListener implement
         Task.callInBackground(() -> parse(dataSnapshot))
                 .onSuccess(task -> {
                     onMessages(task.getResult());
-
                     return null;
                 }, UI)
                 .continueWith(errorHandler::logAndToastTask, UI);
@@ -53,10 +48,8 @@ public abstract class MessagesEventListener extends QueryEventListener implement
 
     private TreeSet<Message> parse(DataSnapshot dataSnapshot) {
         TreeSet<Message> messages = new TreeSet<>();
-
         for (DataSnapshot child : dataSnapshot.getChildren()) {
-            MessageData messageData = child.getValue(MessageData.class);
-            messages.add(new Message(messageData, userManager.getUsername()));
+            messages.add(child.getValue(Message.class));
         }
 
         return messages;

@@ -1,49 +1,67 @@
 package com.aluxian.codementor.data.models;
 
+import com.aluxian.codementor.data.converters.MessageTypeConverter;
+import com.aluxian.codementor.data.converters.StringIdTypeConverter;
 import com.aluxian.codementor.data.types.MessageType;
-import com.aluxian.codementor.utils.Constants;
 import com.aluxian.codementor.utils.ContentComparable;
 import com.aluxian.codementor.utils.Helpers;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
+import static com.aluxian.codementor.services.UserManager.LOGGED_IN_USERNAME;
 import static com.aluxian.codementor.utils.Helpers.italic;
 
+@JsonObject
 public class Chatroom implements Serializable, ContentComparable<Chatroom> {
 
-    private ChatroomData chatroomData;
-    private String loggedInUsername;
+    @JsonField(name = "chatroom_id") String chatroomId;
+    @JsonField(name = "chatroom_firebase_id") String chatroomFirebaseId;
+    @JsonField(name = "id", typeConverter = StringIdTypeConverter.class) long id;
+    @JsonField(typeConverter = MessageTypeConverter.class) MessageType type;
 
-    private long id;
-    private MessageType lastMessageType;
+    @JsonField String content;
+    @JsonField Request request;
+
+    @JsonField User sender;
+    @JsonField User receiver;
+
     private String contentDescription;
 
-    public Chatroom(ChatroomData chatroomData, String loggedInUsername) {
-        this.chatroomData = chatroomData;
-        this.loggedInUsername = loggedInUsername;
-    }
+    public Chatroom() {}
 
     public Chatroom(Chatroom chatroom) {
-        this.chatroomData = chatroom.chatroomData;
-        this.loggedInUsername = chatroom.loggedInUsername;
+        this.chatroomId = chatroom.chatroomId;
+        this.chatroomFirebaseId = chatroom.chatroomFirebaseId;
+        this.id = chatroom.id;
+        this.type = chatroom.type;
+        this.content = chatroom.content;
+        this.request = chatroom.request;
+        this.sender = chatroom.sender;
+        this.receiver = chatroom.receiver;
     }
 
     public long getId() {
-        if (id == 0) {
-            id = Helpers.parseStringId(chatroomData.getId());
-        }
-
         return id;
     }
 
     public String getChatroomId() {
-        return chatroomData.getChatroomId();
+        return chatroomId;
     }
 
     public String getFirebasePath() {
-        return Constants.chatroomPath(chatroomData.getChatroomFirebaseId(), chatroomData.getChatroomId());
+        return String.format("chatrooms/%s/%s", chatroomFirebaseId, chatroomId);
+    }
+
+    public User getCurrentUser() {
+        return sender.getUsername().equals(LOGGED_IN_USERNAME) ? sender : receiver;
+    }
+
+    public User getOtherUser() {
+        return sender.getUsername().equals(LOGGED_IN_USERNAME) ? receiver : sender;
     }
 
     public String getContentDescription() {
@@ -54,114 +72,43 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
         return contentDescription;
     }
 
-    public User getCurrentUser() {
-        User sender = chatroomData.getSender();
-        User receiver = chatroomData.getReceiver();
-
-        if (sender.getUsername().equals(loggedInUsername)) {
-            return sender;
-        } else {
-            return receiver;
-        }
-    }
-
-    public User getOtherUser() {
-        User sender = chatroomData.getSender();
-        User receiver = chatroomData.getReceiver();
-
-        if (!sender.getUsername().equals(loggedInUsername)) {
-            return sender;
-        } else {
-            return receiver;
-        }
-    }
-
-    public void updateContentDescription(Message message) {
-        contentDescription = generateContentDescription(message);
-    }
-
-    private boolean sentByMe() {
-        return chatroomData.getSender().equals(getCurrentUser());
-    }
-
-    private MessageType getLastMessageType() {
-        if (lastMessageType == null) {
-            lastMessageType = MessageType.parse(chatroomData.getType());
-        }
-
-        return lastMessageType;
+    public void setContentDescription(String contentDescription) {
+        this.contentDescription = contentDescription;
     }
 
     private String generateContentDescription() {
-        switch (getLastMessageType()) {
+        boolean sentByMe = sender.equals(getCurrentUser());
+        switch (type) {
             case MESSAGE:
-                if (sentByMe()) {
-                    return italic("You: ") + chatroomData.getContent();
+                if (sentByMe) {
+                    return italic("You: ") + content;
                 }
 
-                return chatroomData.getContent();
+                return content;
 
             case CONNECT:
-                if (sentByMe()) {
+                if (sentByMe) {
                     return italic("You requested a session.");
                 }
 
                 return italic(getOtherUser().getShortestName() + " requested a session.");
 
             case FILE:
-                return italic(Helpers.escapeHtml(chatroomData.getRequest().getFilename()));
+                return italic(Helpers.escapeHtml(request.getFilename()));
 
             case REQUEST:
-                if (sentByMe()) {
+                if (sentByMe) {
                     return italic("You attached a request.");
                 }
 
                 return italic(getOtherUser().getShortestName() + " attached a request.");
 
             case SIGNATURE:
-                if (sentByMe()) {
-                    return italic("You initiated a NDA request.");
+                if (sentByMe) {
+                    return italic("You initiated an NDA request.");
                 }
 
-                return italic(getOtherUser().getShortestName() + " initiated a NDA request.");
-
-            default:
-                return italic("Unsupported message type.");
-        }
-    }
-
-    private String generateContentDescription(Message message) {
-        switch (message.getType()) {
-            case MESSAGE:
-                if (message.sentByMe()) {
-                    return italic("You: ") + message.getRawContent();
-                }
-
-                return message.getRawContent();
-
-            case CONNECT:
-                if (message.sentByMe()) {
-                    return italic("You requested a session.");
-                }
-
-                return italic(message.getOtherUser().getShortestName() + " requested a session.");
-
-            case FILE:
-                return italic(Helpers.escapeHtml(message.getRequest().getFilename()));
-
-            case REQUEST:
-                if (message.sentByMe()) {
-                    return italic("You attached a request.");
-                }
-
-                return italic(message.getOtherUser().getShortestName() + " attached a request.");
-
-            case SIGNATURE:
-                if (message.sentByMe()) {
-                    return italic("You initiated a NDA request.");
-                }
-
-                return italic(message.getOtherUser().getShortestName() + " initiated a NDA request.");
+                return italic(getOtherUser().getShortestName() + " initiated an NDA request.");
 
             default:
                 return italic("Unsupported message type.");
@@ -173,13 +120,12 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
         if (this == o) return true;
         if (!(o instanceof Chatroom)) return false;
         Chatroom chatroom = (Chatroom) o;
-        return Objects.equal(chatroomData, chatroom.chatroomData) &&
-                Objects.equal(loggedInUsername, chatroom.loggedInUsername);
+        return Objects.equal(id, chatroom.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(chatroomData, loggedInUsername);
+        return Objects.hashCode(id);
     }
 
     @Override
@@ -191,8 +137,8 @@ public class Chatroom implements Serializable, ContentComparable<Chatroom> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("id", getId())
-                .add("chatroomId", getChatroomId())
+                .add("id", id)
+                .add("chatroomId", chatroomId)
                 .add("content", getContentDescription())
                 .toString();
     }

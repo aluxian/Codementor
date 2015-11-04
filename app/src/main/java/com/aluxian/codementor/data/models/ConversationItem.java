@@ -1,8 +1,6 @@
 package com.aluxian.codementor.data.models;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.aluxian.codementor.utils.ContentComparable;
 import com.google.common.base.MoreObjects;
@@ -34,10 +32,9 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
     }
 
     /**
-     * @param context The context to be used for formatting.
      * @return An optional, additional text.
      */
-    public String getSubtext(@Nullable Context context) {
+    public String getSubtext() {
         return null;
     }
 
@@ -62,13 +59,6 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         return false;
     }
 
-    /**
-     * @return The getSize of the file if this item represents one, 0 otherwise.
-     */
-    public long getSize() {
-        return 0;
-    }
-
     @Override
     public int compareTo(@NonNull ConversationItem another) {
         return Longs.compare(getTimestamp(), another.getTimestamp());
@@ -76,7 +66,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
 
     @Override
     public boolean contentEquals(ConversationItem another) {
-        return Objects.equal(getSubtext(null), another.getSubtext(null))
+        return Objects.equal(getSubtext(), another.getSubtext())
                 && Objects.equal(getText(), another.getText())
                 && Objects.equal(isRead(), another.isRead());
     }
@@ -86,8 +76,8 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         if (this == o) return true;
         if (!(o instanceof ConversationItem)) return false;
         ConversationItem that = (ConversationItem) o;
-        return Objects.equal(getId(), that.getId()) &&
-                Objects.equal(isRead(), that.isRead());
+        return Objects.equal(getId(), that.getId())
+                && Objects.equal(isRead(), that.isRead());
     }
 
     @Override
@@ -100,7 +90,7 @@ public abstract class ConversationItem implements Comparable<ConversationItem>, 
         return MoreObjects.toStringHelper(this)
                 .add("id", getId())
                 .add("text", getText())
-                .add("subtext", getSubtext(null))
+                .add("subtext", getSubtext())
                 .add("timestamp", getTimestamp())
                 .toString();
     }

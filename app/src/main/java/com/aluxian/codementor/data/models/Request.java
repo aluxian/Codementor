@@ -1,22 +1,26 @@
 package com.aluxian.codementor.data.models;
 
+import com.aluxian.codementor.utils.Constants;
+import com.bluelinelabs.logansquare.annotation.JsonField;
+import com.bluelinelabs.logansquare.annotation.JsonObject;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
-@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@JsonObject
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 public class Request implements Serializable {
 
-    private String filename;
-    private String url;
-    private long size;
+    @JsonField String filename;
+    @JsonField String url;
+    @JsonField long size;
 
-    private String type;
-    private String title;
-    private String id;
+    @JsonField String type;
+    @JsonField String title;
+    @JsonField String id;
 
     public Request() {}
 
@@ -42,6 +46,10 @@ public class Request implements Serializable {
 
     public String getId() {
         return id;
+    }
+
+    public String getQuestionPageUrl() {
+        return String.format("%s/%s", Constants.CODEMENTOR_QUESTIONS_URL, id);
     }
 
     @Override

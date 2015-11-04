@@ -95,7 +95,7 @@ public class ChatroomsPresenter extends Presenter<ChatroomsView> implements OnRe
             Message message = (Message) intent.getSerializableExtra(EXTRA_MESSAGE);
 
             if (chatroomsAdapter.isNewestChatroom(chatroom)) {
-                chatroom.updateContentDescription(message);
+                chatroom.setContentDescription(message.getContentDescription());
                 chatroomsAdapter.replaceFirstChatroom(chatroom);
                 getView().scrollToTop();
             } else {

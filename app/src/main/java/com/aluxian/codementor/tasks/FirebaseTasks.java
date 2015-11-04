@@ -2,9 +2,9 @@ package com.aluxian.codementor.tasks;
 
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
+import com.aluxian.codementor.data.models.User;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.services.UserManager;
-import com.aluxian.codementor.utils.Constants;
 import com.firebase.client.AuthData;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -41,7 +41,7 @@ public class FirebaseTasks {
             @Override
             public void onAuthenticated(AuthData authData) {
                 if (reAuth) {
-                    userManager.setLoggedIn(userManager.getUsername(), authData.getToken());
+                    userManager.setLoggedIn(UserManager.LOGGED_IN_USERNAME);
                 }
 
                 taskSource.setResult(authData);
@@ -80,17 +80,17 @@ public class FirebaseTasks {
     }
 
     /**
-     * @param username The username of the user whose status to retrieve.
+     * @param user The user whose presence to retrieve.
      * @return The status of the given user.
      */
-    public Task<PresenceType> getPresence(String username) {
-        return wrapTaskReAuth(() -> getPresenceImpl(username));
+    public Task<PresenceType> getPresence(User user) {
+        return wrapTaskReAuth(() -> getPresenceImpl(user));
     }
 
-    private Task<PresenceType> getPresenceImpl(String username) {
+    private Task<PresenceType> getPresenceImpl(User user) {
         Task<PresenceType>.TaskCompletionSource taskSource = Task.<PresenceType>create();
 
-        Firebase presenceRef = firebaseRef.child(Constants.presencePath(username));
+        Firebase presenceRef = firebaseRef.child(user.getPresencePath());
         presenceRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -108,17 +108,17 @@ public class FirebaseTasks {
     }
 
     /**
-     * @param username        The username of the user whose status to set.
+     * @param user            The user whose presence to set.
      * @param newPresenceType The new status.
      */
-    public Task<Void> setPresence(String username, PresenceType newPresenceType) {
-        return wrapTaskReAuth(() -> setPresenceImpl(username, newPresenceType));
+    public Task<Void> setPresence(User user, PresenceType newPresenceType) {
+        return wrapTaskReAuth(() -> setPresenceImpl(user, newPresenceType));
     }
 
-    private Task<Void> setPresenceImpl(String username, PresenceType newPresenceType) {
+    private Task<Void> setPresenceImpl(User user, PresenceType newPresenceType) {
         Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
 
-        Firebase presenceRef = firebaseRef.child(Constants.presencePath(username));
+        Firebase presenceRef = firebaseRef.child(user.getPresencePath());
         String value = newPresenceType.name().toLowerCase();
 
         presenceRef.setValue(value, (firebaseError, firebase) -> {

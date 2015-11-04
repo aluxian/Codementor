@@ -1,6 +1,7 @@
 import org.moallemi.gradle.internal.VersionCodeType
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'org.moallemi.advanced-build-version'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'me.tatarka.retrolambda'
@@ -69,7 +70,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'com.facebook.fresco:fresco:0.8.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
-    compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.google.guava:guava:18.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') { transitive = true; }
+    apt 'com.bluelinelabs:logansquare-compiler:1.1.0'
+    compile 'com.bluelinelabs:logansquare:1.1.0'
 }

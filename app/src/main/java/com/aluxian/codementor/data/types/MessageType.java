@@ -1,7 +1,6 @@
 package com.aluxian.codementor.data.types;
 
 import com.aluxian.codementor.R;
-import com.aluxian.codementor.services.ErrorHandler;
 
 public enum MessageType {
 
@@ -20,23 +19,8 @@ public enum MessageType {
         this.rightLayoutId = rightLayoutId;
     }
 
-    public static MessageType parse(String rawType) {
-        rawType = rawType.toUpperCase();
-
-        if (rawType.contains("MSG")) {
-            rawType = "MESSAGE";
-        }
-
-        if (rawType.equals("SESSIONLINK") || rawType.equals("CONNECT")) {
-            rawType = "CONNECT";
-        }
-
-        try {
-            return valueOf(rawType);
-        } catch (IllegalArgumentException e) {
-            ErrorHandler.logError(e);
-            return OTHER;
-        }
+    public boolean isHtml() {
+        return leftLayoutId == R.layout.item_msg_html_left;
     }
 
 }
