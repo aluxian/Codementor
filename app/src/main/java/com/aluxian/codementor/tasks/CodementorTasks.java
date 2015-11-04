@@ -61,7 +61,8 @@ public class CodementorTasks {
                 String code = null;
 
                 if (!response.isSuccessful()) {
-                    throw new IOException("Couldn't retrieve auth code");
+                    taskSource.setError(new Exception("Couldn't retrieve auth code"));
+                    return;
                 }
 
                 Matcher matcher = AUTH_CODE_PATTERN.matcher(body);
@@ -70,7 +71,8 @@ public class CodementorTasks {
                 }
 
                 if (TextUtils.isEmpty(code)) {
-                    throw new IOException("The extracted auth code was empty");
+                    taskSource.setError(new Exception("The extracted auth code was empty"));
+                    return;
                 }
 
                 taskSource.setResult(code);
@@ -102,7 +104,8 @@ public class CodementorTasks {
                 String token = null;
 
                 if (!response.isSuccessful()) {
-                    throw new IOException("Couldn't retrieve Firebase token");
+                    taskSource.setError(new Exception("Couldn't retrieve Firebase token"));
+                    return;
                 }
 
                 Matcher matcher = FIREBASE_TOKEN_PATTERN.matcher(body);
@@ -111,7 +114,8 @@ public class CodementorTasks {
                 }
 
                 if (TextUtils.isEmpty(token)) {
-                    throw new IOException("Extracted Firebase token was empty");
+                    taskSource.setError(new Exception("Extracted Firebase token was empty"));
+                    return;
                 }
 
                 taskSource.setResult(token);
@@ -156,17 +160,20 @@ public class CodementorTasks {
                 response.body().close();
 
                 if (response.code() != 302) {
-                    throw new IOException("Couldn't sign in, server returned code " + response.code());
+                    taskSource.setError(new Exception("Couldn't sign in, server returned code " + response.code()));
+                    return;
                 }
 
                 List<String> headers = response.headers("Location");
                 if (headers.size() < 1) {
-                    throw new IOException("Location header not found");
+                    taskSource.setError(new Exception("Location header not found"));
+                    return;
                 }
 
                 // Redirected to the same page
                 if (headers.get(0).equals(Constants.CODEMENTOR_SIGN_IN_URL)) {
-                    throw new IOException("Wrong credentials");
+                    taskSource.setError(new Exception("Wrong credentials"));
+                    return;
                 }
 
                 taskSource.setResult(null);
@@ -196,7 +203,8 @@ public class CodementorTasks {
             @Override
             public void onResponse(Response response) throws IOException {
                 if (!response.isSuccessful()) {
-                    throw new IOException("Couldn't retrieve chatrooms list");
+                    taskSource.setError(new Exception("Couldn't retrieve chatrooms list"));
+                    return;
                 }
 
                 InputStream body = response.body().byteStream();
@@ -232,7 +240,8 @@ public class CodementorTasks {
                 response.body().close();
 
                 if (!response.isSuccessful()) {
-                    throw new IOException("Couldn't mark message as read, code " + response.code());
+                    taskSource.setError(new Exception("Couldn't mark message as read, code " + response.code()));
+                    return;
                 }
 
                 taskSource.setResult(null);
@@ -274,7 +283,8 @@ public class CodementorTasks {
                 response.body().close();
 
                 if (!response.isSuccessful()) {
-                    throw new IOException("Send message to Codementor server failed with code " + response.code());
+                    taskSource.setError(new Exception("Send message to Codementor server failed with code " + response.code()));
+                    return;
                 }
 
                 taskSource.setResult(null);
