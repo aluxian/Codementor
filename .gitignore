@@ -1,7 +1,10 @@
 .gradle
-/local.properties
+local.properties
+fabric.properties
 /.idea/workspace.xml
 /.idea/libraries
 .DS_Store
 /build
 /captures
+*.jks
+app/signing.gradle
