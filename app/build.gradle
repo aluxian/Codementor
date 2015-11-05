@@ -1,3 +1,4 @@
+import org.ajoberstar.grgit.Grgit
 import org.moallemi.gradle.internal.VersionCodeType
 
 apply plugin: 'com.android.application'
@@ -10,6 +11,9 @@ apply plugin: 'io.fabric'
 
 def signingProps = new Properties()
 signingProps.load(new FileInputStream(rootProject.file('signing.properties')))
+
+ext.repo = Grgit.open()
+def commitSuffix = repo.head().abbreviatedId
 
 advancedVersioning {
     nameOptions {
@@ -57,7 +61,7 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+            versionNameSuffix "-" + commitSuffix
             debuggable true
         }
 
@@ -96,5 +100,13 @@ dependencies {
 ribbonizer {
     builder { variant, iconFile ->
         return grayRibbonFilter(variant, iconFile)
+    }
+}
+
+task tagRelease << {
+    repo.tag.add {
+        name = "v${commitSuffix}-c${advancedVersioning.versionCode}"
+        annotate = false
+        force = true
     }
 }
