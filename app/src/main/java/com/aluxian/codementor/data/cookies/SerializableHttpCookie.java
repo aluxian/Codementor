@@ -1,4 +1,4 @@
-package com.aluxian.codementor.utils;
+package com.aluxian.codementor.data.cookies;
 
 import com.aluxian.codementor.services.ErrorHandler;
 

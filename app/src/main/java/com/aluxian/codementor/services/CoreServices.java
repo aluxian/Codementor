@@ -5,10 +5,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 
+import com.aluxian.codementor.data.cookies.PersistentCookieStore;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.aluxian.codementor.utils.Constants;
-import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.Firebase;
 import com.squareup.okhttp.OkHttpClient;
 

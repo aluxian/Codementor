@@ -3,13 +3,13 @@ package com.aluxian.codementor.presentation.presenters;
 import android.text.TextUtils;
 
 import com.aluxian.codementor.R;
+import com.aluxian.codementor.data.cookies.PersistentCookieStore;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
-import com.aluxian.codementor.utils.PersistentCookieStore;
 import com.firebase.client.AuthData;
 
 import java.util.concurrent.CancellationException;
