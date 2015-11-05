@@ -7,4 +7,4 @@ fabric.properties
 /build
 /captures
 *.jks
-app/signing.gradle
+signing.properties
