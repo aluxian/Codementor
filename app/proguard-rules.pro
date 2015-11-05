@@ -8,6 +8,8 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+-keepattributes SourceFile,LineNumberTable # Crashlytics
+-keepattributes Signature,*Annotation*,EnclosingMethod # Jackson
 
 # If your project uses WebView with JS, uncomment the following
 # and specify the fully qualified class name to the JavaScript interface
@@ -62,9 +64,6 @@
 -dontwarn javax.inject.**
 -dontwarn sun.misc.Unsafe
 
-# Crashlytics
--keepattributes SourceFile,LineNumberTable
-
 # LoganSquare
 -keep class com.bluelinelabs.logansquare.** { *; }
 -keep @com.bluelinelabs.logansquare.annotation.JsonObject class *
@@ -75,4 +74,4 @@
 -keep class com.squareup.leakcanary.** { *; }
 
 # Models
--keep class com.aluxian.codementor.data.models.** { *; }
+-keep class com.aluxian.codementor.data.** { *; }
