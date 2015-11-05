@@ -24,6 +24,7 @@ advancedVersioning {
 
     codeOptions {
         versionCodeType VersionCodeType.AUTO_INCREMENT_ONE_STEP
+        dependsOnTasks 'release'
     }
 
     outputOptions {
@@ -105,7 +106,7 @@ ribbonizer {
 
 task tagRelease << {
     repo.tag.add {
-        name = "v${commitSuffix}-c${advancedVersioning.versionCode}"
+        name = "v${advancedVersioning.versionName}"
         annotate = false
         force = true
     }
