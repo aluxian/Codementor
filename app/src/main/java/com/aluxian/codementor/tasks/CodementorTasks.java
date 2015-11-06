@@ -2,6 +2,7 @@ package com.aluxian.codementor.tasks;
 
 import android.text.TextUtils;
 
+import com.aluxian.codementor.data.models.AppData;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.ChatroomsList;
 import com.aluxian.codementor.data.models.FirebaseMessage;
@@ -29,7 +30,7 @@ public class CodementorTasks {
     private static final MediaType TEXT_PLAIN_MEDIA_TYPE = MediaType.parse("text/plain");
     private static final MediaType JSON_MEDIA_TYPE = MediaType.parse("application/json;charset=UTF-8");
 
-    private static final Pattern FIREBASE_TOKEN_PATTERN = Pattern.compile("\"token\":\"(.*?)\"");
+    private static final Pattern APP_DATA_PATTERN = Pattern.compile("data-init='(\\{.+?\\})'");
     private static final Pattern AUTH_CODE_PATTERN =
             Pattern.compile("users/sign_in.*?name=\"authenticity_token\" value=\"(.*?)\"");
 
@@ -84,10 +85,10 @@ public class CodementorTasks {
     }
 
     /**
-     * @return A Firebase token extracted from Codementor's website.
+     * @return An {@link AppData} object extracted from Codementor's website.
      */
-    public Task<String> extractToken() {
-        Task<String>.TaskCompletionSource taskSource = Task.<String>create();
+    public Task<AppData> extractAppData() {
+        Task<AppData>.TaskCompletionSource taskSource = Task.<AppData>create();
 
         Request request = new Request.Builder()
                 .url(Constants.CODEMENTOR_FIREBASE_TOKEN_URL)
@@ -102,25 +103,26 @@ public class CodementorTasks {
             @Override
             public void onResponse(Response response) throws IOException {
                 String body = response.body().string();
-                String token = null;
+                String json = null;
                 response.body().close();
 
                 if (!response.isSuccessful()) {
-                    taskSource.setError(new Exception("Couldn't retrieve Firebase token"));
+                    taskSource.setError(new Exception("Couldn't retrieve app data"));
                     return;
                 }
 
-                Matcher matcher = FIREBASE_TOKEN_PATTERN.matcher(body);
+                Matcher matcher = APP_DATA_PATTERN.matcher(body);
                 if (matcher.find()) {
-                    token = matcher.group(1);
+                    json = matcher.group(1);
                 }
 
-                if (TextUtils.isEmpty(token)) {
-                    taskSource.setError(new Exception("Extracted Firebase token was empty"));
+                if (TextUtils.isEmpty(json)) {
+                    taskSource.setError(new Exception("Extracted app data json was empty"));
                     return;
                 }
 
-                taskSource.setResult(token);
+                AppData appData = LoganSquare.parse(json, AppData.class);
+                taskSource.setResult(appData);
             }
         });
 
@@ -285,7 +287,8 @@ public class CodementorTasks {
                 response.body().close();
 
                 if (!response.isSuccessful()) {
-                    taskSource.setError(new Exception("Send message to Codementor server failed with code " + response.code()));
+                    taskSource.setError(new Exception("Send message to Codementor server failed with code " +
+                            response.code()));
                     return;
                 }
 

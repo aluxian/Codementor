@@ -4,13 +4,13 @@ import android.text.TextUtils;
 
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.cookies.PersistentCookieStore;
+import com.aluxian.codementor.data.models.AppData;
 import com.aluxian.codementor.presentation.views.LoginActivityView;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.services.UserManager;
 import com.aluxian.codementor.tasks.CodementorTasks;
 import com.aluxian.codementor.tasks.FirebaseTasks;
-import com.firebase.client.AuthData;
 
 import java.util.concurrent.CancellationException;
 
@@ -61,10 +61,10 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
                 .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> codementorTasks.signIn(username, password, task.getResult()))
                 .onSuccess(updateUnlessCancelled(R.string.auth_step_firebase), UI)
-                .onSuccessTask(task -> codementorTasks.extractToken())
+                .onSuccessTask(task -> codementorTasks.extractAppData())
                 .onSuccess(updateUnlessCancelled(0), UI)
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), false))
-                .onSuccess(loggedIn(username), UI)
+                .onSuccess(this::onLoggedIn, UI)
                 .continueWith(this::onErrorHandler, UI)
                 .continueWith(this::onDismissDialog, UI);
 
@@ -83,15 +83,13 @@ public class LoginActivityPresenter extends Presenter<LoginActivityView> {
         return null;
     }
 
-    private <T extends AuthData, C> Continuation<T, C> loggedIn(String username) {
-        return task -> {
-            if (!task.isCancelled()) {
-                userManager.setLoggedIn(username);
-                getView().navigateToMainActivity();
-            }
+    private Void onLoggedIn(Task<AppData> task) {
+        if (!task.isCancelled()) {
+            userManager.setLoggedIn(task.getResult().getUser().getUsername());
+            getView().navigateToMainActivity();
+        }
 
-            return null;
-        };
+        return null;
     }
 
     private <T> Continuation<T, T> updateUnlessCancelled(int stringResId) {

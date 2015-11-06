@@ -49,7 +49,7 @@ public abstract class QueryEventListener implements ValueEventListener {
             return;
         }
 
-        firebaseReAuthTask = codementorTasks.extractToken()
+        firebaseReAuthTask = codementorTasks.extractAppData()
                 .onSuccessTask(task -> firebaseTasks.authenticate(task.getResult(), true))
                 .onSuccess(this::onReAuthSuccessful, UI)
                 .continueWith(this::onReAuthCompleted, UI);

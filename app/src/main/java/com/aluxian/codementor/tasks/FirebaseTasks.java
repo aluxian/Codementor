@@ -1,5 +1,6 @@
 package com.aluxian.codementor.tasks;
 
+import com.aluxian.codementor.data.models.AppData;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
 import com.aluxian.codementor.data.models.User;
@@ -30,21 +31,21 @@ public class FirebaseTasks {
     }
 
     /**
-     * @param firebaseToken The Firebase token to authenticate with.
-     * @param reAuth        True if this is a re-authentication attempt.
+     * @param appData {@link AppData} object which contains the token to authenticate with.
+     * @param reAuth  True if this is a re-authentication attempt.
      * @return An {@link AuthData} object.
      */
-    public Task<AuthData> authenticate(String firebaseToken, boolean reAuth) {
-        Task<AuthData>.TaskCompletionSource taskSource = Task.<AuthData>create();
+    public Task<AppData> authenticate(AppData appData, boolean reAuth) {
+        Task<AppData>.TaskCompletionSource taskSource = Task.<AppData>create();
 
-        firebaseRef.authWithCustomToken(firebaseToken, new Firebase.AuthResultHandler() {
+        firebaseRef.authWithCustomToken(appData.getFirebaseConfig().getToken(), new Firebase.AuthResultHandler() {
             @Override
             public void onAuthenticated(AuthData authData) {
                 if (reAuth) {
-                    userManager.setLoggedIn(UserManager.LOGGED_IN_USERNAME);
+                    userManager.setLoggedIn(appData.getUser().getUsername());
                 }
 
-                taskSource.setResult(authData);
+                taskSource.setResult(appData);
             }
 
             @Override
@@ -180,7 +181,7 @@ public class FirebaseTasks {
         boolean permissionDenied = firebaseException.getMessage().contains("Permission denied");
 
         if (permissionDenied) {
-            codementorTasks.extractToken()
+            codementorTasks.extractAppData()
                     .onSuccessTask(task -> authenticate(task.getResult(), true))
                     .continueWith(task -> {
                         if (task.isCancelled() || task.isFaulted()) {
