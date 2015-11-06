@@ -39,9 +39,20 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
 
     public ChatroomItemViewHolder(View itemView, CoreServices coreServices) {
         super(itemView);
+
         this.context = itemView.getContext();
         this.coreServices = coreServices;
+
         ButterKnife.bind(this, itemView);
+        itemView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {}
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
+                recycle();
+            }
+        });
     }
 
     public void bindChatroom(Chatroom chatroom) {
@@ -52,17 +63,6 @@ public class ChatroomItemViewHolder extends RecyclerView.ViewHolder {
         setText(chatroom);
         setAvatar(chatroom);
         setPresenceListener(chatroom);
-
-        itemView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-            @Override
-            public void onViewAttachedToWindow(View v) {}
-
-            @Override
-            public void onViewDetachedFromWindow(View v) {
-                itemView.removeOnAttachStateChangeListener(this);
-                recycle();
-            }
-        });
     }
 
     public void recycle() {
