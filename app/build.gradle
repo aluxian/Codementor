@@ -19,12 +19,11 @@ advancedVersioning {
     nameOptions {
         versionMajor 1
         versionMinor 0
-        versionPatch 0
+        versionPatch 1
     }
 
     codeOptions {
         versionCodeType VersionCodeType.AUTO_INCREMENT_ONE_STEP
-        dependsOnTasks 'release'
     }
 
     outputOptions {
@@ -105,8 +104,10 @@ ribbonizer {
 }
 
 task tagRelease << {
+    def tagName = "v${advancedVersioning.versionName}"
+    repo.tag.remove(names: [tagName])
     repo.tag.add {
-        name = "v${advancedVersioning.versionName}"
+        name = tagName
         annotate = false
         force = true
     }
