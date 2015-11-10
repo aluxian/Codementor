@@ -9,8 +9,6 @@ apply plugin: 'com.github.gfx.ribbonizer'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'io.fabric'
 
-ext.betaDistributionReleaseNotes = rootProject.file('release_notes.txt').text
-
 def signingProps = new Properties()
 signingProps.load(new FileInputStream(rootProject.file('signing.properties')))
 
@@ -21,8 +19,7 @@ advancedVersioning {
     nameOptions {
         versionMajor 1
         versionMinor 0
-        versionPatch 4
-        versionBuild 2
+        versionPatch 5
     }
 
     codeOptions {
@@ -57,7 +54,7 @@ android {
         applicationId "com.aluxian.codementor"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 102
+        versionCode 103
         versionName advancedVersioning.versionName
     }
 
