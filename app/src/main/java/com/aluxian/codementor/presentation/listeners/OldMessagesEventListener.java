@@ -28,8 +28,9 @@ public class OldMessagesEventListener extends MessagesEventListener {
 
     @Override
     protected Query createQuery(Firebase firebase) {
-        return firebase.child(chatroom.getFirebasePath()).limitToLast(BATCH_SIZE)
-                .endAt(conversationAdapter.getOldestMessage().getTimestamp() - 1);
+        return firebase.child(chatroom.getFirebasePath())
+                .endAt(null, conversationAdapter.getOldestMessage().getKey())
+                .limitToLast(BATCH_SIZE);
     }
 
     @Override

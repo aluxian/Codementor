@@ -27,8 +27,6 @@ import static com.aluxian.codementor.utils.Helpers.italic;
 @JsonDeserialize(converter = TimestampCounterConverter.class)
 public class Message extends ConversationItem implements Serializable {
 
-    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("kk:mm", Locale.ENGLISH);
-
     @JsonDeserialize(using = StringIdDeserializer.class) Long id;
     @JsonDeserialize(using = MessageTypeDeserializer.class) MessageType type;
     @JsonDeserialize(using = TimestampDeserializer.class) @JsonProperty("created_at") Long createdAt;
@@ -43,6 +41,7 @@ public class Message extends ConversationItem implements Serializable {
     private String text;
     private String subtext;
     private String contentDescription;
+    private String key;
 
     @Override
     public long getId() {
@@ -75,7 +74,8 @@ public class Message extends ConversationItem implements Serializable {
     @Override
     public String getSubtext() {
         if (subtext == null) {
-            subtext = TIME_FORMAT.format(new Date(createdAt));
+            SimpleDateFormat timeFormat = new SimpleDateFormat("kk:mm", Locale.ENGLISH);
+            subtext = timeFormat.format(new Date(createdAt));
             if (request != null) {
                 subtext += " " + Formatter.formatShortFileSize(null, request.getSize());
             }
@@ -105,6 +105,14 @@ public class Message extends ConversationItem implements Serializable {
 
     public void setCreatedAt(Long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getContentDescription() {

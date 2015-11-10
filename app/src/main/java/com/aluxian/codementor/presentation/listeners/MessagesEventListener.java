@@ -37,7 +37,9 @@ public abstract class MessagesEventListener extends QueryEventListener {
     private TreeSet<Message> parse(DataSnapshot dataSnapshot) {
         TreeSet<Message> messages = new TreeSet<>();
         for (DataSnapshot child : dataSnapshot.getChildren()) {
-            messages.add(child.getValue(Message.class));
+            Message message = child.getValue(Message.class);
+            message.setKey(child.getKey());
+            messages.add(message);
         }
 
         return messages;
