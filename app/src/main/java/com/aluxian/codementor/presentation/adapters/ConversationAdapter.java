@@ -16,6 +16,7 @@ import com.aluxian.codementor.presentation.holders.TimeMarkerViewHolder;
 import com.aluxian.codementor.services.CoreServices;
 import com.aluxian.codementor.services.ErrorHandler;
 import com.aluxian.codementor.tasks.CodementorTasks;
+import com.aluxian.codementor.tasks.FirebaseTasks;
 import com.aluxian.codementor.utils.Helpers;
 
 import java.util.ArrayList;
@@ -32,11 +33,13 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
 
     private Chatroom chatroom;
     private CodementorTasks codementorTasks;
+    private FirebaseTasks firebaseTasks;
     private ErrorHandler errorHandler;
 
     public ConversationAdapter(Chatroom chatroom, CoreServices coreServices) {
         this.chatroom = chatroom;
         this.codementorTasks = coreServices.getCodementorTasks();
+        this.firebaseTasks = coreServices.getFirebaseTasks();
         this.errorHandler = coreServices.getErrorHandler();
     }
 
@@ -56,8 +59,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationItemVi
         ConversationItem item = items.get(position);
         boolean isNewest = position == 0;
 
-        if (isNewest && !item.sentByMe() && !item.isRead()) {
-            codementorTasks.markConversationRead(chatroom).continueWith(errorHandler::logAndToastTask, UI);
+        if (isNewest && !item.sentByMe() && !item.isRead() && item instanceof Message) {
+            firebaseTasks.markRead(chatroom, ((Message) item))
+                    .onSuccessTask(task -> codementorTasks.markConversationRead(chatroom))
+                    .continueWith(errorHandler::logAndToastTask, UI);
         }
 
         holder.bindItem(item, isNewest);

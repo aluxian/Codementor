@@ -3,6 +3,7 @@ package com.aluxian.codementor.tasks;
 import com.aluxian.codementor.data.models.AppData;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.data.models.FirebaseMessage;
+import com.aluxian.codementor.data.models.Message;
 import com.aluxian.codementor.data.models.User;
 import com.aluxian.codementor.data.types.PresenceType;
 import com.aluxian.codementor.services.UserManager;
@@ -13,6 +14,7 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.FirebaseException;
 import com.firebase.client.ValueEventListener;
 
+import java.util.Date;
 import java.util.concurrent.CancellationException;
 
 import bolts.Continuation;
@@ -123,6 +125,33 @@ public class FirebaseTasks {
         String value = newPresenceType.name().toLowerCase();
 
         presenceRef.setValue(value, (firebaseError, firebase) -> {
+            if (firebaseError != null) {
+                taskSource.setError(firebaseError.toException());
+            } else {
+                taskSource.setResult(null);
+            }
+        });
+
+        return taskSource.getTask();
+    }
+
+    /**
+     * @param chatroom The chatroom of the message.
+     * @param message  The message to mark as read.
+     */
+    public Task<Void> markRead(Chatroom chatroom, Message message) {
+        return wrapTaskReAuth(() -> markReadImpl(chatroom, message));
+    }
+
+    private Task<Void> markReadImpl(Chatroom chatroom, Message message) {
+        Task<Void>.TaskCompletionSource taskSource = Task.<Void>create();
+
+        long value = new Date().getTime();
+        Firebase messageRef = firebaseRef.child(chatroom.getFirebasePath())
+                .child(message.getKey())
+                .child("read_at");
+
+        messageRef.setValue(value, (firebaseError, firebase) -> {
             if (firebaseError != null) {
                 taskSource.setError(firebaseError.toException());
             } else {
