@@ -21,11 +21,11 @@ advancedVersioning {
     nameOptions {
         versionMajor 1
         versionMinor 0
-        versionPatch 2
+        versionPatch 3
     }
 
     codeOptions {
-        versionCodeType VersionCodeType.AUTO_INCREMENT_ONE_STEP
+        versionCodeType VersionCodeType.DATE
     }
 
     outputOptions {
@@ -56,7 +56,7 @@ android {
         applicationId "com.aluxian.codementor"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode advancedVersioning.versionCode
+        versionCode 100
         versionName advancedVersioning.versionName
     }
 
