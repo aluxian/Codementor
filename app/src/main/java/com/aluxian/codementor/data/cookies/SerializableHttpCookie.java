@@ -62,7 +62,7 @@ public class SerializableHttpCookie implements Serializable {
             initFieldHttpOnly();
             return (boolean) fieldHttpOnly.get(cookie);
         } catch (NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
-            ErrorHandler.logWarn(e);
+            ErrorHandler.logWarn(e, false);
         }
 
         return false;

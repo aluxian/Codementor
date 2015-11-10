@@ -34,8 +34,20 @@ public class ErrorHandler {
      * @param e The error to log.
      */
     public static void logWarn(Exception e) {
+        logWarn(e, true);
+    }
+
+    /**
+     * Log the given warning exception.
+     *
+     * @param e                   The error to log.
+     * @param reportToCrashlytics Whether the exception should be sent to Crashlytics.
+     */
+    public static void logWarn(Exception e, boolean reportToCrashlytics) {
         Log.w(tag(), e);
-        reportToCrashlytics(e);
+        if (reportToCrashlytics) {
+            reportToCrashlytics(e);
+        }
     }
 
     /**
