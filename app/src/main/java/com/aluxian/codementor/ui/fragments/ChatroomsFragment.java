@@ -18,10 +18,10 @@ import android.widget.TextView;
 import com.aluxian.codementor.R;
 import com.aluxian.codementor.data.models.Chatroom;
 import com.aluxian.codementor.presentation.adapters.ChatroomsAdapter;
+import com.aluxian.codementor.presentation.decorations.DividerItemDecoration;
 import com.aluxian.codementor.presentation.listeners.ChatroomSelectedListener;
 import com.aluxian.codementor.presentation.presenters.ChatroomsPresenter;
 import com.aluxian.codementor.presentation.views.ChatroomsView;
-import com.aluxian.codementor.utils.DividerItemDecoration;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

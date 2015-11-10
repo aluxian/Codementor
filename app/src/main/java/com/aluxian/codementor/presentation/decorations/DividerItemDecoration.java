@@ -1,4 +1,4 @@
-package com.aluxian.codementor.utils;
+package com.aluxian.codementor.presentation.decorations;
 
 import android.content.Context;
 import android.content.res.TypedArray;
