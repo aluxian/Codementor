@@ -9,6 +9,8 @@ apply plugin: 'com.github.gfx.ribbonizer'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'io.fabric'
 
+ext.betaDistributionReleaseNotesFilePath = "release_notes.txt"
+
 def signingProps = new Properties()
 signingProps.load(new FileInputStream(rootProject.file('signing.properties')))
 
@@ -19,7 +21,7 @@ advancedVersioning {
     nameOptions {
         versionMajor 1
         versionMinor 0
-        versionPatch 1
+        versionPatch 2
     }
 
     codeOptions {
