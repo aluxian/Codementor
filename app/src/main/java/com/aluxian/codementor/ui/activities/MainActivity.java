@@ -110,6 +110,7 @@ public class MainActivity extends BaseActivity<MainActivityPresenter>
                 return true;
 
             case R.id.action_log_out:
+                getPresenter().userLoggedOut();
                 userManager.setLoggedOut();
                 cookieStore.removeAll();
 

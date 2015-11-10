@@ -30,6 +30,10 @@ public class MainActivityPresenter extends Presenter<MainActivityView> {
     @Override
     public void stop() {
         super.stop();
+        userLoggedOut();
+    }
+
+    public void userLoggedOut() {
         setPresence(PresenceType.OFFLINE, PresenceType.ONLINE);
     }
 
