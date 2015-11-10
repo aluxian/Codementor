@@ -9,7 +9,7 @@ apply plugin: 'com.github.gfx.ribbonizer'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'io.fabric'
 
-ext.betaDistributionReleaseNotesFilePath = "release_notes.txt"
+ext.betaDistributionReleaseNotesFilePath = rootProject.file('release_notes.txt').absolutePath
 
 def signingProps = new Properties()
 signingProps.load(new FileInputStream(rootProject.file('signing.properties')))
